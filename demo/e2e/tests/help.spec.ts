@@ -6,7 +6,11 @@ import { test, expect, openApp } from '../fixtures';
 // there is no room, following scroll), renders the topic's blocks, closes on
 // Esc and outside clicks, and can stay out of the Tab order.
 
-const help = (page: Page, title: string) => page.getByRole('button', { name: `Help: ${title}` });
+/** The `?` for a topic in the "Help topics" section (outside any assistant). */
+const help = (page: Page, title: string) =>
+  page
+    .locator('section', { has: page.getByRole('heading', { name: 'Help topics' }) })
+    .getByRole('button', { name: `Help: ${title}` });
 const topic = (page: Page, title: string) => page.getByRole('dialog', { name: title });
 
 async function box(locator: Locator) {
@@ -139,5 +143,61 @@ test.describe('placement', () => {
       return Math.round(p.y - (b.y + b.height));
     }).toBe(4);
     expect((await box(button)).y).toBeLessThan(200);
+  });
+});
+
+test.describe('asking an assistant', () => {
+  const asking = (page: Page) => page.locator('section', { has: page.getByRole('heading', { name: 'Asking an assistant' }) });
+  const ask = (page: Page) => page.getByRole('button', { name: 'Ask about this' });
+  const assistant = (page: Page) => page.getByRole('dialog', { name: 'Assistant' });
+  const request = (page: Page, part: string) => assistant(page).locator(`[data-request="${part}"]`);
+
+  async function askAbout(page: Page, title: string) {
+    await asking(page).getByRole('button', { name: `Help: ${title}` }).click();
+    await ask(page).click();
+    await expect(assistant(page)).toBeVisible();
+  }
+
+  test('outside an assistant there is nothing to ask', async ({ page }) => {
+    await help(page, 'Statement balance').first().click();
+    await expect(topic(page, 'Statement balance')).toBeVisible();
+    await expect(ask(page)).toHaveCount(0);
+  });
+
+  test('the request names the topic, the component and its label, and closes the popover', async ({ page }) => {
+    await askAbout(page, 'Statement balance');
+    await expect(topic(page, 'Statement balance')).toBeHidden();
+    await expect(request(page, 'topic')).toHaveText('statement-balance');
+    await expect(request(page, 'component')).toHaveText('field');
+    await expect(request(page, 'label')).toHaveText('Statement balance');
+    await expect(request(page, 'value')).toHaveText('(none)');
+  });
+
+  test('context comes from every enclosing scope, outermost first', async ({ page }) => {
+    await askAbout(page, 'Statement balance');
+    await expect(request(page, 'prompt')).toHaveText(
+      'topic: statement-balance (Statement balance)\ncomponent: field\nlabel: Statement balance\nscreen: reconcile\naccount: checking\n',
+    );
+  });
+
+  test('context that follows the page is read when asking', async ({ page }) => {
+    await page.getByRole('button', { name: 'Next account' }).click();
+    await expect(page.locator('[data-echo="account"]')).toHaveText('savings');
+    await askAbout(page, 'Statement balance');
+    await expect(request(page, 'prompt')).toContainText('account: savings');
+  });
+
+  test("a scope reaches only its own children, not its siblings'", async ({ page }) => {
+    await askAbout(page, 'The five kinds of account');
+    await expect(request(page, 'prompt')).toHaveText(
+      'topic: account-kinds (The five kinds of account)\ncomponent: help\nlabel: The five kinds of account\nscreen: reconcile\n',
+    );
+  });
+
+  test('a value is sent only where it was given', async ({ page }) => {
+    await asking(page).getByPlaceholder('Amount (sent with the request)').fill('12.50');
+    await askAbout(page, 'Amounts on a split');
+    await expect(request(page, 'value')).toHaveText('12.50');
+    await expect(request(page, 'prompt')).toContainText('value: 12.50');
   });
 });

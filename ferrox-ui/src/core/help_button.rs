@@ -6,6 +6,8 @@ use wasm_bindgen::JsCast;
 use web_sys::{Element, Event, HtmlElement};
 
 use super::anchor::{follow, place};
+use super::help_request::HelpRequest;
+use super::help_scope::{assistant, scope_context};
 use super::help_topic::{HelpBlock, HelpTopic};
 use crate::ids::unique_id;
 
@@ -24,6 +26,11 @@ pub fn help_button_classes(extra: &str) -> String {
 ///   viewport, and follows it while the page scrolls.
 /// - It shows the topic's title and blocks, and "Full guide" when the topic
 ///   has one.
+/// - Inside a [`HelpAssistant`](crate::HelpAssistant) it also offers "Ask
+///   about this", which closes the popover and hands the assistant a
+///   [`HelpRequest`]: the topic, `kind` and `about` (what carries the `?`),
+///   the enclosing [`HelpScope`](crate::HelpScope)s' context, and `value`
+///   only if one is given.
 /// - `skip_tab` leaves the Tab order: for a `?` in a row of fields, where it
 ///   would cost a stop on every entry. It stays clickable and reachable by a
 ///   screen reader.
@@ -41,6 +48,15 @@ pub fn HelpButton(
     /// The word before the title in the button's label.
     #[prop(into, default = "Help".into())] help_label: Signal<String>,
     #[prop(into, default = "Full guide".into())] guide_label: Signal<String>,
+    #[prop(into, default = "Ask about this".into())] ask_label: Signal<String>,
+    /// What carries the `?`, for the request ("field", "dialog", …).
+    #[prop(default = "help")] kind: &'static str,
+    /// The label or title of what the `?` is about, for the request (the
+    /// topic's title by default).
+    #[prop(optional, into)] about: MaybeProp<String>,
+    /// A value to send with the request. Only pass one the user would expect
+    /// an assistant to see.
+    #[prop(optional, into)] value: MaybeProp<String>,
     /// Extra classes on the button. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
 ) -> impl IntoView {
@@ -48,6 +64,8 @@ pub fn HelpButton(
     let title_id = format!("{popover_id}-title");
     let (controls, target, labelled_by) = (popover_id.clone(), popover_id.clone(), title_id.clone());
     let open = RwSignal::new(false);
+    // Where this `?` sits decides what a request carries.
+    let scope_context_here = scope_context();
     let button_ref = NodeRef::<html::Button>::new();
     let popover_ref = NodeRef::<html::Div>::new();
 
@@ -72,9 +90,32 @@ pub fn HelpButton(
 
     let blocks = topic.blocks().iter().map(render_block).collect_view();
     let guide = topic.guide_href().map(|href| view! {
-        <div class="help-popover__actions">
-            <a class="help-popover__link" href=href.to_string()>{move || guide_label.get()}</a>
-        </div>
+        <a class="help-popover__link" href=href.to_string()>{move || guide_label.get()}</a>
+    });
+    let ask = assistant().map(|on_ask| {
+        let topic = topic.clone();
+        let closes = popover_id.clone();
+        let ask = move |_| {
+            let label = about.get_untracked().unwrap_or_else(|| topic.title().to_string());
+            let request = HelpRequest::new(&topic, kind, label)
+                .with_context(scope_context_here.get_untracked())
+                .with_value(value.get_untracked());
+            on_ask.run(request);
+        };
+        view! {
+            <button
+                type="button"
+                class="btn btn--secondary btn--sm help-popover__ask"
+                popovertarget=closes
+                popovertargetaction="hide"
+                on:click=ask
+            >
+                {move || ask_label.get()}
+            </button>
+        }
+    });
+    let actions = (guide.is_some() || ask.is_some()).then(|| view! {
+        <div class="help-popover__actions">{guide}{ask}</div>
     });
 
     view! {
@@ -103,7 +144,7 @@ pub fn HelpButton(
         >
             <h3 class="help-popover__title" id=title_id>{title}</h3>
             <div class="help-popover__body">{blocks}</div>
-            {guide}
+            {actions}
         </div>
     }
 }

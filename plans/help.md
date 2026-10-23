@@ -8,7 +8,7 @@ assistant, the same popover offers **"Ask about this"**. That hands the app a
 declared around it (page → section → field). The app sends it to its chat,
 LLM or Patina recall. ferrox-ui never talks to a model itself.
 
-Status: approved (2026-10-23). Piece 1 done (2026-10-23); piece 2 next.
+Status: approved (2026-10-23). Pieces 1–2 done (2026-10-23); piece 3 next.
 
 Notes from piece 1:
 - The `?` opens the popover declaratively (`popovertarget`), so the browser
@@ -23,6 +23,18 @@ Notes from piece 1:
   from script and `data-side` for tests: the one inline style, because the
   position is computed.
 - `ids` is now compiled always, since core uses it.
+- Piece 2: the hook is a scoped component, `<HelpAssistant on_ask=…>`, not
+  the planned `provide_help_assistant()` function. A plain `provide_context`
+  leaks to siblings (the lesson from `Field`), and a component makes the
+  scope explicit: wrap the whole app, or only part of it.
+- `HelpContext` converts from an array or a `Vec` of pairs, or from a
+  closure returning them (context that follows the page).
+- A `?` keeps the scope's context as a signal and reads it when "Ask about
+  this" is clicked, so a changing account is sent as it is then (an early
+  version took a snapshot at creation; caught in review).
+- `HelpButton` gains `kind`, `about` and `value` (what the request says
+  carries the `?`, its label, an opt-in value) and `ask_label`. The Ask
+  button closes the popover declaratively (`popovertargetaction="hide"`).
 
 ## Prior art: conrad
 

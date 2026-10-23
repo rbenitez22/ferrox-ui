@@ -83,6 +83,7 @@
 
 .help-popover__actions {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
   gap: var(--space-md);
   margin-top: var(--space-md);

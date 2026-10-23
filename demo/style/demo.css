@@ -227,3 +227,18 @@
 .demo-row > .form-input {
     width: 12rem;
 }
+
+/* Help page: notes, and the prompt text the fake assistant received. */
+.demo-note {
+    color: var(--text-muted);
+    font-style: italic;
+}
+.demo-prompt {
+    margin: var(--space-md) 0 0;
+    padding: var(--space-sm);
+    background: var(--surface-2);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    white-space: pre-wrap;
+}
