@@ -4,7 +4,9 @@ use leptos::context::Provider;
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
+use crate::core::component_help;
 use crate::ids::unique_id;
+use crate::MaybeHelp;
 
 /// What a [`Field`] hands its control: the id its label points at, the id
 /// of its message, and whether it is invalid. Controls read it with
@@ -15,6 +17,17 @@ pub(crate) struct FieldContext {
     message_id: Arc<str>,
     has_message: Signal<bool>,
     invalid: Signal<bool>,
+    /// The control's value, for a help request that shares it. Filled by
+    /// controls that offer theirs (`PasswordInput` never does).
+    value: StoredValue<Option<Signal<String>>>,
+}
+
+/// Offers a control's value to its `Field`, for help requests that share
+/// it. Does nothing outside a field.
+pub(crate) fn offer_value(value: Signal<String>) {
+    if let Some(field) = use_context::<FieldContext>() {
+        field.value.set_value(Some(value));
+    }
 }
 
 /// How a control is wired: its id, what describes it, whether it is invalid.
@@ -61,6 +74,10 @@ pub fn field_classes(extra: &str) -> String {
 ///   there is an error, `aria-invalid` and `.is-invalid`. One control per
 ///   field. Only the field's own children see this; a control after it gets
 ///   an id of its own.
+/// - `help` puts a `?` after the label (outside the `<label>`). A help
+///   request names the field by its label; it carries the control's value
+///   only with `help_shares_value` (a password's, never). `help_skip_tab`
+///   keeps the `?` out of the Tab order, for a field in a row.
 ///
 /// ```ignore
 /// <Field label="Email" hint="Where receipts go" error=email_error>
@@ -73,6 +90,11 @@ pub fn Field(
     #[prop(optional, into)] hint: MaybeProp<String>,
     /// The field's problem; present (and not empty) means invalid.
     #[prop(optional, into)] error: MaybeProp<String>,
+    /// A help topic: a `?` after the label.
+    #[prop(optional, into)] help: MaybeHelp,
+    #[prop(optional)] help_skip_tab: bool,
+    /// Send the control's value with a help request.
+    #[prop(optional)] help_shares_value: bool,
     /// Extra classes, appended to `field`. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
     children: Children,
@@ -88,7 +110,20 @@ pub fn Field(
     // Through `Provider`, which gives the children an owner of their own: a
     // component does not, so a plain `provide_context` here would reach the
     // controls *after* this field too.
-    let context = FieldContext { id: id.clone(), message_id: message_id.clone(), has_message, invalid };
+    let value = StoredValue::new(None::<Signal<String>>);
+    let context = FieldContext { id: id.clone(), message_id: message_id.clone(), has_message, invalid, value };
+
+    let shared = Signal::derive(move || {
+        if help_shares_value { value.get_value().map(|v| v.get()) } else { None }
+    });
+    let help = component_help(help, "field", label, shared, help_skip_tab, "field__help");
+    let label_tag = view! { <label class="field__label" for=id.to_string()>{move || label.get()}</label> };
+    // With help, the label and its `?` share a row; the `?` stays outside the
+    // `<label>` (a button inside one is a control inside a control).
+    let label_row = match help {
+        Some(help) => view! { <div class="field__label-row">{label_tag}{help}</div> }.into_any(),
+        None => label_tag.into_any(),
+    };
 
     let message = move || match (error.get(), hint.get()) {
         (Some(text), _) => Some(view! { <span class="field__error" id=message_id.to_string()>{text}</span> }.into_any()),
@@ -98,7 +133,7 @@ pub fn Field(
 
     view! {
         <div class=move || field_classes(&class.get().unwrap_or_default())>
-            <label class="field__label" for=id.to_string()>{move || label.get()}</label>
+            {label_row}
             <Provider value=context>{children()}</Provider>
             {message}
         </div>

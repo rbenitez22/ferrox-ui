@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
-use super::field::{control_classes, wiring};
+use super::field::{control_classes, offer_value, wiring};
 
 /// A multi-line text field (`.form-textarea`), bound two-way to `value`.
 /// It grows by hand (resize: vertical), and Enter is a newline, never a
@@ -25,6 +25,7 @@ pub fn Textarea(
 ) -> impl IntoView {
     let wired = wiring("ferrox-textarea");
     let invalid = wired.invalid;
+    offer_value(value.into());
     view! {
         <textarea
             id=wired.id

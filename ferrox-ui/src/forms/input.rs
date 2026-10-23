@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
-use super::field::{control_classes, wiring};
+use super::field::{control_classes, offer_value, wiring};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[non_exhaustive]
@@ -56,6 +56,7 @@ pub fn Input(
 ) -> impl IntoView {
     let wired = wiring("ferrox-input");
     let invalid = wired.invalid;
+    offer_value(value.into());
     view! {
         <input
             type=kind.as_str()

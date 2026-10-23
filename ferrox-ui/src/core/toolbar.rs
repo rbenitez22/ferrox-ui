@@ -1,12 +1,14 @@
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
+use super::{component_help, MaybeHelp};
+
 /// A row of buttons (`.toolbar`). Buttons sit at the right; an optional
 /// `title` takes the free space on the left.
 ///
 /// `compact` tightens the row for `IconButton`s and `ButtonSize::Sm` buttons.
 /// Put buttons that belong together in a `ToolbarGroup`; groups are split by
-/// a hairline.
+/// a hairline. `help` puts a `?` right after the title.
 ///
 /// ```ignore
 /// <Toolbar title="Accounts">
@@ -27,13 +29,23 @@ use leptos::{component, view, IntoView};
 pub fn Toolbar(
     #[prop(optional, into)] title: MaybeProp<String>,
     #[prop(optional)] compact: bool,
+    /// A help topic: a `?` after the title.
+    #[prop(optional, into)] help: MaybeHelp,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
     children: Children,
 ) -> impl IntoView {
+    let title_text = move || title.get().map(|t| view! { <span class="toolbar__title">{t}</span> });
+    let about = Signal::derive(move || title.get().unwrap_or_default());
+    // With help, the title and its `?` share the free space together, so the
+    // `?` sits by the title rather than by the buttons.
+    let heading = match component_help(help, "toolbar", about, Signal::stored(None), false, "toolbar__help") {
+        Some(help) => view! { <div class="toolbar__heading">{title_text}{help}</div> }.into_any(),
+        None => title_text.into_any(),
+    };
     view! {
         <div class=move || toolbar_classes(compact, &class.get().unwrap_or_default())>
-            {move || title.get().map(|t| view! { <span class="toolbar__title">{t}</span> })}
+            {heading}
             {children()}
         </div>
     }

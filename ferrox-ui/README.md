@@ -334,6 +334,30 @@ view! {
 
 `sheet_classes(side, extra)` returns the class list.
 
+## Help context: recommended keys
+
+`HelpScope` context is free-form key/value pairs; every help request carries
+them, outermost scope first. These names are recommended so an assistant (and
+a memory store such as Patina) can rely on them:
+
+| Key | Meaning | Example |
+|---|---|---|
+| `domain` | the app or subject area | `bookkeeping` |
+| `screen` | the screen the user is on | `reconcile` |
+| `section` | a part of that screen | `splits` |
+| `entity` | the kind of thing in view | `transaction` |
+| `<entity>_id` | its id, so a tool can fetch it | `transaction_id` |
+| `mcp_server` | the MCP server that knows about this area | `conrad` |
+| `mcp_tool` | the tool best placed to answer here | `conrad_get_transaction` |
+
+Put `mcp_server` in a scope at the app's root and `mcp_tool` and ids at the
+screen or section that knows them. Stable mappings can live in the app's
+`on_ask` handler instead. They are **hints**: which tools a model may call is
+decided by the client, never by the page, and the model may pick a better
+tool. A full help section (topics, `HelpButton`, `HelpScope`,
+`HelpAssistant`, privacy) arrives with the help docs (`plans/help.md`,
+piece 4).
+
 ## CSS classes (core)
 
 All of these are injected by `init()`, built only from theme tokens, and

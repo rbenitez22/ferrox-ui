@@ -1,7 +1,9 @@
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
+use crate::core::component_help;
 use crate::ids::unique_id;
+use crate::MaybeHelp;
 
 /// The class list for a `.checkbox`.
 pub fn checkbox_classes(invalid: bool, extra: &str) -> String {
@@ -19,6 +21,9 @@ pub fn checkbox_classes(invalid: bool, extra: &str) -> String {
 /// It carries its own label, so it does not go in a `Field`; `hint` and
 /// `error` work as there (never both).
 ///
+/// `help` puts a `?` after the words, outside the `<label>`; a help request
+/// says whether it is ticked only with `help_shares_value`.
+///
 /// ```ignore
 /// <Checkbox checked=recurring label="Repeat every month" />
 /// <Checkbox checked=agreed label="I accept the terms" error=terms_error />
@@ -33,6 +38,11 @@ pub fn Checkbox(
     #[prop(optional, into)] name: MaybeProp<String>,
     #[prop(optional)] required: bool,
     #[prop(optional, into)] disabled: Signal<bool>,
+    /// A help topic: a `?` after the words.
+    #[prop(optional, into)] help: MaybeHelp,
+    #[prop(optional)] help_skip_tab: bool,
+    /// Send whether it is ticked ("true" / "false") with a help request.
+    #[prop(optional)] help_shares_value: bool,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
 ) -> impl IntoView {
@@ -52,22 +62,35 @@ pub fn Checkbox(
         (None, None) => None,
     };
 
+    let shared = Signal::derive(move || help_shares_value.then(|| checked.get().to_string()));
+    let help = component_help(help, "checkbox", label, shared, help_skip_tab, "checkbox__help");
+
+    let row = view! {
+        <label class="checkbox__row">
+            <input
+                type="checkbox"
+                class="checkbox__input"
+                id=id
+                aria-describedby=described_by
+                aria-invalid=move || invalid.get().then_some("true")
+                name=move || name.get()
+                required=required
+                disabled=move || disabled.get()
+                bind:checked=checked
+            />
+            <span class="checkbox__label">{move || label.get()}</span>
+        </label>
+    };
+    // With help, the `?` follows the words, outside the `<label>`: a button
+    // inside one would also tick the box.
+    let line = match help {
+        Some(help) => view! { <div class="checkbox__line">{row}{help}</div> }.into_any(),
+        None => row.into_any(),
+    };
+
     view! {
         <div class=move || checkbox_classes(invalid.get(), &class.get().unwrap_or_default())>
-            <label class="checkbox__row">
-                <input
-                    type="checkbox"
-                    class="checkbox__input"
-                    id=id
-                    aria-describedby=described_by
-                    aria-invalid=move || invalid.get().then_some("true")
-                    name=move || name.get()
-                    required=required
-                    disabled=move || disabled.get()
-                    bind:checked=checked
-                />
-                <span class="checkbox__label">{move || label.get()}</span>
-            </label>
+            {line}
             {message}
         </div>
     }

@@ -201,3 +201,98 @@ test.describe('asking an assistant', () => {
     await expect(request(page, 'prompt')).toContainText('value: 12.50');
   });
 });
+
+test.describe('help on components', () => {
+  const area = (page: Page) => page.locator('section', { has: page.getByRole('heading', { name: 'Help on components' }) });
+  const q = (page: Page, title: string) => page.getByRole('button', { name: `Help: ${title}` });
+  const assistant = (page: Page) => page.getByRole('dialog', { name: 'Assistant' });
+  const request = (page: Page, part: string) => assistant(page).locator(`[data-request="${part}"]`);
+
+  async function askVia(page: Page, title: string) {
+    await q(page, title).click();
+    await page.getByRole('button', { name: 'Ask about this' }).click();
+    await expect(assistant(page)).toBeVisible();
+  }
+
+  async function expectRequest(page: Page, component: string, label: string, value = '(none)') {
+    await expect(request(page, 'component')).toHaveText(component);
+    await expect(request(page, 'label')).toHaveText(label);
+    await expect(request(page, 'value')).toHaveText(value);
+    await expect(request(page, 'prompt')).toContainText('screen: components');
+  }
+
+  test('Field: the ? follows the label, outside it; the value only when shared', async ({ page }) => {
+    const row = area(page).locator('.field__label-row').filter({ hasText: 'Memo' });
+    await expect(row.locator('label').getByRole('button')).toHaveCount(0);
+    await expect(row.getByRole('button', { name: 'Help: Memo' })).toBeVisible();
+
+    await area(page).locator('input[name=help-memo]').fill('Weekly shop');
+    await askVia(page, 'Memo');
+    await expectRequest(page, 'field', 'Memo', 'Weekly shop');
+  });
+
+  test('Field without help_shares_value sends no value', async ({ page }) => {
+    await area(page).locator('input[name=help-payee]').fill('Market');
+    await askVia(page, 'Payee');
+    await expectRequest(page, 'field', 'Payee');
+  });
+
+  test('a password is never sent, even with help_shares_value', async ({ page }) => {
+    await area(page).locator('input[name=help-password]').fill('hunter2');
+    await askVia(page, 'Password');
+    await expectRequest(page, 'field', 'Password');
+    await expect(request(page, 'prompt')).not.toContainText('hunter2');
+  });
+
+  test('Checkbox: the ? follows the words outside the label, and does not tick it', async ({ page }) => {
+    const box = area(page).getByRole('checkbox', { name: 'Repeat every month' });
+    await expect(area(page).locator('.checkbox__row').getByRole('button')).toHaveCount(0);
+    await q(page, 'Repeating').click();
+    await expect(box).not.toBeChecked();
+    await page.keyboard.press('Escape');
+
+    await box.check();
+    await askVia(page, 'Repeating');
+    await expectRequest(page, 'checkbox', 'Repeat every month', 'true');
+  });
+
+  test('Switch: the ? sits beside it, out of the Tab order', async ({ page }) => {
+    const sw = area(page).getByRole('switch', { name: 'Show archived' });
+    await expect(sw.getByRole('button')).toHaveCount(0);
+    await expect(q(page, 'Archived accounts')).toHaveAttribute('tabindex', '-1');
+    await askVia(page, 'Archived accounts');
+    await expectRequest(page, 'switch', 'Show archived');
+    await expect(sw).toHaveAttribute('aria-checked', 'false');
+  });
+
+  test('Toolbar: the ? sits by the title, not by the buttons', async ({ page }) => {
+    const title = await box(area(page).locator('.toolbar__title'));
+    const help = await box(q(page, 'Accounts'));
+    const button = await box(area(page).getByRole('button', { name: 'New account' }));
+    expect(help.x - (title.x + title.width)).toBeLessThan(12);
+    expect(button.x - (help.x + help.width)).toBeGreaterThan(100);
+    await askVia(page, 'Accounts');
+    await expectRequest(page, 'toolbar', 'Accounts');
+  });
+
+  for (const [opener, title, topicTitle, role, component] of [
+    ['Dialog with help…', 'Edit split', 'Editing a split', 'dialog', 'dialog'],
+    ['Confirm with help…', 'Delete split?', 'Deleting a split', 'alertdialog', 'alertdialog'],
+    ['Sheet with help…', 'Menu', 'The menu', 'dialog', 'sheet'],
+  ] as const) {
+    test(`${component}: the ? is in the title bar, just before the ×`, async ({ page }) => {
+      await area(page).getByRole('button', { name: opener }).click();
+      const modal = page.getByRole(role, { name: title });
+      await expect(modal).toBeVisible();
+      // A sheet slides in: measure once it has arrived.
+      await expect.poll(() => modal.evaluate((el) => getComputedStyle(el).transform)).toBe('none');
+      const help = await box(modal.getByRole('button', { name: `Help: ${topicTitle}` }));
+      const close = await box(modal.getByRole('button', { name: 'Close' }));
+      expect(close.x - (help.x + help.width)).toBeLessThan(20);
+      expect(close.x).toBeGreaterThan(help.x);
+
+      await askVia(page, topicTitle);
+      await expectRequest(page, component, title);
+    });
+  }
+});

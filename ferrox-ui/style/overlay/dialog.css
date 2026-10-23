@@ -58,7 +58,8 @@
 
 /* `.icon-btn`'s hover paints `--surface-2`, which is the title bar's ground,
    so it would show nothing here. */
-.dialog__close:hover {
+.dialog__close:hover,
+.dialog__help:hover {
   background: var(--neutral-tint);
 }
 

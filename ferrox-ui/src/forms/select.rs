@@ -2,7 +2,7 @@ use ferrox_icons::{Icon, REFRESH};
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
-use super::field::{control_classes, wiring};
+use super::field::{control_classes, offer_value, wiring};
 use crate::{IconButton, Spinner, SpinnerKind};
 
 /// One choice of a [`Select`]: the value it sets and the text it shows.
@@ -58,6 +58,7 @@ pub fn Select(
 ) -> impl IntoView {
     let wired = wiring("ferrox-select");
     let invalid = wired.invalid;
+    offer_value(value.into());
 
     let refresh = on_refresh.map(|on_refresh| view! {
         <IconButton

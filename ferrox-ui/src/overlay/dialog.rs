@@ -6,7 +6,8 @@ use web_sys::{Element, KeyboardEvent};
 
 use super::modal::Modal;
 use crate::ids::unique_id;
-use crate::{Button, ButtonFamily, IconButton};
+use crate::core::component_help;
+use crate::{Button, ButtonFamily, IconButton, MaybeHelp};
 
 // ---------------------------------------------------------------------------
 // DialogSize / DialogAction
@@ -145,6 +146,8 @@ pub fn Dialog(
     /// `role="alertdialog"`: a dialog that interrupts to ask for a decision
     /// (`ConfirmDialog` sets it).
     #[prop(optional)] alert: bool,
+    /// A help topic: a `?` in the title bar, before the ×.
+    #[prop(optional, into)] help: MaybeHelp,
     /// The × button's label.
     #[prop(into, default = "Close".to_string())] close_label: String,
     /// Extra classes, appended to the generated ones. May be reactive.
@@ -164,6 +167,9 @@ pub fn Dialog(
             action.on_click.run(());
         }
     };
+
+    let kind = if alert { "alertdialog" } else { "dialog" };
+    let help = component_help(help, kind, title, Signal::stored(None), false, "dialog__help");
 
     let has_footer = !no_dismiss || alternate.is_some() || affirm.is_some();
     let footer = has_footer.then(|| view! {
@@ -190,6 +196,7 @@ pub fn Dialog(
         >
             <div class="dialog__title-bar">
                 <h2 class="dialog__title" id=title_id>{move || title.get()}</h2>
+                {help}
                 <IconButton title=close_label class="dialog__close" on_click=move |_| on_close.run(())>
                     <Icon icon=CLOSE />
                 </IconButton>

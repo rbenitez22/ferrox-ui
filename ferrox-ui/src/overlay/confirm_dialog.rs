@@ -2,7 +2,7 @@ use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
 use super::dialog::{Dialog, DialogAction};
-use crate::ButtonFamily;
+use crate::{ButtonFamily, MaybeHelp};
 
 /// The standard destructive confirmation (`role="alertdialog"`).
 ///
@@ -40,6 +40,8 @@ pub fn ConfirmDialog(
     #[prop(into, default = "Cancel".into())] cancel_label: Signal<String>,
     /// The × button's label.
     #[prop(into, default = "Close".to_string())] close_label: String,
+    /// A help topic: a `?` in the title bar, before the ×.
+    #[prop(optional, into)] help: MaybeHelp,
     children: ChildrenFn,
 ) -> impl IntoView {
     let confirm = DialogAction {
@@ -57,6 +59,7 @@ pub fn ConfirmDialog(
             dismiss_label=cancel_label
             close_label=close_label
             alert=true
+            help=help
             affirm=confirm
         >
             {children()}

@@ -5,7 +5,10 @@
 
 use std::sync::LazyLock;
 
-use ferrox_ui::{Button, ButtonFamily, HelpAssistant, HelpButton, HelpRequest, HelpScope, HelpTopic, Input, Sheet, SheetSide};
+use ferrox_ui::{
+    Button, ButtonFamily, Checkbox, ConfirmDialog, Dialog, Field, HelpAssistant, HelpButton, HelpRequest, HelpScope,
+    HelpTopic, Input, PasswordInput, Sheet, SheetSide, Switch, Toolbar,
+};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -42,6 +45,7 @@ pub fn HelpPage() -> impl IntoView {
     view! {
         <Topics />
         <Asking />
+        <OnComponents />
         <RowOfFields />
         <Edges />
     }
@@ -143,17 +147,93 @@ fn Asking() -> impl IntoView {
                 <Button family=ButtonFamily::Secondary on_click=next_account>"Next account"</Button>
                 <span class="demo-note" data-echo="account">{move || account.get()}</span>
             </div>
-            <Sheet open=assistant_open side=SheetSide::Right title="Assistant" on_close=move || assistant_open.set(false)>
-                {move || asked.get().map(|request| view! {
-                    <dl class="demo-echo">
-                        <dt>"topic"</dt><dd data-request="topic">{request.topic_id.clone()}</dd>
-                        <dt>"component"</dt><dd data-request="component">{request.component}</dd>
-                        <dt>"label"</dt><dd data-request="label">{request.label.clone()}</dd>
-                        <dt>"value"</dt><dd data-request="value">{request.value.clone().unwrap_or_else(|| "(none)".into())}</dd>
-                    </dl>
-                    <pre class="demo-prompt" data-request="prompt">{request.to_prompt_context()}</pre>
-                })}
-            </Sheet>
+            <FakeAssistant asked=asked open=assistant_open />
+        </Section>
+    }
+}
+
+/// The fake assistant: a sheet showing the request it was handed.
+#[component]
+fn FakeAssistant(asked: RwSignal<Option<HelpRequest>>, open: RwSignal<bool>) -> impl IntoView {
+    view! {
+        <Sheet open=open side=SheetSide::Right title="Assistant" on_close=move || open.set(false)>
+            {move || asked.get().map(|request| view! {
+                <dl class="demo-echo">
+                    <dt>"topic"</dt><dd data-request="topic">{request.topic_id.clone()}</dd>
+                    <dt>"component"</dt><dd data-request="component">{request.component}</dd>
+                    <dt>"label"</dt><dd data-request="label">{request.label.clone()}</dd>
+                    <dt>"value"</dt><dd data-request="value">{request.value.clone().unwrap_or_else(|| "(none)".into())}</dd>
+                </dl>
+                <pre class="demo-prompt" data-request="prompt">{request.to_prompt_context()}</pre>
+            })}
+        </Sheet>
+    }
+}
+
+/// A one-paragraph topic, for the components below.
+fn about(id: &str, title: &str) -> HelpTopic {
+    HelpTopic::new(id, title).paragraph(format!("What {title} means here."))
+}
+
+/// Every component's `help` prop, inside an assistant: where each `?` sits,
+/// and what its request says.
+#[component]
+fn OnComponents() -> impl IntoView {
+    let asked = RwSignal::new(None::<HelpRequest>);
+    let assistant_open = RwSignal::new(false);
+    let on_ask = move |request: HelpRequest| {
+        asked.set(Some(request));
+        assistant_open.set(true);
+    };
+    let (memo, payee, password) = (RwSignal::new(String::new()), RwSignal::new(String::new()), RwSignal::new(String::new()));
+    let (repeat, archived) = (RwSignal::new(false), RwSignal::new(false));
+    let (editing, deleting, menu) = (RwSignal::new(false), RwSignal::new(false), RwSignal::new(false));
+    view! {
+        <Section title="Help on components">
+            <HelpAssistant on_ask=on_ask>
+                <HelpScope context=[("screen", "components")]>
+                    <Toolbar title="Accounts" help=about("accounts", "Accounts")>
+                        <Button>"New account"</Button>
+                    </Toolbar>
+                    <div class="demo-form">
+                        <Field label="Memo" help=about("memo", "Memo") help_shares_value=true>
+                            <Input value=memo name="help-memo" />
+                        </Field>
+                        <Field label="Payee" help=about("payee", "Payee")>
+                            <Input value=payee name="help-payee" />
+                        </Field>
+                        <Field label="Password" help=about("password", "Password") help_shares_value=true>
+                            <PasswordInput value=password name="help-password" />
+                        </Field>
+                        <Checkbox checked=repeat label="Repeat every month" help=about("repeat", "Repeating") help_shares_value=true />
+                        <div class="demo-row">
+                            <Switch checked=archived label="Show archived" help=about("archived", "Archived accounts") help_skip_tab=true />
+                        </div>
+                    </div>
+                    <div class="demo-row">
+                        <Button family=ButtonFamily::Secondary on_click=move |_| editing.set(true)>"Dialog with help…"</Button>
+                        <Button family=ButtonFamily::Danger on_click=move |_| deleting.set(true)>"Confirm with help…"</Button>
+                        <Button family=ButtonFamily::Secondary on_click=move |_| menu.set(true)>"Sheet with help…"</Button>
+                    </div>
+                    <Dialog open=editing title="Edit split" help=about("edit-split", "Editing a split") on_close=move || editing.set(false)>
+                        <p>"A dialog's ? sits in its title bar, before the ×."</p>
+                    </Dialog>
+                    <ConfirmDialog
+                        open=deleting
+                        title="Delete split?"
+                        confirm_label="Delete"
+                        help=about("delete-split", "Deleting a split")
+                        on_confirm=move || deleting.set(false)
+                        on_cancel=move || deleting.set(false)
+                    >
+                        <p>"This deletes the split."</p>
+                    </ConfirmDialog>
+                    <Sheet open=menu title="Menu" help=about("menu", "The menu") on_close=move || menu.set(false)>
+                        <p>"A sheet's ? sits in its title bar too."</p>
+                    </Sheet>
+                </HelpScope>
+            </HelpAssistant>
+            <FakeAssistant asked=asked open=assistant_open />
         </Section>
     }
 }

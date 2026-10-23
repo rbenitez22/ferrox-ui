@@ -1,6 +1,9 @@
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
+use crate::core::component_help;
+use crate::MaybeHelp;
+
 /// The class list for a `.switch`.
 pub fn switch_classes(extra: &str) -> String {
     if extra.is_empty() { "switch".to_string() } else { format!("switch {extra}") }
@@ -15,7 +18,8 @@ pub fn switch_classes(extra: &str) -> String {
 /// sends stays a [`Checkbox`](crate::Checkbox).
 ///
 /// The words are inside the button: they name it for a screen reader and
-/// are part of the target, with no `<label>` to keep in step.
+/// are part of the target, with no `<label>` to keep in step. `help` puts a
+/// `?` beside the button (not in it: a button in a button).
 ///
 /// ```ignore
 /// <Switch checked=show_archived label="Show archived accounts" />
@@ -26,10 +30,14 @@ pub fn Switch(
     #[prop(into)] label: Signal<String>,
     /// Off and unusable: a setting still loading, or one this user may not change.
     #[prop(optional, into)] disabled: Signal<bool>,
+    /// A help topic: a `?` beside the switch.
+    #[prop(optional, into)] help: MaybeHelp,
+    #[prop(optional)] help_skip_tab: bool,
     /// Extra classes, appended to `switch`. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
 ) -> impl IntoView {
-    view! {
+    let help = component_help(help, "switch", label, Signal::stored(None), help_skip_tab, "switch__help");
+    let button = view! {
         <button
             type="button"
             role="switch"
@@ -41,6 +49,10 @@ pub fn Switch(
             <span class="switch__track" aria-hidden="true"><span class="switch__knob"></span></span>
             {move || label.get()}
         </button>
+    };
+    match help {
+        Some(help) => view! { <span class="switch-line">{button}{help}</span> }.into_any(),
+        None => button.into_any(),
     }
 }
 

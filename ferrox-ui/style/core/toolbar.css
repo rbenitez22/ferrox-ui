@@ -38,6 +38,19 @@
     border-left: 1px solid var(--line);
 }
 
+/* With help: the title and its `?` take the free space together. */
+.toolbar__heading {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.toolbar__heading > .toolbar__title {
+    flex: 0 1 auto;
+}
+
 /* ── Compact — for .icon-btn and .btn--sm rows ── */
 
 .toolbar--compact {

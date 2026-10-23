@@ -21,6 +21,13 @@
   color: var(--text-muted);
 }
 
+/* With help: the label and its `?`, side by side. */
+.field__label-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
 .field__hint {
   font-size: 0.82rem;
   color: var(--text-muted);

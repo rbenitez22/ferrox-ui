@@ -6,7 +6,8 @@ use web_sys::{Element, MouseEvent};
 
 use super::modal::Modal;
 use crate::ids::unique_id;
-use crate::IconButton;
+use crate::core::component_help;
+use crate::{IconButton, MaybeHelp};
 
 // ---------------------------------------------------------------------------
 // SheetSide
@@ -71,6 +72,8 @@ pub fn Sheet(
     #[prop(into)] title: Signal<String>,
     /// The × button's label.
     #[prop(into, default = "Close".to_string())] close_label: String,
+    /// A help topic: a `?` in the title bar, before the ×.
+    #[prop(optional, into)] help: MaybeHelp,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
     children: ChildrenFn,
@@ -79,6 +82,7 @@ pub fn Sheet(
     let (on_cancel, on_closed) = (modal.on_cancel(), modal.on_closed());
     let title_id = unique_id("ferrox-sheet-title");
     let labelled_by = title_id.clone();
+    let help = component_help(help, "sheet", title, Signal::stored(None), false, "sheet__help");
 
     // A click closes only if it both started and ended on the backdrop, so a
     // text selection dragged out of the sheet does not close it.
@@ -103,6 +107,7 @@ pub fn Sheet(
         >
             <div class="sheet__title-bar">
                 <h2 class="sheet__title" id=title_id>{move || title.get()}</h2>
+                {help}
                 <IconButton title=close_label class="sheet__close" on_click=move |_| on_close.run(())>
                     <Icon icon=CLOSE />
                 </IconButton>

@@ -88,6 +88,24 @@ impl HelpTopic {
     }
 }
 
+/// A component's `help` prop: a topic, or none. Converts from a
+/// [`HelpTopic`] or an `Option<HelpTopic>`, so a component can pass its own
+/// on to another (`ConfirmDialog` to `Dialog`).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct MaybeHelp(pub Option<HelpTopic>);
+
+impl From<HelpTopic> for MaybeHelp {
+    fn from(topic: HelpTopic) -> Self {
+        Self(Some(topic))
+    }
+}
+
+impl From<Option<HelpTopic>> for MaybeHelp {
+    fn from(topic: Option<HelpTopic>) -> Self {
+        Self(topic)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

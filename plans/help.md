@@ -8,7 +8,7 @@ assistant, the same popover offers **"Ask about this"**. That hands the app a
 declared around it (page → section → field). The app sends it to its chat,
 LLM or Patina recall. ferrox-ui never talks to a model itself.
 
-Status: approved (2026-10-23). Pieces 1–2 done (2026-10-23); piece 3 next.
+Status: approved (2026-10-23). Pieces 1–3 done (2026-10-23); piece 4 (docs) next.
 
 Notes from piece 1:
 - The `?` opens the popover declaratively (`popovertarget`), so the browser
@@ -35,6 +35,20 @@ Notes from piece 1:
 - `HelpButton` gains `kind`, `about` and `value` (what the request says
   carries the `?`, its label, an opt-in value) and `ask_label`. The Ask
   button closes the popover declaratively (`popovertargetaction="hide"`).
+- Piece 3: every `help` prop takes `MaybeHelp` (from a `HelpTopic` or an
+  `Option<HelpTopic>`), because Leptos can't forward an optional prop as an
+  `Option`; `ConfirmDialog` passes its own on to `Dialog`. One crate-internal
+  helper, `component_help`, places the `?` for every component.
+- Field's value reaches a help request through a slot in `FieldContext`
+  that `Input`, `Textarea` and `Select` fill (`offer_value`). `PasswordInput`
+  never does, so a password can't be sent even with `help_shares_value`.
+- With help, a toolbar's title and `?` share the free space together
+  (`.toolbar__heading`), so the `?` stays by the title. Without help the
+  markup is unchanged.
+- A dialog's `component` in the request is `"alertdialog"` when `alert` is
+  set (so `ConfirmDialog` reads as one).
+- Recommended context keys, including `mcp_server` / `mcp_tool` as routing
+  hints, are in the README (added at the user's request).
 
 ## Prior art: conrad
 
@@ -244,8 +258,9 @@ The demo gets a `/help` page.
    button, the request's component and label, `help_skip_tab`,
    `help_shares_value`.
 4. **Docs.** A README help section: when to give help, granularity, the
-   context conventions for assistants and Patina, privacy, and the class
-   reference. Plus the root README and plan status. webapp-lib gets a note
+   context conventions for assistants and Patina (folding in the "Help
+   context: recommended keys" table added 2026-10-23, with `mcp_server` /
+   `mcp_tool`), privacy, and the class reference. Plus the root README and plan status. webapp-lib gets a note
    about the assistant adapter as a future story.
 
 After this, forms piece 4 (Combobox) builds on `core/anchor.rs`.

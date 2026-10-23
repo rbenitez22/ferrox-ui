@@ -92,7 +92,8 @@
 }
 
 /* `.icon-btn`'s hover paints `--surface-2`, the title bar's ground. */
-.sheet__close:hover {
+.sheet__close:hover,
+.sheet__help:hover {
   background: var(--neutral-tint);
 }
 

@@ -8,7 +8,7 @@ use web_sys::{Element, Event, HtmlElement};
 use super::anchor::{follow, place};
 use super::help_request::HelpRequest;
 use super::help_scope::{assistant, scope_context};
-use super::help_topic::{HelpBlock, HelpTopic};
+use super::help_topic::{HelpBlock, HelpTopic, MaybeHelp};
 use crate::ids::unique_id;
 
 /// The class list for a help button: an `.icon-btn` sized to sit by text.
@@ -147,6 +147,21 @@ pub fn HelpButton(
             {actions}
         </div>
     }
+}
+
+/// The `?` a component places for its `help` prop, if it has a topic:
+/// labelled for the request by `about`, sending `value` only if given.
+pub(crate) fn component_help(
+    help: MaybeHelp,
+    kind: &'static str,
+    about: Signal<String>,
+    value: Signal<Option<String>>,
+    skip_tab: bool,
+    class: &'static str,
+) -> Option<impl IntoView> {
+    help.0.map(|topic| view! {
+        <HelpButton topic=topic kind=kind about=about value=value skip_tab=skip_tab class=class />
+    })
 }
 
 fn render_block(block: &HelpBlock) -> AnyView {
