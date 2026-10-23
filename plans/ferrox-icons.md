@@ -6,7 +6,7 @@ one `const` per icon. A single `Icon` component renders any of them:
 `<Icon icon=CLOSE/>`. Because icons are values, components can take one as a
 prop (`<MenuLink icon=DELETE …>`) and an app can choose one at runtime.
 
-Status: approved (2026-10-23). Piece 1 done (2026-10-23); piece 2 next.
+Status: approved (2026-10-23). Pieces 1–2 done (2026-10-23); piece 3 next.
 
 Changes from the design during piece 1:
 - `IconData` has only `name` and `body`. Validation requires Lucide's root
@@ -18,6 +18,8 @@ Changes from the design during piece 1:
 - `LICENSE-lucide` came in with the first file (piece 1, not 2).
 - There's no keyword or clash check: upper-case consts can't be keywords, and
   kebab-case stems can't clash once converted.
+- Piece 2: Lucide renamed `trash-2` → `trash` (the old `trash-2` drawing) and
+  `circle-help` → `circle-question-mark`. The current names are used.
 - A reactive `class` is a `Signal<String>`. Leptos's `MaybeProp<String>`
   doesn't take a bare closure.
 
@@ -163,13 +165,13 @@ the demo has no hand-drawn SVGs left.
 | menu | menu |
 | refresh | refresh-cw |
 | check | check |
-| delete | trash-2 |
+| delete | trash |
 | chevron-down | chevron-down |
 | chevron-right | chevron-right |
 | search | search |
 | lock | lock |
 | unlock | lock-open |
-| help | circle-help |
+| help | circle-question-mark |
 | camera | camera |
 | ban | ban |
 
@@ -225,5 +227,5 @@ Each one passes `scripts/release-check.sh` and can be reviewed on its own.
 3. **App icons:** later, when an app asks (a `ferrox-icons-build`, like the
    themes). Until then an app writes its own `<svg class="icon">`.
 4. **Names:** our own (`CLOSE`, `DELETE`, `REFRESH`), mapped from Lucide's
-   (`x`, `trash-2`, `refresh-cw`). The doc comment on each const names the
+   (`x`, `trash`, `refresh-cw`). The doc comment on each const names the
    Lucide source.

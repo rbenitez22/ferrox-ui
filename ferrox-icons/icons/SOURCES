@@ -1,4 +1,17 @@
 # Where each icon comes from: <our name> <Lucide name>, one per line.
 # Files are copied unchanged from https://github.com/lucide-icons/lucide
 # (icons/<Lucide name>.svg, commit 7faf876) and renamed to <our name>.svg.
+ban ban
+camera camera
+check check
+chevron-down chevron-down
+chevron-right chevron-right
 close x
+delete trash
+help circle-question-mark
+lock lock
+menu menu
+plus plus
+refresh refresh-cw
+search search
+unlock lock-open

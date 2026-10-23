@@ -42,7 +42,19 @@ width="1em" height="1em" aria-hidden="true" focusable="false">`:
 | `Icon` | The component: `icon` (required: `IconData`, a closure, or a signal), `class` (optional, may be reactive). |
 | `IconData` | One icon: `name` (the file stem, e.g. `"chevron-down"`) and `body` (the SVG's children). `#[non_exhaustive]`: only this crate makes them. |
 | `icon_classes(extra)` | The class list `Icon` sets: `"icon"` or `"icon {extra}"`. |
-| `CLOSE` | Lucide `x`. |
+| `ALL` | Every icon, sorted by name, for galleries and tests. It keeps every icon in the build, so apps name the icons they use instead. |
+
+### Icons
+
+| Const | Lucide | | Const | Lucide |
+|---|---|---|---|---|
+| `BAN` | `ban` | | `HELP` | `circle-question-mark` |
+| `CAMERA` | `camera` | | `LOCK` | `lock` |
+| `CHECK` | `check` | | `MENU` | `menu` |
+| `CHEVRON_DOWN` | `chevron-down` | | `PLUS` | `plus` |
+| `CHEVRON_RIGHT` | `chevron-right` | | `REFRESH` | `refresh-cw` |
+| `CLOSE` | `x` | | `SEARCH` | `search` |
+| `DELETE` | `trash` | | `UNLOCK` | `lock-open` |
 
 ## Adding an icon
 
@@ -74,11 +86,9 @@ These rules keep the markup static and safe to set with `inner_html`.
 
 ## Planned
 
-`plans/ferrox-icons.md`: the rest of the first set (`plus`, `menu`, `refresh`,
-`check`, `delete`, `chevron-down`, `chevron-right`, `search`, `lock`,
-`unlock`, `help`, `camera`, `ban`), an `ALL` table, a demo gallery page with
-e2e tests, and the `.icon` CSS in its own core sheet. Later: app-supplied
-icons through the same checks.
+`plans/ferrox-icons.md`: a demo gallery page with e2e tests, the `.icon` CSS
+in its own core sheet, and the demo's buttons drawn with these icons. Later:
+app-supplied icons through the same checks.
 
 ## Licence
 

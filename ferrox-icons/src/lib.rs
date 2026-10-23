@@ -35,3 +35,38 @@ include!(concat!(env!("OUT_DIR"), "/icons.rs"));
 #[cfg(test)]
 #[path = "../build/mod.rs"]
 mod build_logic;
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The stems of `icons/*.svg`, sorted.
+    fn icon_files() -> Vec<String> {
+        let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("icons");
+        build_logic::discover::svg_files(&dir).unwrap().iter()
+            .map(|p| p.file_stem().unwrap().to_string_lossy().into_owned())
+            .collect()
+    }
+
+    #[test]
+    fn all_matches_the_icon_files_in_order() {
+        let names: Vec<&str> = ALL.iter().map(|i| i.name).collect();
+        assert_eq!(names, icon_files());
+    }
+
+    #[test]
+    fn all_has_no_duplicate_drawings() {
+        for (i, a) in ALL.iter().enumerate() {
+            for b in &ALL[i + 1..] {
+                assert_ne!(a.body, b.body, "{} and {} draw the same", a.name, b.name);
+            }
+        }
+    }
+
+    #[test]
+    fn the_first_set_is_there() {
+        let set = [BAN, CAMERA, CHECK, CHEVRON_DOWN, CHEVRON_RIGHT, CLOSE, DELETE, HELP, LOCK, MENU, PLUS, REFRESH, SEARCH, UNLOCK];
+        assert_eq!(set.len(), ALL.len());
+        assert!(set.iter().all(|icon| ALL.contains(icon)));
+    }
+}

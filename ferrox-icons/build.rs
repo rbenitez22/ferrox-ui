@@ -1,5 +1,5 @@
 //! Generates `$OUT_DIR/icons.rs`: one `IconData` const per `icons/*.svg`,
-//! after checking each file (`build/validate.rs`). A file that breaks a rule
+//! after checking each file (`build/validate.rs`), and the `ALL` table. A file that breaks a rule
 //! fails the build with its name and the reason.
 
 #[path = "build/mod.rs"]
@@ -20,7 +20,8 @@ fn main() {
         .unwrap_or_else(|e| panic!("cannot list {}: {e}", dir.display()));
     check_sources_match(&sources, &files);
 
-    let code: String = files.iter().map(|file| generate(file, &sources)).collect();
+    let mut code: String = files.iter().map(|file| generate(file, &sources)).collect();
+    code.push_str(&icons::emit::all_table(&files.iter().map(|f| stem(f)).collect::<Vec<_>>()));
     let target = PathBuf::from(env::var("OUT_DIR").expect("OUT_DIR is set by cargo")).join("icons.rs");
     fs::write(&target, code).unwrap_or_else(|e| panic!("cannot write {}: {e}", target.display()));
 }
