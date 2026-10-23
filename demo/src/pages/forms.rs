@@ -1,7 +1,7 @@
 //! Forms: fields and their controls, each with its value echoed below, so
 //! labels, messages, invalid states and two-way binding can be checked.
 
-use ferrox_ui::{Button, ButtonFamily, Field, Input, InputKind, Textarea};
+use ferrox_ui::{Button, ButtonFamily, Field, Input, InputKind, PasswordInput, Textarea};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -10,6 +10,7 @@ use crate::section::Section;
 pub fn FormsPage() -> impl IntoView {
     view! {
         <Fields />
+        <Passwords />
     }
 }
 
@@ -48,6 +49,29 @@ fn Fields() -> impl IntoView {
                 <dt>"email"</dt><dd data-echo="email">{move || email.get()}</dd>
                 <dt>"notes"</dt><dd data-echo="notes">{move || notes.get()}</dd>
                 <dt>"query"</dt><dd data-echo="query">{move || query.get()}</dd>
+            </dl>
+        </Section>
+    }
+}
+
+/// Signing in, and setting a new password with its strength meter.
+#[component]
+fn Passwords() -> impl IntoView {
+    let password = RwSignal::new(String::new());
+    let new_password = RwSignal::new(String::new());
+    view! {
+        <Section title="Passwords">
+            <div class="demo-form">
+                <Field label="Password">
+                    <PasswordInput value=password name="password" />
+                </Field>
+                <Field label="New password" hint="At least 80 bits: long, and mixed">
+                    <PasswordInput value=new_password name="new-password" autocomplete="new-password" strength=true />
+                </Field>
+            </div>
+            <dl class="demo-echo">
+                <dt>"password"</dt><dd data-echo="password">{move || password.get()}</dd>
+                <dt>"new password"</dt><dd data-echo="new-password">{move || new_password.get()}</dd>
             </dl>
         </Section>
     }

@@ -58,6 +58,7 @@ width="1em" height="1em" aria-hidden="true" focusable="false">`:
 | `CLOSE` | `x` | | `SUCCESS` | `circle-check` |
 | `DELETE` | `trash` | | `UNLOCK` | `lock-open` |
 | `ERROR` | `circle-alert` | | `WARNING` | `triangle-alert` |
+| `EYE` | `eye` | | `EYE_OFF` | `eye-off` |
 | `HELP` | `circle-question-mark` | | | |
 | `INFO` | `info` | | | |
 

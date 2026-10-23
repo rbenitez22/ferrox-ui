@@ -6,7 +6,7 @@ conrad's `FormField.tsx`, `Autocomplete.tsx` and its `.form-*` rules, and
 replaces webapp-lib's form primitives. The data-loading halves stay in
 webapp-lib as adapters.
 
-Status: approved (2026-10-23). Piece 1 done (2026-10-23); piece 2 next.
+Status: approved (2026-10-23). Pieces 1–2 done (2026-10-23); piece 3 next.
 
 Notes from piece 1:
 - `Field` hands its wiring down through `<Provider>`, not `provide_context`.
@@ -20,6 +20,14 @@ Notes from piece 1:
   tokens), as buttons do.
 - The release check now runs `--feature-powerset` (8 combinations for
   ferrox-ui).
+- Piece 2: the show/hide button keeps one label ("Show password") and says
+  whether it's on through `aria-pressed`, the ARIA way for a toggle. The
+  strength code is split: `password_entropy` (moved from webapp-lib,
+  unchanged), `strength_level` (the cut-offs: 25, 40, `min_bits`), and
+  `password_strength`. `min_bits` defaults to 80, webapp-lib's
+  `min_password_entropy`. The meter's word comes from `StrengthLabels`
+  (English by default), and the bits are on `data-bits`, not in the visible
+  text. The field is described by its hint and the meter together.
 
 ## Sources
 

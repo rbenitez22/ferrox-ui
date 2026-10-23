@@ -66,7 +66,7 @@ test.describe('Field', () => {
 
   test('every control has its own id, inside a field or not', async ({ page }) => {
     const ids = await page.locator('.form-input, .form-textarea').evaluateAll((els) => els.map((e) => e.id));
-    expect(ids).toHaveLength(4);
+    expect(ids.length).toBeGreaterThanOrEqual(4);
     expect(ids.every((id) => id.length > 0)).toBe(true);
     expect(new Set(ids).size).toBe(ids.length);
   });
@@ -101,5 +101,79 @@ test.describe('Input and Textarea', () => {
       const size = await control.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
       expect(size).toBeGreaterThanOrEqual(16);
     }
+  });
+});
+
+test.describe('PasswordInput', () => {
+  const password = (page: Page) => page.getByLabel('Password', { exact: true });
+  const newPassword = (page: Page) => page.getByLabel('New password');
+  const meter = (page: Page) => page.locator('.password-strength');
+
+  test('hidden by default; the toggle is a button that shows and hides it', async ({ page }) => {
+    const field = password(page);
+    await field.fill('hunter2');
+    await expect(field).toHaveAttribute('type', 'password');
+
+    const toggle = page.getByRole('button', { name: 'Show password' }).first();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(toggle.locator('svg')).toHaveAttribute('data-icon', 'eye');
+
+    await toggle.click();
+    await expect(field).toHaveAttribute('type', 'text');
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle.locator('svg')).toHaveAttribute('data-icon', 'eye-off');
+    await expect(field).toHaveValue('hunter2');
+
+    await toggle.focus();
+    await page.keyboard.press('Space');
+    await expect(field).toHaveAttribute('type', 'password');
+  });
+
+  test('the toggle sits inside the field, and text never runs under it', async ({ page }) => {
+    const field = (await password(page).boundingBox())!;
+    const toggle = (await page.getByRole('button', { name: 'Show password' }).first().boundingBox())!;
+    expect(toggle.x + toggle.width).toBeLessThanOrEqual(field.x + field.width);
+    expect(toggle.y).toBeGreaterThanOrEqual(field.y);
+    const padding = await password(page).evaluate((el) => parseFloat(getComputedStyle(el).paddingRight));
+    expect(padding).toBeGreaterThanOrEqual(toggle.width);
+  });
+
+  test('autocomplete tells password managers which password it is', async ({ page }) => {
+    await expect(password(page)).toHaveAttribute('autocomplete', 'current-password');
+    await expect(newPassword(page)).toHaveAttribute('autocomplete', 'new-password');
+  });
+
+  test('no meter unless asked for, and none while empty', async ({ page }) => {
+    await password(page).fill('anything at all');
+    await expect(meter(page)).toHaveCount(0);
+    await expect(newPassword(page)).toHaveValue('');
+    await expect(meter(page)).toHaveCount(0);
+  });
+
+  for (const [typed, level, label] of [
+    ['abc', 'very-weak', 'Very weak'],
+    ['abcdefgh', 'weak', 'Weak'],
+    ['Abcdefgh12', 'fair', 'Fair'],
+    ['Abcdefgh12!x-Zq9', 'strong', 'Strong'],
+  ] as const) {
+    test(`"${typed}" reads ${label}`, async ({ page }) => {
+      await newPassword(page).fill(typed);
+      await expect(meter(page)).toHaveClass(new RegExp(`\\bpassword-strength--${level}\\b`));
+      await expect(meter(page).locator('.password-strength__label')).toHaveText(label);
+    });
+  }
+
+  test('the field is described by its hint and its meter', async ({ page }) => {
+    const field = newPassword(page);
+    await field.fill('abc');
+    const described = await field.evaluate((el) =>
+      (el.getAttribute('aria-describedby') ?? '').split(' ').map((id) => document.getElementById(id)?.textContent),
+    );
+    expect(described).toEqual(['At least 80 bits: long, and mixed', 'Very weak']);
+  });
+
+  test('the value binds both ways through the toggle', async ({ page }) => {
+    await newPassword(page).fill('s3cret!');
+    await expect(echo(page, 'new-password')).toHaveText('s3cret!');
   });
 });
