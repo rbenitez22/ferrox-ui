@@ -21,22 +21,14 @@ step() { printf '\n\033[1m== %s\033[0m\n' "$1"; }
 crates=(ferrox-theme-build ferrox-theme ferrox-ui)
 
 step "1/5 features build alone"
-if cargo hack --version >/dev/null 2>&1; then
-    for crate in "${crates[@]}"; do
-        cargo hack check -p "$crate" --each-feature --no-dev-deps
-    done
-else
-    # Without cargo-hack: the same check, with each crate's features read from its manifest.
-    for crate in "${crates[@]}"; do
-        echo "  $crate: no features"
-        cargo check -q -p "$crate" --no-default-features
-        features=$(sed -n '/^\[features\]/,/^\[/p' "$crate/Cargo.toml" | grep -oE '^[a-z][a-z0-9-]*' | grep -v '^default$' || true)
-        for f in $features; do
-            echo "  $crate: $f"
-            cargo check -q -p "$crate" --no-default-features --features "$f"
-        done
-    done
+if ! cargo hack --version >/dev/null 2>&1; then
+    echo "cargo-hack is required: cargo install cargo-hack" >&2
+    exit 1
 fi
+# Switch to --feature-powerset once ferrox-ui has two or more groups.
+for crate in "${crates[@]}"; do
+    cargo hack check -p "$crate" --each-feature --no-dev-deps
+done
 
 step "2/5 clippy"
 cargo clippy -q --workspace --all-targets --all-features -- -D warnings

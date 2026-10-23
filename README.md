@@ -103,6 +103,10 @@ cd demo/e2e && npm ci && npm test
 scripts/release-check.sh        # the gate before any tag
 ```
 
+The release check needs `trunk`, Node (for Playwright) and
+[cargo-hack](https://github.com/taiki-e/cargo-hack) (`cargo install cargo-hack`),
+which builds every crate with each of its features alone.
+
 ## Licence
 
 Licensed under either of

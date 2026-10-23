@@ -9,7 +9,7 @@ webapp-lib keeps the app plumbing (http, storage, reactive, auth, app-level
 components such as `Login`) and depends on ferrox-ui; see webapp-lib's
 `plans/crate-split.md` for that side.
 
-Status: piece 0 done. Repo `/programming/ferrox-ui`
+Status: pieces 0–4 done. Repo `/programming/ferrox-ui`
 (`git@github.com:rbenitez22/ferrox-ui.git`, branch `master`).
 
 ## Crates (one workspace, this repo)
@@ -183,8 +183,10 @@ webapp-lib's history as the record (fresh first commit here).
    `buttons.spec.ts`. Review items for primitives from here on: `MaybeProp`
    classes and no `style` props (X3), text props (X4), id props (H12), newtype
    contexts (H11).
-4. **Feature hygiene.** cargo-hack: every group builds alone, in the release
-   check.
+4. **Feature hygiene** — done (2026-10-23). Release check step 1 runs
+   `cargo hack check --each-feature --no-dev-deps` on every library crate;
+   cargo-hack is required (the manifest-grep fallback is gone). Switch to
+   `--feature-powerset` once ferrox-ui has two or more groups.
 5. **`ferrox-icons`.** Build-time SVG discovery, first icons: close, plus,
    menu, refresh, check, delete, chevron. Own plan (the SVG icon story).
 6. **Port today's webapp-lib primitives**, one group per piece, each with its
