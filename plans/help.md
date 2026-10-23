@@ -280,6 +280,46 @@ component), since it takes over a key.
   a shortcut on top of the visible `?`, never the only way in.
 - Most useful where the `?` uses `skip_tab` (rows of fields).
 
+### Follow-up: noticing when a user needs help (discussed 2026-10-23, not started)
+
+The user's example: entering a transaction whose splits keep failing the
+balance check. The design splits the work into three layers.
+
+1. **Components report facts, not judgments (ferrox-ui, opt-in).** One
+   observer, `<HelpSignals on_signal=…>`, scoped like `HelpAssistant`.
+   Components emit generic events, each with the enclosing `HelpScope`
+   context:
+   - a Field's error appeared, cleared, or persisted through N edits;
+   - a Dialog's submit was refused;
+   - help was opened, or dismissed within a second;
+   - a Combobox was left with no match, repeatedly.
+
+   There's no guessing from raw behaviour (dwell, rage clicks): it's noisy
+   and reads as surveillance.
+2. **The app reports domain signals through the same channel.** A public
+   `report_help_signal(kind, detail)`, for example "imbalance" with the
+   number of edits it has persisted and (opt-in) the amounts. Only the app
+   knows these, and they're the strongest signals.
+3. **A policy decides whether to offer help (webapp-lib or the app, not
+   ferrox-ui).** It sets thresholds and cool-downs (for example, imbalance
+   for 3 edits or 30s, offered once per entry).
+   - It **offers and never interrupts**: a "suggested" state on the relevant
+     `?` (ferrox-ui provides the state, e.g. `data-suggested`), or a quiet
+     "Need a hand…?" link, announced with `aria-live`. It never steals focus
+     and never auto-opens a chat.
+   - The offer opens the right topic, or asks the assistant with the context
+     already filled in.
+
+**Payoff:** high for the few known pain points the app already detects
+(imbalance, reconciliation that won't tie out, failing import mappings),
+low for generic struggle detection. **Privacy:** signals stay local unless
+the app sends them; values are opt-in, as for help requests.
+
+**In ferrox-ui:** the observer and the factual events, `report_help_signal`,
+and the suggested state on `HelpButton`. Thresholds, wording and the offer
+UI live in the app or a webapp-lib adapter (with the assistant adapter
+noted in `webapp-lib/plans/crate-split.md`).
+
 ## Decisions (2026-10-23)
 
 All as recommended:
