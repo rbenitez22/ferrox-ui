@@ -1,0 +1,54 @@
+/* Toolbar — a row of buttons with an optional title. Part of ferrox-ui
+   `core`. Tokens only, so every theme styles it. */
+
+/* ── Row — buttons sit right, with or without a title ── */
+
+.toolbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm) 0;
+}
+
+/* ── Title — takes the free space, so the buttons sit right ── */
+
+.toolbar__title {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--text);
+}
+
+/* ── Group — buttons that belong together, split from the next by a hairline ── */
+
+.toolbar__group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.toolbar__group + .toolbar__group {
+    margin-left: var(--space-xs);
+    padding-left: var(--space-sm);
+    border-left: 1px solid var(--line);
+}
+
+/* ── Compact — for .icon-btn and .btn--sm rows ── */
+
+.toolbar--compact {
+    gap: 2px;
+    padding: var(--space-xs) 0;
+}
+
+.toolbar--compact .toolbar__group {
+    gap: 2px;
+}
+
+.toolbar--compact .toolbar__title {
+    font-size: 1rem;
+}

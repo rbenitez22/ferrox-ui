@@ -18,7 +18,7 @@ cd "$root"
 step() { printf '\n\033[1m== %s\033[0m\n' "$1"; }
 
 # Library crates and their features (the demo is not a library).
-crates=(ferrox-theme-build ferrox-theme)
+crates=(ferrox-theme-build ferrox-theme ferrox-ui)
 
 step "1/5 features build alone"
 if cargo hack --version >/dev/null 2>&1; then

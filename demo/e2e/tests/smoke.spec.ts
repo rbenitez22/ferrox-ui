@@ -4,6 +4,7 @@ import { test, expect, openApp } from '../fixtures';
 // page error or console error.
 const ROUTES = [
   { path: '/', heading: 'Surfaces' },
+  { path: '/buttons', heading: 'Families' },
 ];
 
 for (const { path, heading } of ROUTES) {

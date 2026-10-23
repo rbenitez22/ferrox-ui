@@ -170,7 +170,14 @@ webapp-lib's history as the record (fresh first commit here).
    the Playwright setup (`fixtures.ts`, `themes.spec.ts`, smoke test),
    `scripts/release-check.sh`. The theme tests pass here unchanged; the
    pre-paint test gains a check that the page is styled before mount.
-3. **`ferrox-ui` skeleton + `core`.** Crate, group features, `init()` CSS
+3. **`ferrox-ui` skeleton + `core`** — done (2026-10-23). `Button`,
+   `IconButton`, `Toolbar` with reactive `MaybeProp` classes and no `style`
+   prop (X3), `#[non_exhaustive]` enums (H7); `init()` injects core CSS
+   (idempotent, `set_text_content`). The saving border now keeps 1px, so a
+   saving button no longer moves its neighbour (conrad's 2px fixed here; the
+   e2e test is a normal test now). A unit test enforces class-only selectors
+   on every shipped sheet. e2e: 56 pass. Not yet run: repeated stability runs.
+   Originally: Crate, group features, `init()` CSS
    injection. Move `Button`, `IconButton`, `Toolbar` with `focus.css`,
    `buttons.css` (now an owned file, not generated from conrad), `toolbar.css`, the `/buttons` demo page and
    `buttons.spec.ts`. Review items for primitives from here on: `MaybeProp`

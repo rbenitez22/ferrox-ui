@@ -5,7 +5,7 @@ use leptos::prelude::*;
 use leptos_router::components::{Route, Router, Routes, A};
 use leptos_router::path;
 
-use crate::pages::themes::ThemesPage;
+use crate::pages::{buttons::ButtonsPage, themes::ThemesPage};
 use crate::theme_bar::ThemeBar;
 
 #[component]
@@ -18,12 +18,14 @@ pub fn App() -> impl IntoView {
                     <span class="demo-title">"ferrox-ui demo"</span>
                     <nav class="demo-nav">
                         <A href="/">"Themes"</A>
+                        <A href="/buttons">"Buttons"</A>
                     </nav>
                 </header>
                 <ThemeBar />
                 <main class="demo-main">
                     <Routes fallback=|| view! { <p>"Page not found."</p> }>
                         <Route path=path!("/") view=ThemesPage />
+                        <Route path=path!("/buttons") view=ButtonsPage />
                     </Routes>
                 </main>
             </div>

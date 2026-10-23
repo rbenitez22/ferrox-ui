@@ -1,0 +1,18 @@
+[package]
+name        = "ferrox-ui"
+description = "UI primitives for Leptos CSR apps, in feature groups, styled by class-only CSS on ferrox-theme's tokens."
+version.workspace    = true
+edition.workspace    = true
+license.workspace    = true
+repository.workspace = true
+authors.workspace    = true
+
+# `core` (Button, IconButton, Toolbar) is always compiled. One feature per
+# further group, added as each group is built: forms, menus, overlay,
+# navigation, layout, data.
+[features]
+default = []
+
+[dependencies]
+leptos  = { workspace = true }
+web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent"] }

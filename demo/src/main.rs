@@ -3,6 +3,7 @@
 
 mod app;
 mod pages;
+mod section;
 mod swatch;
 mod theme_bar;
 
@@ -11,6 +12,7 @@ use ferrox_theme::ThemeChoice;
 fn main() {
     ferrox_theme::register(include!(concat!(env!("OUT_DIR"), "/ferrox_themes.rs")));
     ferrox_theme::init();
+    ferrox_ui::init();
     apply_theme_from_url();
     leptos::mount::mount_to_body(app::App);
     mark_ready();

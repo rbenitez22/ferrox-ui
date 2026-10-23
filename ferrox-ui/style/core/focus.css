@@ -1,0 +1,11 @@
+/* Focus ring — the keyboard focus indicator, opt-in per class.
+
+   ferrox-ui styles nothing by element, so there is no global
+   `:focus-visible` rule: each class that takes focus is listed here. Loaded
+   before buttons.css, so a filled button's own outline-color still wins. */
+
+.btn:focus-visible,
+.icon-btn:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+}

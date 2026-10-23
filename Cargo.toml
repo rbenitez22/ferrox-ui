@@ -2,7 +2,7 @@
 resolver = "3"
 # Crates are added as they move in from webapp-lib (plans/ferrox-ui.md):
 # ferrox-theme-build, ferrox-theme, demo, ferrox-ui, ferrox-icons.
-members = ["ferrox-theme-build", "ferrox-theme", "demo"]
+members = ["ferrox-theme-build", "ferrox-theme", "ferrox-ui", "demo"]
 
 # One version for every crate in this repo; one git tag releases them all.
 [workspace.package]

@@ -24,13 +24,15 @@ changing it does not trigger a rebuild.
 | Route | Page | Shows |
 |---|---|---|
 | `/` | `pages/themes.rs` | Every surface, text, role (explicit and derived slots) and chart token of the active theme, with the values the browser computed |
+| `/buttons` | `pages/buttons.rs` | `Button` (families, quiet, sizes, disabled, saving), `IconButton` (plain, pressed, danger, disabled), `Toolbar` (standard, compact, grouped) |
 
 The header and the theme bar (`theme_bar.rs`, plain `<select>`s for family and
 mode, plus the active `data-theme`) are on every page.
 
 ### Adding a page
 
-1. Add `src/pages/<name>.rs` with a `#[component] pub fn <Name>Page()`.
+1. Add `src/pages/<name>.rs` with a `#[component] pub fn <Name>Page()`; use
+   `crate::section::Section` for each titled block.
 2. Declare it in `src/pages/mod.rs`.
 3. Add a `<Route>` and a nav link in `src/app.rs`.
 4. Add the route to `e2e/tests/smoke.spec.ts`, and a spec for what it shows.
@@ -74,6 +76,7 @@ E2E_FRESH=1 npm test   # own server on :3299, fresh build (what the release chec
 | `playwright.config.ts` | server, browsers, the two modes above |
 | `fixtures.ts` | `openApp(page, path)` waits for `<body data-ready="true">`; every test fails on a page error or `console.error`, except patterns in `test.use({ expectedErrors: /…/ })` (one regex, not an array) |
 | `tests/smoke.spec.ts` | every route loads |
+| `tests/buttons.spec.ts` | Button / IconButton / Toolbar, including "no neighbour moves" on hover, press and saving |
 | `tests/themes.spec.ts` | choosing, persisting, pre-paint, styled before mount, loading screen, fonts, legacy key, `?theme=`, system mode, fallbacks |
 
 Writing a test:

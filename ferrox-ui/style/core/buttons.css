@@ -1,0 +1,294 @@
+/* Buttons (`.btn`) and icon buttons (`.icon-btn`). Part of ferrox-ui `core`.
+   Tokens only and class-only: every theme styles them, and nothing is styled
+   unless it carries the class. */
+
+/* ============================================================
+   BUTTONS
+
+   Families are SEMANTIC — what the button means, not how heavy it looks:
+
+     .btn--primary     affirmative. The main thing a screen exists for.
+     .btn--secondary   a real, committing action that is not the primary one.
+     .btn--cancel      negative / dismissive.
+     .btn--danger      destructive. The only role spending the danger hue.
+
+   Emphasis is a separate axis, because meaning and weight are separate
+   questions: `.btn--quiet` renders any family as an outline instead of a
+   fill. An outline secondary-coloured button is a SECONDARY action rendered quietly
+   (`.btn--secondary.btn--quiet`), not a family of its own — the same
+   reasoning that makes colour an axis rather than a family elsewhere.
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.6em 1.4em;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform var(--react-time) var(--react-ease);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* A standalone control breathes under the pointer — grows just past its size
+   and settles — and presses the same 1px, app-wide. A disabled or saving
+   button gets neither: it takes no pointer events. Clickable rows and tiles
+   reuse this exact press rather than inventing their own. */
+.btn:hover { transform: var(--react-grow); }
+.btn:active { transform: var(--react-press); }
+
+/* A ring in the fill's own colour is invisible. Filled families flip the ring
+   to the same token their own text uses. */
+.btn--primary:focus-visible { outline-color: var(--primary-on-fill); }
+.btn--secondary:focus-visible { outline-color: var(--secondary-on-fill); }
+.btn--danger:focus-visible { outline-color: var(--danger-on-fill); }
+
+/* ── Primary — affirmative ── */
+.btn--primary {
+  background: var(--primary-fill);
+  color: var(--primary-on-fill);
+  border-color: var(--primary-base);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 var(--fill-sheen);
+}
+
+.btn--primary:hover {
+  background: var(--primary-fill-hover);
+  box-shadow: var(--shadow-md), var(--primary-glow);
+}
+
+/* ── Secondary — supportive ── */
+.btn--secondary {
+  background: var(--secondary-fill);
+  color: var(--primary-on-fill);
+  border-color: var(--secondary-base);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 var(--fill-sheen);
+}
+
+.btn--secondary:hover {
+  background: var(--secondary-fill-hover);
+  box-shadow: var(--shadow-md), var(--secondary-glow);
+}
+
+/* ── Cancel — negative / dismissive ──
+   Always an outline: a dismissive action never carries fill weight. Does the
+   same thing as a dialog's × close. */
+.btn--cancel {
+  background: transparent;
+  color: var(--neutral-text);
+  border-color: var(--neutral-line);
+}
+
+.btn--cancel:hover {
+  color: var(--text);
+  border-color: var(--neutral-base);
+  background: var(--neutral-tint);
+}
+
+/* ── Danger — destructive ──
+   The affirmative button of a destructive confirmation. Its weight has to
+   read as danger, not as an ordinary commit. */
+.btn--danger {
+  background: var(--danger-fill);
+  color: var(--danger-on-fill);
+  border-color: var(--danger-base);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 var(--fill-sheen);
+}
+
+.btn--danger:hover {
+  background: var(--danger-fill-hover);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Quiet — the emphasis axis ──
+   Strips the fill, keeps the family's meaning and colour. Placed after every
+   family so it wins on equal specificity regardless of class order in the
+   markup. */
+.btn--quiet {
+  background: transparent;
+  box-shadow: none;
+  filter: none;
+}
+
+.btn--primary.btn--quiet {
+  color: var(--primary-text);
+  border-color: var(--primary-base);
+}
+
+.btn--primary.btn--quiet:hover {
+  background: var(--primary-tint);
+  box-shadow: var(--primary-glow);
+  filter: none;
+}
+
+.btn--secondary.btn--quiet {
+  color: var(--secondary-text);
+  border-color: var(--secondary-base);
+}
+
+.btn--secondary.btn--quiet:hover {
+  background: var(--secondary-tint);
+  box-shadow: var(--secondary-glow);
+  filter: none;
+}
+
+.btn--danger.btn--quiet {
+  color: var(--danger-text);
+  border-color: var(--danger-base);
+}
+
+.btn--danger.btn--quiet:hover {
+  background: var(--danger-tint);
+  filter: none;
+}
+
+/* A quiet button's ring goes back to the page default — there is no fill for
+   --<role>-on-fill to sit on. */
+.btn--quiet:focus-visible {
+  outline-color: var(--focus-ring-color);
+}
+
+/* ── Sizes ── */
+.btn--sm { font-size: 0.72rem; padding: 0.45em 1em; }
+.btn--lg { font-size: 0.9rem;  padding: 0.8em 2em;  }
+
+/* ── Disabled ──
+   Never reacts: no hover, no press, no transform. */
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  opacity: 0.45;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* ── Saving — a request is in flight ──
+   The label stays visible and the button keeps full opacity; only the border
+   colour animates. The border keeps its 1px width: a wider border would grow
+   the button and push its neighbours. Declared after the disabled rule so it
+   wins.
+
+   IMPORTANT for the component: while saving, set aria-disabled="true", NOT
+   the `disabled` attribute. A disabled element is not focusable, and a
+   keyboard user must not lose their place mid-request. `pointer-events: none`
+   is what actually blocks the second click. */
+.btn.is-saving,
+.btn.is-saving[aria-disabled='true'] {
+  opacity: 1;
+  pointer-events: none;
+  cursor: progress;
+  border-style: solid;
+  animation: ferrox-border-sweep 0.8s linear infinite;
+  animation-delay: var(--loading-delay);
+}
+
+
+/* ============================================================
+   ICON BUTTON — a glyph acting on the row it sits in
+
+   `.btn` is built for a word: it carries a border, a fill and padding on
+   both axes. A `+` or a `×` in a dense list or a toolbar wants none of that,
+   and three of them to a row wants it least of all. This is that control:
+   one size, 1.75rem square, at every width.
+
+   It does not grow to a 44px touch target. A row action's real target is the
+   row: it is one of several on a line, beside the thing it acts on, and a
+   44px box around each would take more of a phone's width than the content.
+
+   **It answers in colour, not in size.** A row is a dense place: a control
+   that grew under the pointer would shift its neighbours. The press is a
+   deeper tint rather than `--react-press`.
+   ============================================================ */
+.icon-btn {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.icon-btn:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+/* A drawn mark (`Icon`): a block, so no line box adds space under it. It takes
+   no pointer events, so hovering it is hovering the button around it: an SVG
+   under the pointer otherwise stands in for the button, and Firefox then looks
+   for the SVG's own `<title>` and shows no tooltip from the button's `title`. */
+.icon {
+  display: block;
+  flex: none;
+  pointer-events: none;
+}
+
+.icon-btn:active {
+  background: var(--primary-tint);
+}
+
+.icon-btn:focus-visible {
+  outline-offset: -2px;
+}
+
+/* A glyph that is a switch (`aria-pressed`), while it is on: tinted and in the
+   primary's text colour, so on reads apart from off without a second mark. */
+.icon-btn[aria-pressed='true'] {
+  background: var(--primary-tint-strong);
+  color: var(--primary-text);
+}
+
+/* Nothing to do from here: faded, and answering neither hover nor press. */
+.icon-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* A glyph that takes something away (a row's `×`). Colour only:
+   the size, the shape and the lack of chrome are the family's. */
+.icon-btn--danger {
+  color: var(--danger-text);
+}
+
+.icon-btn--danger:hover {
+  background: var(--danger-tint);
+  color: var(--danger-text);
+}
+
+.icon-btn--danger:active {
+  background: var(--danger-tint-strong);
+}
+
+
+
+/* The saving border's sweep, one side at a time. */
+@keyframes ferrox-border-sweep {
+  0%   { border-color: var(--primary-base) var(--primary-tint-strong) var(--primary-tint-strong) var(--primary-tint-strong); }
+  25%  { border-color: var(--primary-tint-strong) var(--primary-base) var(--primary-tint-strong) var(--primary-tint-strong); }
+  50%  { border-color: var(--primary-tint-strong) var(--primary-tint-strong) var(--primary-base) var(--primary-tint-strong); }
+  75%  { border-color: var(--primary-tint-strong) var(--primary-tint-strong) var(--primary-tint-strong) var(--primary-base); }
+  100% { border-color: var(--primary-base) var(--primary-tint-strong) var(--primary-tint-strong) var(--primary-tint-strong); }
+}
