@@ -24,7 +24,7 @@ plan, with the decisions and the full component inventory, is
 | `ferrox-ui` | Primitives in feature groups: `core` (always on), `forms`, `menus`, `overlay`, `navigation`, `layout`, `data` |
 | `ferrox-icons` | SVG icons, one function per icon |
 | `ferrox-charts` | Charts on the theme's chart tokens (later) |
-| `demo/` | Showcase of every theme and component, with Playwright end-to-end tests (not published) |
+| `demo/` | Showcase of every theme and component, with Playwright end-to-end tests (not published). *Moved in: themes.* |
 
 All crates share one version and are released together under one git tag.
 
@@ -45,7 +45,7 @@ type. The only direct dependency such an app adds is `ferrox-theme-build`, in
 `[build-dependencies]`, from the same tag webapp-lib uses; a mismatch fails
 the build with a message saying so.
 
-### Theme setup (from piece 1; the demo in piece 2 shows it working)
+### Theme setup (`demo/` is a working example)
 
 ```toml
 [build-dependencies]
@@ -72,7 +72,36 @@ ferrox_theme::register(include!(concat!(env!("OUT_DIR"), "/ferrox_themes.rs")));
 ferrox_theme::init();
 ```
 
+```toml
+# Trunk.toml — Trunk resolves index.html's links before it runs cargo, so the
+# build script must run first, or a clean checkout fails to build.
+[[hooks]]
+stage = "pre_build"
+command = "cargo"
+command_arguments = ["check", "--quiet", "--target", "wasm32-unknown-unknown"]
+
+[watch]
+ignore = ["style/ferrox"]   # written by every build, never a reason for one
+```
+
+Optional loading screen, shown until the app mounts (in `<body>`):
+
+```html
+<div class="ferrox-loading">
+  <div class="ferrox-loading__spinner"></div>
+  <div class="ferrox-loading__text">Loading…</div>
+</div>
+```
+
 Add `style/ferrox/` to `.gitignore`: it is generated.
+
+## Developing
+
+```sh
+cd demo && trunk serve          # http://127.0.0.1:3200
+cd demo/e2e && npm ci && npm test
+scripts/release-check.sh        # the gate before any tag
+```
 
 ## Licence
 

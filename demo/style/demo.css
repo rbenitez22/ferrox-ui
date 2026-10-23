@@ -1,0 +1,123 @@
+/* Demo-only layout. Class-only and token-only, like the library's CSS. */
+
+/* ── Page frame ── */
+.demo-app {
+    min-height: 100vh;
+    background: var(--background);
+    color: var(--text);
+    font-family: var(--font-body);
+}
+.demo-main {
+    max-width: min(1100px, 94vw);
+    margin: 0 auto;
+    padding-bottom: var(--space-2xl);
+}
+
+/* ── Header ── */
+.demo-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--primary-fill);
+    color: var(--primary-on-fill);
+}
+.demo-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+}
+.demo-nav {
+    display: flex;
+    gap: var(--space-md);
+}
+.demo-nav a {
+    color: var(--primary-on-fill);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+.demo-nav a[aria-current='page'] {
+    text-decoration: underline;
+}
+
+/* ── Theme bar ── */
+.demo-theme-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--surface-1);
+    border-bottom: 1px solid var(--line);
+}
+.demo-inline-label {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+.demo-theme-bar select {
+    background: var(--surface-0);
+    color: var(--text);
+    border: 1px solid var(--primary-line);
+    border-radius: var(--radius-sm);
+    padding: 2px var(--space-xs);
+}
+.demo-active {
+    margin-left: auto;
+    color: var(--text-muted);
+}
+
+/* ── Sections ── */
+.demo-section {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--line);
+}
+.demo-section h2 {
+    margin: 0 0 var(--space-sm);
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+}
+.demo-role-name {
+    margin: var(--space-md) 0 var(--space-xs);
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    text-transform: capitalize;
+}
+.demo-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* ── Token chips ── */
+.demo-chips {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: var(--space-sm);
+}
+.demo-chip {
+    margin: 0;
+    font-size: 0.75rem;
+}
+.demo-chip-sample {
+    height: 56px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+.demo-chip figcaption {
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--space-xs);
+}
+.demo-chip-value {
+    color: var(--text-subtle);
+    word-break: break-all;
+}

@@ -1,0 +1,19 @@
+[serve]
+address = "127.0.0.1"
+port    = 3200
+open    = false
+
+[watch]
+# e2e/: Playwright writes test-results/ there; watching it would rebuild and
+# auto-reload every open page mid-test.
+# style/ferrox/: written by build.rs on every build; a change there is always
+# the result of a build, never a reason for one.
+ignore = ["e2e", "style/ferrox"]
+
+# build.rs writes style/ferrox/ (the stylesheet and fonts index.html links),
+# but Trunk resolves index.html's links before it runs cargo. Running the
+# build script first, via `cargo check`, makes the files exist on a clean build.
+[[hooks]]
+stage = "pre_build"
+command = "cargo"
+command_arguments = ["check", "--quiet", "--target", "wasm32-unknown-unknown"]

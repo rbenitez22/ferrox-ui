@@ -34,8 +34,13 @@ pub fn write_css(out_dir: &str, themes_dir: Option<&str>) {
         }
         None => Vec::new(),
     };
-    write_assets(&root.join(out_dir), &app_themes)
+    let out = root.join(out_dir);
+    write_assets(&out, &app_themes)
         .unwrap_or_else(|e| panic!("cannot write ferrox-theme assets into {out_dir}: {e}"));
+    // Watch the output too: if it is deleted (a clean checkout, `git clean`),
+    // the next cargo run re-runs this script and writes it again.
+    println!("cargo:rerun-if-changed={}", out.join(CSS_FILE).display());
+    println!("cargo:rerun-if-changed={}", out.join(FONTS_DIR).display());
 }
 
 /// The whole stylesheet. Order matters: tokens before themes, so

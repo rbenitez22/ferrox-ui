@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ferrox-ui demo</title>
+    <!-- Copy of ferrox_theme::PREPAINT_SCRIPT; tests/prepaint.rs keeps it in step. -->
+    <script>
+(function () {
+  try {
+    var parts = (localStorage.getItem('ferrox.theme') ||
+      localStorage.getItem('webapp-lib.theme') || '').split(':');
+    if (parts.length < 4) return;
+    var mode = parts[1];
+    var dark = mode === 'dark' || (mode === 'system' && window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches);
+    var theme = dark ? parts[3] : parts[2];
+    if (theme) document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {
+    /* A blocked localStorage must not stop the app booting. */
+  }
+})();
+    </script>
+    <!-- Written by build.rs (ferrox_theme_build::write_css): fonts, tokens, themes, loading screen. -->
+    <link data-trunk rel="css" href="style/ferrox/ferrox.css" />
+    <link data-trunk rel="copy-dir" href="style/ferrox/fonts" />
+    <link data-trunk rel="css" href="style/demo.css" />
+    <link data-trunk rel="rust" data-wasm-opt="z" />
+  </head>
+  <body>
+    <div class="ferrox-loading">
+      <div class="ferrox-loading__spinner"></div>
+      <div class="ferrox-loading__text">Loading…</div>
+    </div>
+  </body>
+</html>

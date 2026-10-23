@@ -8,10 +8,23 @@
 //!     // The CSS file and fonts index.html links.
 //!     ferrox_theme_build::write_css("style/ferrox", Some("style/themes"));
 //! }
+//! ```
 //!
-//! // main.rs
+//! ```rust,ignore
+//! // main.rs, before mounting
 //! ferrox_theme::register(include!(concat!(env!("OUT_DIR"), "/ferrox_themes.rs")));
 //! ferrox_theme::init();
+//! ```
+//!
+//! Trunk resolves `index.html`'s links before it runs cargo, so on a clean
+//! checkout the generated files would not exist yet. Run the build script
+//! first with a pre-build hook in `Trunk.toml`:
+//!
+//! ```toml
+//! [[hooks]]
+//! stage = "pre_build"
+//! command = "cargo"
+//! command_arguments = ["check", "--quiet", "--target", "wasm32-unknown-unknown"]
 //! ```
 //!
 //! ```html

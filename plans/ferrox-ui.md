@@ -157,7 +157,16 @@ webapp-lib's history as the record (fresh first commit here).
    users keep their choice). Add the generated CSS file (C9), idempotent
    `init`/`register` (H9), a `ThemeFile` constructor (H8), `#[non_exhaustive]`
    (H7), configurable default family (X5).
-2. **Demo + e2e + release check.** Move the demo's theme page, theme bar and
+2. **Demo + e2e + release check** — done (2026-10-23). Demo on port 3200
+   (fresh-build e2e 3299), header + theme bar + themes page, demo-only
+   `harbor` theme through the app path. Clean-build finding: Trunk resolves
+   `index.html` links before cargo runs, so the generated CSS did not exist on
+   a clean build. Fixed with a Trunk `pre_build` hook (`cargo check`) plus
+   `write_css` watching its own output (`rerun-if-changed`). New e2e tests:
+   styled before mount (theme, `--background`, loading screen at
+   DOMContentLoaded), loading screen hides, fonts load from `fonts/`, legacy
+   key kept. Release check: per-feature checks, clippy `-D warnings`, tests,
+   demo build from scratch, e2e. Originally: Move the demo's theme page, theme bar and
    the Playwright setup (`fixtures.ts`, `themes.spec.ts`, smoke test),
    `scripts/release-check.sh`. The theme tests pass here unchanged; the
    pre-paint test gains a check that the page is styled before mount.

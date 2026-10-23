@@ -1,0 +1,16 @@
+[package]
+name    = "ferrox-ui-demo"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+leptos        = { workspace = true }
+leptos_router = { workspace = true }
+ferrox-theme  = { path = "../ferrox-theme", features = ["leptos"] }
+web-sys       = { workspace = true, features = ["Window", "Document", "Element", "CssStyleDeclaration", "Location"] }
+
+# Wired exactly as an app would be (apps use a git dependency instead of a path).
+[build-dependencies]
+ferrox-theme-build = { path = "../ferrox-theme-build" }
