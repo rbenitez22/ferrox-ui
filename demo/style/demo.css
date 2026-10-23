@@ -210,3 +210,20 @@
 .demo-form > .demo-row {
     margin-bottom: var(--space-lg);
 }
+
+/* Help page: a label beside its `?`, a row pushed to the right edge, and a
+   tall gap so the last `?` sits low on the page. */
+.demo-help-label {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+}
+.demo-row--end {
+    justify-content: flex-end;
+}
+.demo-tall {
+    height: 70vh;
+}
+/* Inputs sitting side by side in a demo row, not each a full line. */
+.demo-row > .form-input {
+    width: 12rem;
+}

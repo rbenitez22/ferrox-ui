@@ -9,6 +9,7 @@ const ROUTES = [
   { path: '/feedback', heading: 'Spinners' },
   { path: '/overlay', heading: 'Dialogs' },
   { path: '/forms', heading: 'Fields' },
+  { path: '/help', heading: 'Help topics' },
 ];
 
 for (const { path, heading } of ROUTES) {

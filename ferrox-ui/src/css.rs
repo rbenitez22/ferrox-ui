@@ -14,6 +14,7 @@ const CORE: &[(&str, &str)] = &[
     ("ferrox-ui-toolbar", include_str!("../style/core/toolbar.css")),
     ("ferrox-ui-spinner", include_str!("../style/core/spinner.css")),
     ("ferrox-ui-alert", include_str!("../style/core/alert.css")),
+    ("ferrox-ui-help", include_str!("../style/core/help.css")),
 ];
 
 /// `overlay`: the shared modal rules first, then each modal.

@@ -1,0 +1,99 @@
+/* Help (`.help-btn`, the `?`, and `.help-popover`, the topic it opens).
+   Part of ferrox-ui `core`. Tokens only and class-only.
+
+   A `?` only where help was given, and quiet until wanted: subtle ink,
+   smaller than a toolbar's icon buttons, so it sits beside a label without
+   competing with it. */
+
+.help-btn {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--text-subtle);
+  vertical-align: middle;
+}
+
+/* ── The popover ──
+   The browser's own popover, in the top layer; placed by the anchor module
+   (`left` / `top` set from script, `data-side` below or above). The
+   browser's centring (`inset: 0; margin: auto`) is replaced. */
+
+.help-popover {
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  box-sizing: border-box;
+  width: min(22rem, calc(100vw - 16px));
+  max-height: min(60vh, 28rem);
+  overflow-y: auto;
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-1);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* Focus moves to the popover so a screen reader reads it; the box itself
+   needs no ring. Its links and buttons keep theirs. */
+.help-popover:focus {
+  outline: none;
+}
+
+.help-popover__title {
+  margin: 0 0 var(--space-sm);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.help-popover__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.help-popover__paragraph {
+  margin: 0;
+}
+
+.help-popover__list {
+  margin: 0;
+  padding-left: 1.25em;
+}
+
+.help-popover__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.help-popover__heading,
+.help-popover__cell {
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+.help-popover__heading {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.help-popover__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--line);
+}
+
+.help-popover__link {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary-text);
+}

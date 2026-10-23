@@ -3,10 +3,11 @@
 //!
 //! Components come in feature groups. `core` is always compiled:
 //! [`Button`], [`IconButton`], [`Toolbar`] / [`ToolbarGroup`], [`Spinner`],
-//! [`LoadingOverlay`], [`Alert`]. Feature `overlay`: `Dialog`,
-//! `ConfirmDialog`, `Sheet`. Feature `forms`: `Field`, `Input`, `Textarea`,
-//! `PasswordInput`, `Checkbox`, `Switch`, `Select`. Further groups (`menus`,
-//! `navigation`, `layout`, `data`) arrive as they are built.
+//! [`LoadingOverlay`], [`Alert`], [`HelpButton`] / [`HelpTopic`]. Feature
+//! `overlay`: `Dialog`, `ConfirmDialog`, `Sheet`. Feature `forms`: `Field`,
+//! `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`.
+//! Further groups (`menus`, `navigation`, `layout`, `data`) arrive as they
+//! are built.
 //!
 //! Call [`init`] once at startup, before mounting, to add the components'
 //! CSS. The theme itself (tokens, themes, fonts) comes from ferrox-theme.
@@ -21,7 +22,6 @@ mod core;
 mod css;
 #[cfg(feature = "forms")]
 mod forms;
-#[cfg(any(feature = "overlay", feature = "forms"))]
 mod ids;
 #[cfg(feature = "overlay")]
 mod overlay;

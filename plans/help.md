@@ -8,7 +8,21 @@ assistant, the same popover offers **"Ask about this"**. That hands the app a
 declared around it (page → section → field). The app sends it to its chat,
 LLM or Patina recall. ferrox-ui never talks to a model itself.
 
-Status: approved (2026-10-23); piece 1 next.
+Status: approved (2026-10-23). Piece 1 done (2026-10-23); piece 2 next.
+
+Notes from piece 1:
+- The `?` opens the popover declaratively (`popovertarget`), so the browser
+  handles opening, Esc, light dismiss, one-open-at-a-time and focus going
+  back to the `?` on Esc. The component only places the popover (in
+  `on:toggle`), focuses it so a screen reader reads it, and mirrors
+  `aria-expanded`.
+- `core/anchor.rs` splits the maths (`position`, unit-tested: below, above,
+  the roomier side, clamped at the edges) from the DOM (`place`, and
+  `follow`, which re-places it every frame while open, so it tracks page
+  scroll, scrolling parents and layout shifts alike). It sets `left`/`top`
+  from script and `data-side` for tests: the one inline style, because the
+  position is computed.
+- `ids` is now compiled always, since core uses it.
 
 ## Prior art: conrad
 
