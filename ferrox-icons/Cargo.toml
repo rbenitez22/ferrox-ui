@@ -1,0 +1,19 @@
+[package]
+name        = "ferrox-icons"
+description = "SVG icons for Leptos CSR apps: each icon a value, drawn by one Icon component."
+version.workspace    = true
+edition.workspace    = true
+license.workspace    = true
+repository.workspace = true
+authors.workspace    = true
+
+[dependencies]
+leptos = { workspace = true }
+
+# build.rs checks every icons/*.svg and generates one const per icon. The
+# tests include the same logic (build/), so they need the parser too.
+[build-dependencies]
+roxmltree = { workspace = true }
+
+[dev-dependencies]
+roxmltree = { workspace = true }

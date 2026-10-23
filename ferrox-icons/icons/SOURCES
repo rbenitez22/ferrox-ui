@@ -1,0 +1,4 @@
+# Where each icon comes from: <our name> <Lucide name>, one per line.
+# Files are copied unchanged from https://github.com/lucide-icons/lucide
+# (icons/<Lucide name>.svg, commit 7faf876) and renamed to <our name>.svg.
+close x
