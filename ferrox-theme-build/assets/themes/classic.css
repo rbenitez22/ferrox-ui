@@ -1,0 +1,96 @@
+/* ============================================================
+   THEME — CLASSIC
+   webapp-lib 0.x's indigo palette (its `vars.css`), restated in the token
+   contract so apps moving off webapp-lib 0.x can keep their look.
+
+   Old variable → token:
+     --background  #eeeff4  → --background
+     .main bg      #fbfbfe  → --surface-0
+     --primary     #2f27ce  → --primary-base / --primary-fill
+     --accent      #433bff  → --primary-fill-hover
+     --secondary   #dedcff  → --secondary-fill
+     --white       #ffffff  → --primary-on-fill (and the other on-fills)
+     --error-color #e33030  → --danger-fill (darkened to #d42a2a)
+     --warning-color #e3a330 → --warning-fill
+   Where an old value failed WCAG AA (4.5:1) it was darkened: warning text
+   (#e3a330 read at 2.5:1, so --warning-base is #9a6a00), and white on the
+   success/danger fills and their hovers. Hovers darken rather than lighten,
+   so text on them stays legible.
+   Fills are flat, as the old buttons were; hence the faint sheen.
+   ============================================================ */
+:root[data-theme='classic'] {
+  /* ── Surfaces ── */
+  --background: #eeeff4;
+  --surface-0:  #fbfbfe;
+  --surface-1:  #f3f3fa;
+  --surface-2:  #e4e3f3;
+  --surface-3:  #cfcde8;
+
+  /* Charts — category hues are conrad's validated light set. */
+  --chart-in:  #1f8f74;
+  --chart-out: #2f27ce;
+
+  --chart-cat-1: #2a6fc4;
+  --chart-cat-2: #d0561f;
+  --chart-cat-3: #14876a;
+  --chart-cat-4: #9a6a00;
+  --chart-cat-5: #c04a80;
+  --chart-other: #7a7570;
+
+  color-scheme: light;
+
+  --text:        #050315;
+  --text-muted:  #3d3b55;
+  --text-subtle: #5f5d78;
+
+  --line: rgba(5, 3, 21, 0.12);
+
+  --fill-sheen: rgba(255, 255, 255, 0.08);
+  --scrim: rgba(5, 3, 21, 0.40);
+
+  --focus-ring-color:  #2f27ce;
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+
+  --text-mix: #000;
+
+  /* ── Roles — explicit slots only ── */
+  --primary-base: #2f27ce;
+  --primary-fill: #2f27ce;
+  --primary-fill-hover: #433bff;
+  --primary-on-fill: #ffffff;
+
+  --secondary-base: #5b55c9;
+  --secondary-fill: #dedcff;
+  --secondary-fill-hover: #cbc8ff;
+  --secondary-on-fill: #050315;
+
+  --neutral-base: #6b6a80;
+  --neutral-fill: #e4e3f3;
+  --neutral-fill-hover: #cfcde8;
+  --neutral-on-fill: #050315;
+
+  --info-base: #2f27ce;
+  --info-fill: #2f27ce;
+  --info-fill-hover: #433bff;
+  --info-on-fill: #ffffff;
+
+  --success-base: #1a7f4f;
+  --success-fill: #1a7a4c;
+  --success-fill-hover: #17704a;
+  --success-on-fill: #ffffff;
+
+  --warning-base: #9a6a00;
+  --warning-fill: #e3a330;
+  --warning-fill-hover: #eab452;
+  --warning-on-fill: #050315;
+
+  --danger-base: #d42a2a;
+  --danger-fill: #d42a2a;
+  --danger-fill-hover: #c62828;
+  --danger-on-fill: #ffffff;
+
+  --shadow-sm: 0 1px 3px rgba(5, 3, 21, 0.14), 0 1px 2px rgba(5, 3, 21, 0.08);
+  --shadow-md: 0 4px 12px rgba(5, 3, 21, 0.16), 0 2px 4px rgba(5, 3, 21, 0.10);
+  --shadow-lg: 0 8px 28px rgba(5, 3, 21, 0.20), 0 4px 8px rgba(5, 3, 21, 0.12);
+}

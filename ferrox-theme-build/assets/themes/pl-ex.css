@@ -1,0 +1,115 @@
+/* ============================================================
+   THEME — PL-EX (day)
+   A delivery company's building, worn as a whole: its brick for the ground,
+   the darker red of the observatory dome for the title bars, the mustard trim
+   along its foot for the borders and the accent, the green of its bands and
+   door for the buttons, and the blue of its windows. The day half of the
+   Pl-Ex family; `pl-ex-dark` is the night.
+
+
+   A DARK GROUND BY DAY. The brick is dark enough that the words are cream,
+   not black, so this "light" half declares `color-scheme: dark` and pushes
+   role text toward white. The ground is a shade deeper than the tower's
+   face: cream has to clear AAA on every surface (held by contrast.test.ts).
+
+   THE SURFACES RUN DOWN, NOT UP. Panel heads, dialog title bars and table
+   heads are `--surface-2`, so `--surface-2` is the dome's darker red, and the
+   deep inset below it darker still. Inputs and raised cards (`--surface-0`)
+   sit a touch lighter than the ground.
+
+   WHICH COLOUR DOES WHICH JOB. The bands' green is primary — a deep fill with
+   cream on it. The trim's mustard is secondary, the accent. Warning cannot be
+   mustard too, so it takes the antenna lamp's orange. The windows' blue is
+   info and the focus ring. Danger is a hot, cool crimson with a pink text
+   form: brighter and pinker than the wall, so it never reads as the ground.
+
+   Restates the SURFACES block and every role's four EXPLICIT slots; the
+   derived slots re-derive themselves from the bases.
+   ============================================================ */
+:root[data-theme='pl-ex'] {
+  /* ── Surfaces — the brick, and the dome above it ── */
+  --background: #b13420;
+  --surface-0:  #8c2918;
+  --surface-1:  #7e2414;
+  --surface-2:  #661c10;
+  --surface-3:  #521609;
+
+  /* Charts: money in and money out, in the bands' green and a pale brick,
+     light enough for 3:1 on every surface a card can be (held by
+     contrast.test.ts). */
+  --chart-in:  #7ee0a6;
+  --chart-out: #ffb090;
+
+  /* Charts by category: five hues in a fixed order, then a neutral for
+     everything else; 3:1 held by contrast.test.ts. */
+  --chart-cat-1: #9ccaf5;
+  --chart-cat-2: #ffb090;
+  --chart-cat-3: #6fd8c8;
+  --chart-cat-4: #ffd27a;
+  --chart-cat-5: #f0a8dc;
+  --chart-other: #d8d0c0;
+
+  color-scheme: dark;
+
+  --text:        #fff8e6;   /* cream */
+  --text-muted:  #f8ecd0;   /* AAA against surface-0 */
+  --text-subtle: #dcc298;   /* AA  against surface-0 */
+
+  /* The trim's mustard, as the line every edge is drawn with. */
+  --line: rgba(217, 169, 42, 0.45);
+
+  --fill-sheen: rgba(255, 255, 255, 0.18);
+  --scrim: rgba(20, 5, 2, 0.6);
+
+  --focus-ring-color:  #9ccaf5;
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+
+  --text-mix: #fff;
+
+  /* ── Roles — explicit slots only ── */
+
+  /* The bands' and the door's green, deep, with cream on it. */
+  --primary-base: #7ee0a6;
+  --primary-fill: linear-gradient(135deg, #2f8d5c 0%, #1f7a4a 50%, #135c36 100%);
+  --primary-fill-hover: linear-gradient(135deg, #3fa56e 0%, #2f8d5c 50%, #1f7a4a 100%);
+  --primary-on-fill: #fff8e6;
+
+  /* The trim's mustard, the accent, with black on it. */
+  --secondary-base: #e8c050;
+  --secondary-fill: linear-gradient(135deg, #e8c050 0%, #d9a92a 50%, #b88a14 100%);
+  --secondary-fill-hover: linear-gradient(135deg, #f2d478 0%, #e8c050 50%, #d9a92a 100%);
+  --secondary-on-fill: #161412;
+
+  --neutral-base: #dcc298;
+  --neutral-fill: #661c10;
+  --neutral-fill-hover: #521609;
+  --neutral-on-fill: #fff8e6;
+
+  /* The windows' blue. */
+  --info-base: #9ccaf5;
+  --info-fill: #1b5fa8;
+  --info-fill-hover: #2a78c8;
+  --info-on-fill: #fff8e6;
+
+  --success-base: #8fe09a;
+  --success-fill: #1e6b3a;
+  --success-fill-hover: #28844a;
+  --success-on-fill: #fff8e6;
+
+  /* The antenna lamp's orange: a fill with black on it. */
+  --warning-base: #ffb84a;
+  --warning-fill: #e8892a;
+  --warning-fill-hover: #f2a04c;
+  --warning-on-fill: #161412;
+
+  /* A hot, cool crimson: brighter and pinker than the wall. */
+  --danger-base: #ff8a9a;
+  --danger-fill: #d42850;
+  --danger-fill-hover: #e8406a;
+  --danger-on-fill: #fff8e6;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.50);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.55);
+}

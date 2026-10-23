@@ -1,0 +1,96 @@
+/* ============================================================
+   THEME — PATINA DARK
+   Blackened metal with verdigris accents.
+
+
+   Restates the SURFACES block and every role's four EXPLICIT slots. The
+   derived slots (--*-text, --*-tint, --*-tint-strong, --*-line, --*-glow) are
+   NOT restated: they are defined in tokens.css as color-mix() over
+   --<role>-base, and re-derive themselves from the bases below.
+
+   `:root[data-theme=…]`, not a bare attribute selector — the bare form ties
+   with `:root` on specificity and would win only by source order.
+   ============================================================ */
+:root[data-theme='patina-dark'] {
+  /* ── Surfaces ── */
+  --background: #0e0b09;
+  --surface-0:  #14100d;
+  --surface-1:  #1c1612;
+  --surface-2:  #2a1f17;
+  --surface-3:  #3b2e24;
+
+  /* Charts: money in and money out, in the hues debit and credit already wear
+     but tuned to pass the colour-blind and contrast checks (3:1 on every
+     surface a card can be, held by contrast.test.ts). */
+  --chart-in:  #3aa38c;
+  --chart-out: #d9773a;
+
+  /* Charts by category: the same five hues stepped for a dark card, then a
+     neutral for everything else (validated as a set; 3:1 held by
+     contrast.test.ts). */
+  --chart-cat-1: #3987e5;
+  --chart-cat-2: #d95926;
+  --chart-cat-3: #199e70;
+  --chart-cat-4: #c98500;
+  --chart-cat-5: #d55181;
+  --chart-other: #8f877e;
+
+  color-scheme: dark;
+
+  --text:        #f0e6d8;
+  --text-muted:  #bba897;   /* AAA — 7.0:1 against surface-2, the worst case */
+  --text-subtle: #a68069;   /* AA  — 4.5:1. Was #6b5040 at 2.4:1, which failed */
+
+  --line: rgba(240, 230, 216, 0.10);
+
+  --focus-ring-color:  #e8874a;
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+
+  /* Role text is pushed toward white here, not black — the one line that
+     flips every derived --<role>-text for the whole theme. */
+  --text-mix: #fff;
+
+  /* ── Roles — explicit slots only ── */
+  --primary-base: #e8874a;
+  --primary-fill: linear-gradient(135deg, #f2a96e 0%, #e8874a 45%, #c4622d 100%);
+  --primary-fill-hover: linear-gradient(135deg, #f7d4b5 0%, #f2a96e 45%, #e8874a 100%);
+  --primary-on-fill: #14100d;
+
+  --secondary-base: #5fb8a5;
+  --secondary-fill: linear-gradient(135deg, #a8d8ce 0%, #5fb8a5 55%, #3d8c7a 100%);
+  --secondary-fill-hover: linear-gradient(135deg, #dff0ec 0%, #a8d8ce 55%, #5fb8a5 100%);
+  --secondary-on-fill: #14100d;
+
+  --neutral-base: #b09a86;
+  --neutral-fill: #2a1f17;
+  --neutral-fill-hover: #3b2e24;
+  --neutral-on-fill: #f0e6d8;
+
+  --info-base: #5fb8a5;
+  --info-fill: #3d8c7a;
+  --info-fill-hover: #5fb8a5;
+  --info-on-fill: #0e0b09;
+
+  --success-base: #7ed4bf;
+  --success-fill: #5fb8a5;
+  --success-fill-hover: #a8d8ce;
+  --success-on-fill: #0e0b09;
+
+  --warning-base: #e0a055;
+  --warning-fill: #c47a2d;
+  --warning-fill-hover: #e0a055;
+  --warning-on-fill: #0e0b09;
+
+  --danger-base: #e0685a;
+  --danger-fill: #c0392b;
+  --danger-fill-hover: #d4503f;
+  --danger-on-fill: #fdf8f3;
+
+  /* ── Elevation ──
+     Warm copper-tinted shadows disappear on a black ground; these are the one
+     non-colour group a dark theme genuinely has to restate. */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.60);
+}

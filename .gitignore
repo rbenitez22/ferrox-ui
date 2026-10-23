@@ -4,3 +4,4 @@
 /demo/e2e/node_modules
 /demo/e2e/test-results
 /demo/e2e/playwright-report
+/.idea

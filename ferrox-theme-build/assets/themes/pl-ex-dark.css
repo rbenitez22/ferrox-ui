@@ -1,0 +1,104 @@
+/* ============================================================
+   THEME — PL-EX (night)
+   The same delivery company after dark: the city's night sky for the ground,
+   the badge's cream for the words, and the ship, the building and the rocket
+   lit against it. The night half of the Pl-Ex family; `pl-ex` is the day.
+
+
+   The roles keep their day jobs: the ship's green is primary, the building's
+   brick secondary, the badge's crimson danger, the mustard trim warning. On a
+   navy ground each is lifted to read, and the two reds are pulled apart (brick
+   toward orange, crimson toward rose) so danger never reads as the secondary
+   action. The sky blue that was info by day would vanish into the night, so
+   info and the focus ring take the rocket's cyan instead.
+
+   Restates the SURFACES block and every role's four EXPLICIT slots; the
+   derived slots re-derive themselves from the bases.
+   ============================================================ */
+:root[data-theme='pl-ex-dark'] {
+  /* ── Surfaces — the night sky over the city, not black ── */
+  --background: #0b1220;
+  --surface-0:  #101a2b;
+  --surface-1:  #152136;
+  --surface-2:  #1d2b44;
+  --surface-3:  #2b3c5a;
+
+  /* Charts: money in and money out, in the ship's green and the building's
+     brick, lifted for 3:1 on every surface a card can be (held by
+     contrast.test.ts). */
+  --chart-in:  #2fbf7f;
+  --chart-out: #e0663e;
+
+  /* Charts by category: the day's five hues stepped for a dark card, then a
+     neutral for everything else; 3:1 held by contrast.test.ts. */
+  --chart-cat-1: #4a8fe0;
+  --chart-cat-2: #e0663e;
+  --chart-cat-3: #22b08a;
+  --chart-cat-4: #d4a020;
+  --chart-cat-5: #df5c95;
+  --chart-other: #8f8a78;
+
+  color-scheme: dark;
+
+  --text:        #f6f0c4;   /* the badge's cream */
+  --text-muted:  #c9c3a0;   /* AAA against surface-2 */
+  --text-subtle: #9c977c;   /* AA  against surface-2 */
+
+  --line: rgba(246, 240, 196, 0.12);
+
+  --fill-sheen: rgba(255, 255, 255, 0.18);
+  --scrim: rgba(5, 9, 16, 0.6);
+
+  --focus-ring-color:  #7ff0e8;
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+
+  --text-mix: #fff;
+
+  /* ── Roles — explicit slots only ── */
+
+  /* The ship's green, as bright as the hull. */
+  --primary-base: #5fd88a;
+  --primary-fill: linear-gradient(135deg, #8be8a8 0%, #5fd88a 45%, #2fa866 100%);
+  --primary-fill-hover: linear-gradient(135deg, #b4f2c6 0%, #8be8a8 45%, #5fd88a 100%);
+  --primary-on-fill: #0b1220;
+
+  /* The building's brick, lifted and leaning orange. */
+  --secondary-base: #ee6a48;
+  --secondary-fill: linear-gradient(135deg, #f08463 0%, #e0553a 50%, #b8381e 100%);
+  --secondary-fill-hover: linear-gradient(135deg, #f6a487 0%, #f08463 50%, #e0553a 100%);
+  --secondary-on-fill: #0b1220;
+
+  --neutral-base: #a8a48e;
+  --neutral-fill: #1d2b44;
+  --neutral-fill-hover: #2b3c5a;
+  --neutral-on-fill: #f6f0c4;
+
+  /* The rocket's cyan. */
+  --info-base: #7ff0e8;
+  --info-fill: #3cc8c0;
+  --info-fill-hover: #7ff0e8;
+  --info-on-fill: #0b1220;
+
+  --success-base: #5fd47f;
+  --success-fill: #3fb95f;
+  --success-fill-hover: #5fd47f;
+  --success-on-fill: #0b1220;
+
+  /* The mustard trim. */
+  --warning-base: #e8b83a;
+  --warning-fill: #d9a92a;
+  --warning-fill-hover: #e8c050;
+  --warning-on-fill: #0b1220;
+
+  /* The badge's crimson, leaning rose, apart from the brick. */
+  --danger-base: #ff5c74;
+  --danger-fill: #c8263c;
+  --danger-fill-hover: #e23a52;
+  --danger-on-fill: #f6f0c4;
+
+  /* A night ground swallows a tinted shadow. */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.55);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.60);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.65);
+}

@@ -51,7 +51,12 @@ ferrox-theme        tokens, themes, runtime switching, CSS file generation
 - **Lockstep inside this repo**: one version, one git tag (`vX.Y.Z`) for all
   crates. Starts at `0.1.0`.
 - Apps normally reach ferrox-ui through webapp-lib's re-exports (facade); an
-  app without webapp-lib uses ferrox-ui directly.
+  app without webapp-lib uses ferrox-ui directly. **An app using webapp-lib
+  never lists ferrox-ui or ferrox-theme itself**: two references that differ
+  (tag, or ssh vs https URL) make two copies of every type. The build script's
+  `ferrox-theme-build` is the one direct dependency; `check_build_version`
+  catches a mismatched tag, and `embed_themes_for(dir, "::webapp_lib::theme")`
+  points the generated code at the re-export.
 - Charts: `ferrox-charts`, later.
 - Icons are SVG (UTF-8 glyph icons were abandoned in webapp-lib).
 - **ferrox-ui is the source of truth** for its tokens, themes and component
@@ -133,7 +138,18 @@ webapp-lib's history as the record (fresh first commit here).
    `0.1.0`, shared deps), `LICENSE-MIT` + `LICENSE-APACHE`, `README.md`,
    `.gitignore`, this plan. First commit, push `master`; check GitHub's
    default branch is `master`.
-1. **`ferrox-theme` + `ferrox-theme-build`.** Move `lib/src/theme`,
+1. **`ferrox-theme` + `ferrox-theme-build`** — done (2026-10-23). The CSS
+   assets (tokens, built-in themes, fonts + OFL licences, `.ferrox-loading`
+   screen) live in `ferrox-theme-build/assets/`, compiled into the build crate;
+   `write_css(out_dir, themes_dir)` writes `ferrox.css` + `fonts/` (only when
+   changed). The runtime no longer injects CSS. Storage key `ferrox.theme`,
+   legacy `webapp-lib.theme` read as fallback (runtime and pre-paint).
+   Generated code calls `check_build_version` (compile_fail doc test).
+   `register` dedupes by id; `init` is idempotent; `set_starting_family` (X5).
+   **To verify in piece 2:** Trunk processes `rel="css"` while cargo runs the
+   build script, so on a clean first build `ferrox.css` may not exist yet.
+   Check; if it bites, run the write from a Trunk `pre_build` hook instead.
+   Originally: move `lib/src/theme`,
    `lib/style/{tokens.css,themes/}`, `webapp-lib-build`. Not the conrad sync
    script: ferrox-ui owns the CSS now, so drop the "TIER 1 / edit it in conrad"
    headers. Rename identifiers and the storage key

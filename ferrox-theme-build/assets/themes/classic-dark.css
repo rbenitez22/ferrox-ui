@@ -1,0 +1,93 @@
+/* ============================================================
+   THEME — CLASSIC DARK
+   The dark half of Classic: webapp-lib 0.x's `.main[data-theme="dark"]` block,
+   restated in the token contract.
+
+   Old variable → token:
+     --background #010104 → --background
+     --text       #ebe9fc → --text
+     --primary    #3a31d8 → --primary-fill
+     --accent     #0600c2 → (dropped — darker than primary, so it read as a
+                            press, not a hover; hover is now lighter)
+     --secondary  #020024 → --secondary-fill (lifted a step to stay visible)
+   --primary-base is lighter than the old --primary: the derived
+   --primary-text mixes the base toward white, and #3a31d8 on near-black
+   text fell well under 4.5:1. Success/danger fills and hovers match
+   Classic's, darkened so white on them holds 4.5:1.
+   ============================================================ */
+:root[data-theme='classic-dark'] {
+  /* ── Surfaces ── */
+  --background: #010104;
+  --surface-0:  #0a0a14;
+  --surface-1:  #11101f;
+  --surface-2:  #1a1830;
+  --surface-3:  #252244;
+
+  /* Charts — category hues are conrad's validated dark set. */
+  --chart-in:  #3aa38c;
+  --chart-out: #8a84ff;
+
+  --chart-cat-1: #3987e5;
+  --chart-cat-2: #d95926;
+  --chart-cat-3: #199e70;
+  --chart-cat-4: #c98500;
+  --chart-cat-5: #d55181;
+  --chart-other: #8f877e;
+
+  color-scheme: dark;
+
+  --text:        #ebe9fc;
+  --text-muted:  #b9b6d6;
+  --text-subtle: #8c89ad;
+
+  --line: rgba(235, 233, 252, 0.12);
+
+  --fill-sheen: rgba(255, 255, 255, 0.08);
+  --scrim: rgba(1, 1, 4, 0.60);
+
+  --focus-ring-color:  #7a73ff;
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+
+  --text-mix: #fff;
+
+  /* ── Roles — explicit slots only ── */
+  --primary-base: #6c64f0;
+  --primary-fill: #3a31d8;
+  --primary-fill-hover: #4b43e6;
+  --primary-on-fill: #ffffff;
+
+  --secondary-base: #8a84e8;
+  --secondary-fill: #14104a;
+  --secondary-fill-hover: #201a66;
+  --secondary-on-fill: #ebe9fc;
+
+  --neutral-base: #8c89ad;
+  --neutral-fill: #1a1830;
+  --neutral-fill-hover: #252244;
+  --neutral-on-fill: #ebe9fc;
+
+  --info-base: #6c64f0;
+  --info-fill: #3a31d8;
+  --info-fill-hover: #4b43e6;
+  --info-on-fill: #ffffff;
+
+  --success-base: #3fbf85;
+  --success-fill: #1a7a4c;
+  --success-fill-hover: #17704a;
+  --success-on-fill: #ffffff;
+
+  --warning-base: #e3a330;
+  --warning-fill: #e3a330;
+  --warning-fill-hover: #eab452;
+  --warning-on-fill: #050315;
+
+  --danger-base: #f05454;
+  --danger-fill: #d42a2a;
+  --danger-fill-hover: #c62828;
+  --danger-on-fill: #ffffff;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.60);
+}

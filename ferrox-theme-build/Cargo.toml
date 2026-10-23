@@ -1,0 +1,11 @@
+[package]
+name        = "ferrox-theme-build"
+description = "Build-script helper for ferrox-theme: validates theme files, embeds their metadata, and writes the CSS file and fonts an app links in index.html."
+version.workspace    = true
+edition.workspace    = true
+license.workspace    = true
+repository.workspace = true
+authors.workspace    = true
+
+# Std only: an app's build script never compiles Leptos or web-sys.
+[dependencies]

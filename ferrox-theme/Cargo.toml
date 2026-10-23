@@ -1,0 +1,21 @@
+[package]
+name        = "ferrox-theme"
+description = "Token themes for Leptos CSR apps: families with light and dark halves, system/light/dark mode, a pre-paint script, and Leptos signals."
+version.workspace    = true
+edition.workspace    = true
+license.workspace    = true
+repository.workspace = true
+authors.workspace    = true
+
+[features]
+default = []
+# provide_theme / use_theme: the theme as Leptos signals.
+leptos = ["dep:leptos"]
+
+[dependencies]
+leptos       = { workspace = true, optional = true }
+wasm-bindgen = { workspace = true }
+web-sys      = { workspace = true, features = ["Window", "Document", "Element", "Storage", "MediaQueryList", "Event", "EventTarget"] }
+
+[build-dependencies]
+ferrox-theme-build = { path = "../ferrox-theme-build", version = "0.1.0" }

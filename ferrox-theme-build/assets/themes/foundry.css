@@ -1,0 +1,95 @@
+/* ============================================================
+   THEME — FOUNDRY
+   Cold-rolled steel and brass. Deliberately the opposite temperature from
+   Patina: cool blue-grey ground, steel-blue primary, brass secondary.
+
+
+   This theme exists to PROVE the claim that a new theme is one file and no
+   edits elsewhere. It shares no hue with Patina, and every difference below
+   is a value — not a rule, not a selector, not a component change.
+
+   Written by copying the SURFACES block and each role's four EXPLICIT slots
+   out of tokens.css and changing the numbers. Nothing else was needed.
+   ============================================================ */
+:root[data-theme='foundry'] {
+  /* ── Surfaces ── */
+  --background: #eceff3;
+  --surface-0:  #f8fafc;
+  --surface-1:  #e4e9ef;
+  --surface-2:  #d2dae4;
+  --surface-3:  #b6c2d0;
+
+  /* Charts: money in and money out, in the hues debit and credit already wear
+     but tuned to pass the colour-blind and contrast checks (3:1 on every
+     surface a card can be, held by contrast.test.ts). */
+  --chart-in:  #96741c;
+  --chart-out: #2f6fb0;
+
+  /* Charts by category (where the money goes): five hues in a fixed order, then
+     a neutral for everything else. Checked with the dataviz palette validator
+     (lightness band, chroma, colour-blind and normal-vision separation of
+     neighbours, the last beside the first) on this theme's card surfaces;
+     3:1 held by contrast.test.ts. */
+  --chart-cat-1: #2a6fc4;
+  --chart-cat-2: #d0561f;
+  --chart-cat-3: #14876a;
+  --chart-cat-4: #9a6a00;
+  --chart-cat-5: #c04a80;
+  --chart-other: #7a7570;
+
+  color-scheme: light;
+
+  --text:        #10161d;
+  --text-muted:  #394352;   /* AAA — 7.1:1 against surface-2 */
+  --text-subtle: #506076;   /* AA  — 4.6:1 */
+
+  --line: rgba(16, 22, 29, 0.12);
+
+  --focus-ring-color:  #1f4d80;
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+
+  --text-mix: #000;
+
+  /* ── Roles — explicit slots only ── */
+  --primary-base: #2f6fb0;
+  --primary-fill: linear-gradient(135deg, #6ba3dc 0%, #2f6fb0 45%, #1f4d80 100%);
+  --primary-fill-hover: linear-gradient(135deg, #9cc5ea 0%, #6ba3dc 45%, #2f6fb0 100%);
+  --primary-on-fill: #f8fafc;
+
+  --secondary-base: #b08a2f;
+  --secondary-fill: linear-gradient(135deg, #e2c273 0%, #b08a2f 55%, #7d611f 100%);
+  --secondary-fill-hover: linear-gradient(135deg, #f0dcac 0%, #e2c273 55%, #b08a2f 100%);
+  --secondary-on-fill: #10161d;
+
+  --neutral-base: #55637a;
+  --neutral-fill: #d2dae4;
+  --neutral-fill-hover: #b6c2d0;
+  --neutral-on-fill: #10161d;
+
+  --info-base: #2f6fb0;
+  --info-fill: #2f6fb0;
+  --info-fill-hover: #6ba3dc;
+  --info-on-fill: #f8fafc;
+
+  --success-base: #2e8b6a;
+  --success-fill: #2e8b6a;
+  --success-fill-hover: #4fb18d;
+  --success-on-fill: #f8fafc;
+
+  --warning-base: #b8791b;
+  --warning-fill: #b8791b;
+  --warning-fill-hover: #d69a3d;
+  --warning-on-fill: #10161d;
+
+  --danger-base: #b5322c;
+  --danger-fill: #b5322c;
+  --danger-fill-hover: #cf4a43;
+  --danger-on-fill: #f8fafc;
+
+  /* Neutral-grey shadows: copper-tinted ones read as a stain on a cool
+     ground. */
+  --shadow-sm: 0 1px 3px rgba(16, 22, 29, 0.14), 0 1px 2px rgba(16, 22, 29, 0.08);
+  --shadow-md: 0 4px 12px rgba(16, 22, 29, 0.16), 0 2px 4px rgba(16, 22, 29, 0.10);
+  --shadow-lg: 0 8px 28px rgba(16, 22, 29, 0.20), 0 4px 8px rgba(16, 22, 29, 0.12);
+}

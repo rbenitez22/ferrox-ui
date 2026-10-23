@@ -1,0 +1,384 @@
+/* ============================================================
+   PATINA THEME — TOKENS (the default theme)
+
+   ------------------------------------------------------------
+   HOW THIS FILE IS ORGANISED, AND THE ONE RULE THAT MATTERS
+   ------------------------------------------------------------
+   Three layers, and they only ever read downward:
+
+     1. PALETTE   raw hues (--copper-mid, --verdigris-deep, …).
+                  PRIVATE. Readable only inside this file. No component,
+                  and no other stylesheet, may name one.
+     2. SURFACES  the ground everything sits on — page, panels, body text,
+                  lines, the focus ring. Not an intent, a substrate.
+     3. ROLES     what a colour MEANS when applied: primary, secondary,
+                  neutral, info, success, warning, danger.
+
+   Components name a ROLE or a SURFACE. Never a palette hue, never a literal.
+   That is checkable, not a matter of discipline:
+
+       grep -rE "var\(--(copper|verdigris|metal)-" ferrox-ui/style \
+            ferrox-theme-build/assets --exclude=tokens.css
+
+   must return nothing.
+
+   ------------------------------------------------------------
+   ADDING A THEME
+   ------------------------------------------------------------
+   Copy the SURFACES block and each role's EXPLICIT four lines into
+   theme/themes/<name>.css under `:root[data-theme="<name>"]`, and change the
+   values. That is ~38 declarations. The DERIVED slots are not copied: they
+   are defined once here as color-mix() over `--<role>-base`, and a custom
+   property resolves against the cascaded value at the point of use — so
+   redefining `--primary-base` in a theme automatically re-derives that
+   theme's `--primary-tint`, `--primary-line`, `--primary-glow` and
+   `--primary-text`.
+
+   `:root[data-theme="…"]`, not a bare `[data-theme="…"]`: the bare form has
+   identical specificity to `:root` (0,1,0) and would win only by source
+   order, so a mis-ordered import would silently stop applying a theme.
+   ============================================================ */
+
+/* ============================================================
+   1. PALETTE — PRIVATE
+
+   Nothing outside this file may reference these. They exist so the role and
+   surface values below have readable names to be built from.
+   ============================================================ */
+:root {
+  /* Polished copper (warm metallic) */
+  --copper-bright: #e8874a;
+  --copper-mid:    #c4622d;
+  --copper-deep:   #8b3a1a;
+  --copper-sheen:  #f2a96e;
+  --copper-blush:  #f7d4b5;
+
+  /* Oxidized copper / verdigris */
+  --verdigris-bright: #5fb8a5;
+  --verdigris-mid:    #3d8c7a;
+  --verdigris-deep:   #1e5c4f;
+  --verdigris-pale:   #a8d8ce;
+  --verdigris-ghost:  #dff0ec;
+
+  /* Neutral metal ground */
+  --metal-darkest: #0e0b09;
+  --metal-dark:    #1c1612;
+  --metal-mid:     #3b2e24;
+  --metal-warm:    #6b5040;
+  --metal-light:   #c9b9ab;
+  --metal-pale:    #ede4db;
+
+  /* Signal hues */
+  --signal-red:   #c0392b;
+  --signal-amber: #c47a2d;
+}
+
+/* ============================================================
+   2. SURFACES — explicit, restated in full by every theme
+   ============================================================ */
+:root {
+  --background:  #f5ede3;   /* the page behind everything */
+  --surface-0:   #fdf8f3;   /* raised: inputs, page cards */
+  --surface-1:   #f0e6d8;   /* panel / card body */
+  --surface-2:   #e2d0be;   /* inset: table heads, wells, tracks */
+  --surface-3:   #cbb89f;   /* deep inset / pressed */
+
+  /* Charts: money in and money out, in the hues debit and credit already wear
+     but tuned to pass the colour-blind and contrast checks (3:1 on every
+     surface a card can be, held by contrast.test.ts). */
+  --chart-in:  #1f8f74;
+  --chart-out: #c4622d;
+
+  /* Charts by category (where the money goes): five hues in a fixed order, then
+     a neutral for everything else. Checked with the dataviz palette validator
+     (lightness band, chroma, colour-blind and normal-vision separation of
+     neighbours, the last beside the first) on this theme's card surfaces;
+     3:1 held by contrast.test.ts. */
+  --chart-cat-1: #2a6fc4;
+  --chart-cat-2: #d0561f;
+  --chart-cat-3: #14876a;
+  --chart-cat-4: #9a6a00;
+  --chart-cat-5: #c04a80;
+  --chart-other: #7a7570;
+
+  /* Tells the browser to render its own chrome — scrollbars, form controls,
+     the canvas behind the page — to match. Without it a dark theme keeps
+     light scrollbars and light native widgets. */
+  color-scheme: light;
+
+  --text:         #1c1208;  /* body copy */
+  --text-muted:   #4f3b2f;  /* labels, secondary copy — AAA (7.0:1 worst case) */
+  --text-subtle:  #6b5745;  /* placeholders, de-emphasised copy — AA (4.6:1) */
+
+  --line: rgba(139, 58, 26, 0.12);   /* the default hairline */
+
+  /* Top highlight on a filled surface — the "polished metal" sheen on
+     gradient buttons. A theme with pale fills wants this weaker. */
+  --fill-sheen: rgba(255, 255, 255, 0.15);
+
+  /* A loading placeholder: the block it draws, and the band swept across it.
+     The block is the inset surface — the same ground a well or a table head
+     sits on — and the band is light passing over it, stated as white at a
+     strength a theme may restate. Light rather than a second colour because
+     a colour would have to be lighter than the block in a dark theme and
+     darker in a light one; a sheen lifts both. */
+  --skeleton-base:  var(--surface-2);
+  --skeleton-sheen: rgba(255, 255, 255, 0.28);
+
+  /* The dimmer behind a blocking overlay. */
+  --scrim: rgba(28, 18, 8, 0.40);
+
+  --focus-ring-color:  var(--copper-deep);
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+
+  /* Which way role text is pushed for contrast against the surfaces above.
+     #000 on a light theme, #fff on a dark one. One line flips every role's
+     readable text colour, which is why --*-text can be derived rather than
+     hand-set seven times per theme. */
+  --text-mix: #000;
+}
+
+/* ============================================================
+   3. ROLES
+
+   Seven, in two vocabularies that meet at `danger`:
+
+     BRAND   primary    affirmative; the main thing a screen exists for
+             secondary  a real committing action that is not the primary one
+
+     STATUS  neutral    no intent — inert, default, dismissive
+             info       informational
+             success    completed, in good standing
+             warning    cautionary, never blocking
+             danger     destructive, or failed          ← both vocabularies
+
+   Which vocabulary a component may use is fixed by the component: buttons and
+   interactive cards take brand roles plus danger and neutral; badges, alerts
+   and toasts take status roles only. A badge is never `primary`, a button is
+   never `info`.
+
+   EIGHT SLOTS per role. Four are explicit — a theme sets these:
+
+     --<role>-base        the hue everything else is derived from
+     --<role>-fill        solid or gradient background for a filled treatment
+     --<role>-fill-hover  what that fill becomes on hover (a declared value,
+                          not filter: brightness(), which does nothing to a
+                          pale fill)
+     --<role>-on-fill     text and icons drawn ON that fill
+
+   Four are derived here and never restated by a theme:
+
+     --<role>-text        readable on a surface, pushed toward --text-mix
+     --<role>-tint        soft background wash
+     --<role>-tint-strong background for badges and selected rows
+     --<role>-line        border / edge
+     --<role>-glow        focus and hover halo
+   ============================================================ */
+:root {
+  /* ── Primary — copper ── */
+  --primary-base: var(--copper-mid);
+  --primary-fill:
+    linear-gradient(135deg, var(--copper-sheen) 0%, var(--copper-mid) 45%, var(--copper-deep) 100%);
+  --primary-fill-hover:
+    linear-gradient(135deg, var(--copper-blush) 0%, var(--copper-sheen) 45%, var(--copper-mid) 100%);
+  --primary-on-fill: #fdf8f3;
+
+  /* ── Secondary — verdigris ── */
+  --secondary-base: var(--verdigris-mid);
+  --secondary-fill:
+    linear-gradient(135deg, var(--verdigris-pale) 0%, var(--verdigris-mid) 55%, var(--verdigris-deep) 100%);
+  --secondary-fill-hover:
+    linear-gradient(135deg, var(--verdigris-ghost) 0%, var(--verdigris-bright) 55%, var(--verdigris-mid) 100%);
+  --secondary-on-fill: #fdf8f3;
+
+  /* ── Neutral — the metal ground ── */
+  --neutral-base: var(--metal-warm);
+  --neutral-fill: var(--surface-2);
+  --neutral-fill-hover: var(--surface-3);
+  --neutral-on-fill: var(--text);
+
+  /* ── Info ── */
+  --info-base: var(--verdigris-mid);
+  --info-fill: var(--verdigris-mid);
+  --info-fill-hover: var(--verdigris-bright);
+  --info-on-fill: #fdf8f3;
+
+  /* ── Success ── */
+  --success-base: var(--verdigris-bright);
+  --success-fill: var(--verdigris-bright);
+  --success-fill-hover: var(--verdigris-pale);
+  --success-on-fill: #0e0b09;
+
+  /* ── Warning ── */
+  --warning-base: var(--signal-amber);
+  --warning-fill: var(--signal-amber);
+  --warning-fill-hover: var(--copper-sheen);
+  --warning-on-fill: #1c1208;
+
+  /* ── Danger ── */
+  --danger-base: var(--signal-red);
+  --danger-fill: var(--signal-red);
+  --danger-fill-hover: #d4503f;
+  --danger-on-fill: #fdf8f3;
+}
+
+/* ============================================================
+   3b. DERIVED SLOTS
+
+   Defined once, for every theme. A theme changes --<role>-base and these
+   follow, because a custom property resolves against the cascaded value at
+   the point of use rather than where it was written.
+
+   A theme that wants to override one of these specifically may still restate
+   that single line — the derivation is a default, not a cage.
+   ============================================================ */
+:root {
+  --primary-text:         color-mix(in srgb, var(--primary-base) 78%, var(--text-mix));
+  --primary-tint:         color-mix(in srgb, var(--primary-base) 10%, transparent);
+  --primary-tint-strong:  color-mix(in srgb, var(--primary-base) 18%, transparent);
+  --primary-line:         color-mix(in srgb, var(--primary-base) 35%, transparent);
+  --primary-glow:         0 0 var(--glow-blur) color-mix(in srgb, var(--primary-base) 35%, transparent);
+
+  --secondary-text:        color-mix(in srgb, var(--secondary-base) 78%, var(--text-mix));
+  --secondary-tint:        color-mix(in srgb, var(--secondary-base) 10%, transparent);
+  --secondary-tint-strong: color-mix(in srgb, var(--secondary-base) 18%, transparent);
+  --secondary-line:        color-mix(in srgb, var(--secondary-base) 35%, transparent);
+  --secondary-glow:        0 0 var(--glow-blur) color-mix(in srgb, var(--secondary-base) 35%, transparent);
+
+  --neutral-text:        var(--text-muted);
+  --neutral-tint:        color-mix(in srgb, var(--neutral-base) 8%, transparent);
+  --neutral-tint-strong: color-mix(in srgb, var(--neutral-base) 14%, transparent);
+  --neutral-line:        color-mix(in srgb, var(--neutral-base) 32%, transparent);
+  --neutral-glow:        0 0 var(--glow-blur) color-mix(in srgb, var(--neutral-base) 25%, transparent);
+
+  --info-text:        color-mix(in srgb, var(--info-base) 78%, var(--text-mix));
+  --info-tint:        color-mix(in srgb, var(--info-base) 10%, transparent);
+  --info-tint-strong: color-mix(in srgb, var(--info-base) 18%, transparent);
+  --info-line:        color-mix(in srgb, var(--info-base) 35%, transparent);
+  --info-glow:        0 0 var(--glow-blur) color-mix(in srgb, var(--info-base) 35%, transparent);
+
+  --success-text:        color-mix(in srgb, var(--success-base) 82%, var(--text-mix));
+  --success-tint:        color-mix(in srgb, var(--success-base) 12%, transparent);
+  --success-tint-strong: color-mix(in srgb, var(--success-base) 20%, transparent);
+  --success-line:        color-mix(in srgb, var(--success-base) 35%, transparent);
+  --success-glow:        0 0 var(--glow-blur) color-mix(in srgb, var(--success-base) 35%, transparent);
+
+  --warning-text:        color-mix(in srgb, var(--warning-base) 82%, var(--text-mix));
+  --warning-tint:        color-mix(in srgb, var(--warning-base) 12%, transparent);
+  --warning-tint-strong: color-mix(in srgb, var(--warning-base) 20%, transparent);
+  --warning-line:        color-mix(in srgb, var(--warning-base) 35%, transparent);
+  --warning-glow:        0 0 var(--glow-blur) color-mix(in srgb, var(--warning-base) 35%, transparent);
+
+  --danger-text:        color-mix(in srgb, var(--danger-base) 85%, var(--text-mix));
+  --danger-tint:        color-mix(in srgb, var(--danger-base) 10%, transparent);
+  --danger-tint-strong: color-mix(in srgb, var(--danger-base) 18%, transparent);
+  --danger-line:        color-mix(in srgb, var(--danger-base) 35%, transparent);
+  --danger-glow:        0 0 var(--glow-blur) color-mix(in srgb, var(--danger-base) 35%, transparent);
+
+  /* Grid rows (the row pattern in components.css). The active row takes the
+     primary tint, colour that already means "you can act on this" and what the
+     register's hover used first; a group label's bar is the inset surface, as
+     budget's groups were. Both sit on surfaces the contrast test measures. */
+  --row-active: var(--primary-tint);
+  --row-group:  var(--surface-2);
+  /* The banding of a striped list (`.grid--striped`), one step in from the page. */
+  --row-stripe: var(--surface-1);}
+
+/* ============================================================
+   4. NON-COLOUR TOKENS
+
+   A different axis from theming: swapping a colour theme leaves these alone.
+   A theme MAY restate them, but is not required to.
+   ============================================================ */
+:root {
+  /* ── Typography ── */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-mono:    'DM Mono', 'Courier New', monospace;
+  --font-body:    'Cormorant Garamond', Georgia, serif;
+
+  /* ── Elevation ── */
+  --shadow-sm: 0 1px 3px rgba(139, 58, 26, 0.15), 0 1px 2px rgba(139, 58, 26, 0.08);
+  --shadow-md: 0 4px 12px rgba(139, 58, 26, 0.18), 0 2px 4px rgba(139, 58, 26, 0.10);
+  --shadow-lg: 0 8px 28px rgba(139, 58, 26, 0.22), 0 4px 8px rgba(139, 58, 26, 0.12);
+
+  /* ── Radius ── */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+
+  /* ── Spacing ──
+     sm/md/lg keep the values already in informal use, so nothing that ships
+     today changes meaning; xs fills the gap below (icon-to-label), xl/2xl add
+     section- and page-level headroom that had no token. */
+  --space-xs:  4px;
+  --space-sm:  8px;
+  --space-md:  16px;
+  --space-lg:  24px;
+  --space-xl:  32px;
+  --space-2xl: 48px;
+
+  /* ── Glow ──
+     How far a role's halo reaches past its element, used by every
+     --<role>-glow. Kept tight on purpose: a wide halo is fine on an isolated
+     button and bleeds onto its neighbours the moment controls sit close
+     together. One knob, so all seven roles stay in step. */
+  --glow-blur: 8px;
+
+  /* ── Transitions ── */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+
+  /* ── Reactions ──
+     How anything interactive answers the pointer, named once so every call
+     site moves alike — and so `prefers-reduced-motion` is one override (the
+     block after this one) rather than a list of selectors to remember to join.
+     A cell of a grid only ever changes colour: growing one would shove its
+     neighbours. A standalone control also breathes — `--react-grow` over
+     `--react-ease`, whose overshoot carries it just past and settles it back.
+     Every press is the same 1px, app-wide. */
+  --react-time:  200ms;
+  --react-ease:  cubic-bezier(0.34, 1.56, 0.64, 1);
+  --react-grow:  scale(1.03);
+  --react-rise:  translateY(-1px);
+  --react-press: translateY(1px);
+
+  /* ── Loading ──
+     Indicators are armed on a delay, so anything that resolves faster never
+     paints a spinner at all. Disabling a control is immediate and separate. */
+  --loading-delay: 400ms;
+
+  /* ── Arrival ──
+     How long a skeleton takes to fade out while the content it stood in for
+     fades in. Short on purpose: it should read as the content arriving, not
+     as a wait added after it was already here. */
+  --arrive-time: 350ms;
+
+  /* ── Toasts ──
+     Page-level only. Auto-dismiss is a property of the placement: inline
+     errors never time out. */
+  --toast-duration:      5s;
+  --toast-duration-long: 8s;
+
+  /* ── Breakpoint ──
+     NOTE: custom properties are not permitted in a media-query prelude, so
+     `@media (max-width: var(--bp-mobile))` does not work. This token exists
+     for JavaScript to read (matchMedia) and as the single written record of
+     the value; media queries repeat the literal 768px. Keep them in step. */
+  --bp-mobile: 768px;
+}
+
+/* Movement on hover and press is ornament: the colour and shadow changes carry
+   the same information without the travel. Arrival is ornament too: at 0ms the
+   skeleton gives way to its content on the first frame. Redefining the
+   reactions here, once, keeps every call site honest without its having to know. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --react-grow:  none;
+    --react-rise:  none;
+    --react-press: none;
+    --arrive-time: 0ms;
+  }
+}

@@ -1,0 +1,115 @@
+/* ============================================================
+   THEME — JAMAICA (day)
+   Sun-bleached limestone, gold and green. The light half of the Jamaica
+   family; `jamaica-dark` is the night half.
+
+
+   THE INTERESTING PROBLEM HERE: gold does not survive a light ground.
+   #f2c230 on cream is roughly 1.6:1 — it is unusable for text, a border or
+   any line work, while being perfectly good as a FILL with dark text on it.
+
+   The explicit/derived split is what resolves this without inventing a rule.
+   `--primary-base` is the value every readable slot derives from (text, tint,
+   line, glow), so here it is a deep ochre that reads on cream; `--primary-fill`
+   is a separate explicit slot and stays bright gold with near-black on it.
+   Same role, same hue family, two jobs, two values. Nothing else changes.
+
+   Gold therefore stays PRIMARY across both halves of the family rather than
+   swapping places with green in the light one — a role that means different
+   things depending on the time of day would be worse than a slightly darker
+   gold.
+
+   Restates the SURFACES block and every role's four EXPLICIT slots; the
+   derived slots re-derive themselves from the bases.
+   ============================================================ */
+:root[data-theme='jamaica'] {
+  /* ── Surfaces — bleached limestone rather than paper white ── */
+  --background: #f6f1e2;
+  --surface-0:  #fffdf4;
+  --surface-1:  #efe8d5;
+  --surface-2:  #e2d9be;
+  --surface-3:  #cbbf9d;
+
+  /* Charts: money in and money out, in the hues debit and credit already wear
+     but tuned to pass the colour-blind and contrast checks (3:1 on every
+     surface a card can be, held by contrast.test.ts). */
+  --chart-in:  #00826d;
+  --chart-out: #bd6418;
+
+  /* Charts by category (where the money goes): five hues in a fixed order, then
+     a neutral for everything else. Checked with the dataviz palette validator
+     (lightness band, chroma, colour-blind and normal-vision separation of
+     neighbours, the last beside the first) on this theme's card surfaces;
+     3:1 held by contrast.test.ts. */
+  --chart-cat-1: #2a6fc4;
+  --chart-cat-2: #d0561f;
+  --chart-cat-3: #14876a;
+  --chart-cat-4: #9a6a00;
+  --chart-cat-5: #c04a80;
+  --chart-other: #7a7570;
+
+  color-scheme: light;
+
+  --text:        #14180f;   /* the flag's black, warmed toward green */
+  --text-muted:  #474332;   /* AAA — 7.0:1 against surface-2 */
+  --text-subtle: #645f4a;   /* AA  — 4.6:1 against surface-2 */
+
+  --line: rgba(20, 24, 15, 0.14);
+
+  --fill-sheen: rgba(255, 255, 255, 0.22);
+  --scrim: rgba(20, 24, 15, 0.42);
+
+  --focus-ring-color:  #7d5a0e;
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+
+  --text-mix: #000;
+
+  /* ── Roles — explicit slots only ── */
+
+  /* Gold. The base is a deep ochre so text, borders and tints derived from it
+     are legible on limestone; the fill stays bright gold. */
+  --primary-base: #a8781a;
+  --primary-fill: linear-gradient(135deg, #ffd95e 0%, #eebc2c 45%, #c2900f 100%);
+  --primary-fill-hover: linear-gradient(135deg, #ffe89a 0%, #ffd95e 45%, #eebc2c 100%);
+  --primary-on-fill: #14180f;
+
+  /* Green. The flag's #009B3A is only just readable on cream, so this is a
+     shade deeper — the opposite adjustment the night theme had to make. */
+  --secondary-base: #1e7d3c;
+  --secondary-fill: linear-gradient(135deg, #4bb168 0%, #1e7d3c 55%, #14562a 100%);
+  --secondary-fill-hover: linear-gradient(135deg, #7fd096 0%, #4bb168 55%, #1e7d3c 100%);
+  --secondary-on-fill: #fffdf4;
+
+  --neutral-base: #5d5949;
+  --neutral-fill: #e2d9be;
+  --neutral-fill-hover: #cbbf9d;
+  --neutral-on-fill: #14180f;
+
+  --info-base: #24796a;
+  --info-fill: #24796a;
+  --info-fill-hover: #2f9a86;
+  --info-on-fill: #fffdf4;
+
+  --success-base: #1e7d3c;
+  --success-fill: #1e7d3c;
+  --success-fill-hover: #2c9c50;
+  --success-on-fill: #fffdf4;
+
+  /* Orange, not gold: gold is already primary, and a warning that looks like
+     the main action is not a warning. */
+  --warning-base: #a85c14;
+  --warning-fill: #c2661a;
+  --warning-fill-hover: #d98530;
+  --warning-on-fill: #fffdf4;
+
+  --danger-base: #b0302a;
+  --danger-fill: #b0302a;
+  --danger-fill-hover: #c9453e;
+  --danger-on-fill: #fffdf4;
+
+  /* Warm shadow, matching the ground rather than a neutral grey. */
+  --shadow-sm: 0 1px 3px rgba(74, 60, 20, 0.16), 0 1px 2px rgba(74, 60, 20, 0.09);
+  --shadow-md: 0 4px 12px rgba(74, 60, 20, 0.18), 0 2px 4px rgba(74, 60, 20, 0.10);
+  --shadow-lg: 0 8px 28px rgba(74, 60, 20, 0.22), 0 4px 8px rgba(74, 60, 20, 0.12);
+}

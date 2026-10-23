@@ -1,0 +1,112 @@
+/* ============================================================
+   THEME — JAMAICA (night)
+   Black, gold and green. Hermes Conrad, Grade 34 Bureaucrat, is Jamaican; the
+   app is named after him, so the flag gets a theme.
+
+
+   A NOTE ON THE FLAG COLOURS. The flag is #000000, #FED100 and #009B3A, and
+   using those literally does not work as an interface:
+
+     - #009B3A on a near-black ground is about 4:1 — under the AA floor for
+       body text, and the contrast test rejects it. The green is lifted until
+       it clears, keeping the hue.
+     - #FED100 at full saturation is punishing over a whole screen, so the
+       gold is brought down slightly. It is still unmistakably gold.
+     - Pure #000000 as the page ground makes every surface above it read as
+       grey. The ground carries a faint green cast instead, so the surface
+       ladder has somewhere to go.
+
+   Gold is PRIMARY and green is SECONDARY, which leaves warning needing a hue
+   that is not gold — it is orange here, or a warning would be
+   indistinguishable from the app's main action colour.
+
+   Restates the SURFACES block and every role's four EXPLICIT slots; the
+   derived slots re-derive themselves from the bases.
+   ============================================================ */
+:root[data-theme='jamaica-dark'] {
+  /* ── Surfaces ── */
+  --background: #0c0e0c;
+  --surface-0:  #121510;
+  --surface-1:  #181c17;
+  --surface-2:  #232821;
+  --surface-3:  #333a30;
+
+  /* Charts: money in and money out, in the hues debit and credit already wear
+     but tuned to pass the colour-blind and contrast checks (3:1 on every
+     surface a card can be, held by contrast.test.ts). */
+  --chart-in:  #1aa08c;
+  --chart-out: #d4762a;
+
+  /* Charts by category: the same five hues stepped for a dark card, then a
+     neutral for everything else (validated as a set; 3:1 held by
+     contrast.test.ts). */
+  --chart-cat-1: #3987e5;
+  --chart-cat-2: #d95926;
+  --chart-cat-3: #199e70;
+  --chart-cat-4: #c98500;
+  --chart-cat-5: #d55181;
+  --chart-other: #8f877e;
+
+  color-scheme: dark;
+
+  --text:        #f7f3e3;   /* sun-bleached cream, not white */
+  --text-muted:  #c6c0a8;   /* AAA — 7:1 against surface-2 */
+  --text-subtle: #948d76;   /* AA  — 4.5:1 against surface-2 */
+
+  --line: rgba(247, 243, 227, 0.10);
+
+  --fill-sheen: rgba(255, 255, 255, 0.18);
+  --scrim: rgba(12, 14, 12, 0.55);
+
+  --focus-ring-color:  #f2c230;
+  --focus-ring-width:  2px;
+  --focus-ring-offset: 2px;
+
+  --text-mix: #fff;
+
+  /* ── Roles — explicit slots only ── */
+
+  /* Gold — the saltire. */
+  --primary-base: #f2c230;
+  --primary-fill: linear-gradient(135deg, #ffd95e 0%, #f2c230 45%, #c99a12 100%);
+  --primary-fill-hover: linear-gradient(135deg, #ffe89a 0%, #ffd95e 45%, #f2c230 100%);
+  --primary-on-fill: #0c0e0c;
+
+  /* Green — lifted from the flag's #009B3A, which fails contrast on black. */
+  --secondary-base: #3fb95f;
+  --secondary-fill: linear-gradient(135deg, #6fd98a 0%, #3fb95f 55%, #1e7d3c 100%);
+  --secondary-fill-hover: linear-gradient(135deg, #9ce9ae 0%, #6fd98a 55%, #3fb95f 100%);
+  --secondary-on-fill: #0c0e0c;
+
+  --neutral-base: #9a9686;
+  --neutral-fill: #232821;
+  --neutral-fill-hover: #333a30;
+  --neutral-on-fill: #f7f3e3;
+
+  --info-base: #45b8a0;
+  --info-fill: #2f8f7c;
+  --info-fill-hover: #45b8a0;
+  --info-on-fill: #0c0e0c;
+
+  --success-base: #5fd47f;
+  --success-fill: #3fb95f;
+  --success-fill-hover: #5fd47f;
+  --success-on-fill: #0c0e0c;
+
+  /* Orange, not gold: gold is already primary, and a warning that looks like
+     the main action is not a warning. */
+  --warning-base: #f0873a;
+  --warning-fill: #d9701f;
+  --warning-fill-hover: #f0873a;
+  --warning-on-fill: #0c0e0c;
+
+  --danger-base: #e2574a;
+  --danger-fill: #c83e33;
+  --danger-fill-hover: #e2574a;
+  --danger-on-fill: #f7f3e3;
+
+  /* Black ground swallows a tinted shadow. */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.55);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.60);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.65);
+}
