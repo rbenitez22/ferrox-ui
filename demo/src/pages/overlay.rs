@@ -1,10 +1,10 @@
-//! Overlay: dialogs (later the confirm dialog and sheets), each opened from a
+//! Overlay: dialogs and the confirm dialog (later sheets), each opened from a
 //! button, with a log of what every way out did, so focus, Esc, Enter, the
 //! footer and the scroll lock can be checked.
 
 use std::time::Duration;
 
-use ferrox_ui::{Button, ButtonFamily, Dialog, DialogAction, DialogSize};
+use ferrox_ui::{Button, ButtonFamily, ConfirmDialog, Dialog, DialogAction, DialogSize};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -34,6 +34,11 @@ fn Dialogs(log: RwSignal<Vec<String>>) -> impl IntoView {
                 <WideDialog note=note />
                 <NoDismissDialog note=note />
                 <NestedDialogs note=note />
+            </div>
+        </Section>
+        <Section title="Confirm dialog">
+            <div class="demo-row">
+                <DeleteConfirm note=note />
             </div>
         </Section>
     }
@@ -136,5 +141,35 @@ fn NestedDialogs(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
         >
             <p>"A second modal on top of the first."</p>
         </Dialog>
+    }
+}
+
+/// The destructive confirmation: Delete runs for a moment (saving), then the
+/// dialog closes.
+#[component]
+fn DeleteConfirm(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
+    let open = RwSignal::new(false);
+    let deleting = RwSignal::new(false);
+    let delete = move || {
+        note("confirm: confirmed");
+        deleting.set(true);
+        set_timeout(move || {
+            deleting.set(false);
+            open.set(false);
+            note("confirm: deleted");
+        }, Duration::from_millis(SAVING_MS));
+    };
+    view! {
+        <Button family=ButtonFamily::Danger on_click=move |_| open.set(true)>"Delete account…"</Button>
+        <ConfirmDialog
+            open=open
+            title="Delete account?"
+            confirm_label="Delete"
+            saving=deleting
+            on_confirm=delete
+            on_cancel=move || { open.set(false); note("confirm: cancelled"); }
+        >
+            <p>"This deletes “Groceries” and its 214 transactions."</p>
+        </ConfirmDialog>
     }
 }

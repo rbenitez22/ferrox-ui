@@ -141,6 +141,9 @@ pub fn Dialog(
     #[prop(optional)] alternate: Option<DialogAction>,
     #[prop(default = true)] submit_on_enter: bool,
     #[prop(optional)] size: DialogSize,
+    /// `role="alertdialog"`: a dialog that interrupts to ask for a decision
+    /// (`ConfirmDialog` sets it).
+    #[prop(optional)] alert: bool,
     /// The × button's label.
     #[prop(into, default = "Close".to_string())] close_label: String,
     /// Extra classes, appended to the generated ones. May be reactive.
@@ -178,6 +181,7 @@ pub fn Dialog(
         <dialog
             node_ref=modal.node_ref
             class=move || dialog_classes(size, &class.get().unwrap_or_default())
+            role=alert.then_some("alertdialog")
             aria-labelledby=labelled_by
             on:cancel=on_cancel
             on:close=on_closed

@@ -5,7 +5,7 @@ footer band, Alert dialog, Sheet. Ports conrad's `Dialog.tsx` /
 `ConfirmDialog.tsx` behaviour and CSS, and replaces webapp-lib's dialog
 helpers and the drawer half of `SideMenu`.
 
-Status: approved (2026-10-23). Piece 1 done (2026-10-23); piece 2 next.
+Status: approved (2026-10-23). Pieces 1–2 done (2026-10-23); piece 3 next.
 
 Notes from piece 1:
 - Callbacks with no input are zero-argument closures:
@@ -20,6 +20,10 @@ Notes from piece 1:
   pulled the title's margin and pushed the × against the title; the demo rule
   is now `.demo-section > h2`, and a test checks the title bar layout. Worth
   saying in the README: scope app rules to direct children near dialogs.
+- Piece 2: `Dialog` gained a public `alert` prop (`role="alertdialog"`), which
+  `ConfirmDialog` sets. An app may want a non-destructive alert dialog too.
+  `ConfirmDialog` also takes `close_label`. Focus opens on the ×, never on
+  Delete, so a reflexive Enter closes rather than deletes.
 
 ## Sources
 

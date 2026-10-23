@@ -194,3 +194,55 @@ test.describe('size', () => {
     expect(close.width).toBeCloseTo(44, 0);
   });
 });
+
+test.describe('ConfirmDialog', () => {
+  const confirm = (page: Page) => page.getByRole('alertdialog', { name: 'Delete account?' });
+
+  test('is an alertdialog whose last button is a danger verb', async ({ page }) => {
+    await trigger(page, 'Delete account…').click();
+    const d = confirm(page);
+    await expect(d).toBeVisible();
+    expect(await d.evaluate((el) => el.matches(':modal'))).toBe(true);
+    await expect(d).toContainText('“Groceries” and its 214 transactions');
+    const buttons = d.locator('.dialog__footer button');
+    await expect(buttons).toHaveText(['Cancel', 'Delete']);
+    await expect(buttons.last()).toHaveClass(/\bbtn--danger\b/);
+  });
+
+  test('opens with focus on the close button, not on Delete', async ({ page }) => {
+    await trigger(page, 'Delete account…').click();
+    await expect(confirm(page)).toBeVisible();
+    await expect.poll(() => focused(page)).toBe('Close');
+  });
+
+  for (const [how, act] of [
+    ['Cancel', (page: Page) => confirm(page).getByRole('button', { name: 'Cancel' }).click()],
+    ['Esc', (page: Page) => page.keyboard.press('Escape')],
+  ] as const) {
+    test(`${how} calls on_cancel once and runs nothing`, async ({ page }) => {
+      await trigger(page, 'Delete account…').click();
+      await expect(confirm(page)).toBeVisible();
+      await act(page);
+      await expect(confirm(page)).toBeHidden();
+      await expect(log(page)).toHaveText(['confirm: cancelled']);
+    });
+  }
+
+  test('Delete runs once: saving refuses a second click, then it closes', async ({ page }) => {
+    await trigger(page, 'Delete account…').click();
+    const del = confirm(page).getByRole('button', { name: 'Delete' });
+    await del.click();
+    await expect(del).toHaveAttribute('aria-disabled', 'true');
+    await del.click({ force: true });
+    await expect(confirm(page)).toBeHidden();
+    await expect(log(page)).toHaveText(['confirm: confirmed', 'confirm: deleted']);
+  });
+
+  test('reopening after a delete starts ready, not saving', async ({ page }) => {
+    await trigger(page, 'Delete account…').click();
+    await confirm(page).getByRole('button', { name: 'Delete' }).click();
+    await expect(confirm(page)).toBeHidden();
+    await trigger(page, 'Delete account…').click();
+    await expect(confirm(page).getByRole('button', { name: 'Delete' })).not.toHaveAttribute('aria-disabled', 'true');
+  });
+});
