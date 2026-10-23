@@ -1,0 +1,185 @@
+# ferrox-ui: theme, primitives and icons for Leptos CSR apps
+
+A public UI kit, split out of webapp-lib (whose `v1.0` branch is where the
+theme and the first primitives were built). Modelled on rust-ui.com's
+*behaviour and inventory*, not its construction: a normal crate dependency on
+token-based, class-only CSS. No copy-in CLI, no Tailwind.
+
+webapp-lib keeps the app plumbing (http, storage, reactive, auth, app-level
+components such as `Login`) and depends on ferrox-ui; see webapp-lib's
+`plans/crate-split.md` for that side.
+
+Status: piece 0 done. Repo `/programming/ferrox-ui`
+(`git@github.com:rbenitez22/ferrox-ui.git`, branch `master`).
+
+## Crates (one workspace, this repo)
+
+```
+ferrox-theme-build  (std only, build-dependency)
+        │
+ferrox-theme        tokens, themes, runtime switching, CSS file generation
+        │                       ferrox-icons   SVG icons (leptos only)
+        │                          │
+        └────────────┬─────────────┘
+                 ferrox-ui        primitives, one Cargo feature per group
+                     │
+          (webapp-lib, other repo: plumbing + app components)
+                     │
+                    apps
+```
+
+| Crate | Contains | Depends on |
+|---|---|---|
+| `ferrox-theme-build` | theme file discovery + validation, generated CSS file (today's `webapp-lib-build`) | std |
+| `ferrox-theme` | `tokens.css`, `themes/*.css`, `register`/`init`/`set_choice`…, `PREPAINT_SCRIPT`. Feature `leptos`: `provide_theme`/`use_theme` | web-sys, wasm-bindgen; leptos (optional) |
+| `ferrox-icons` | one SVG file per icon → one function per icon | leptos |
+| `ferrox-ui` | primitives + their class-only CSS, injected per enabled group | ferrox-theme, ferrox-icons, leptos; leptos_router only for `navigation` |
+| `ferrox-charts` (later) | charts on the theme's chart tokens | ferrox-theme, leptos (+ chart deps) |
+| `demo/` (not published) | showcase of every theme and component; Playwright e2e in `demo/e2e/` | all of the above, by path |
+
+## Decisions (2026-10-23, carried over from webapp-lib's crate-split discussion)
+
+- Names `ferrox-*`. Public repo.
+- **Class-only CSS.** No element selectors, no global pseudo-classes; tokens on
+  `:root` only. Every style is opt-in through a class.
+- **`ferrox-ui` features are broad groups**, `core` always on (inventory below).
+- **Theme + loading CSS is a generated file** (review C9): the app's `build.rs`
+  calls `ferrox-theme-build`, which writes one combined CSS file into the app;
+  `index.html` links it with `data-trunk`. The page is styled before the WASM
+  loads, so pre-paint and the `#loading` screen work. Component CSS is
+  injected by `ferrox_ui::init()` for the enabled groups.
+- **Lockstep inside this repo**: one version, one git tag (`vX.Y.Z`) for all
+  crates. Starts at `0.1.0`.
+- Apps normally reach ferrox-ui through webapp-lib's re-exports (facade); an
+  app without webapp-lib uses ferrox-ui directly.
+- Charts: `ferrox-charts`, later.
+- Icons are SVG (UTF-8 glyph icons were abandoned in webapp-lib).
+- **ferrox-ui is the source of truth** for its tokens, themes and component
+  CSS. They started as copies of conrad's (TIER 1 files); conrad, a React app,
+  goes its own way from here. No sync script, no "edit it in conrad" headers.
+- Licence `MIT OR Apache-2.0`. Fresh first commit; webapp-lib keeps the
+  history of how the theme and first primitives were built.
+- Release policy as in webapp-lib: develop and harden here, test, then tag.
+  The demo's release check (every feature alone, clippy, tests, Trunk build,
+  Playwright in Chromium + Firefox) gates every tag. Apps use tags only and
+  extend, never modify.
+
+### Inventory (draft for review)
+
+Sources: **W** = webapp-lib today, **C** = conrad has it (React; behaviour and
+CSS to port), **R** = in rust-ui's catalogue. **Now** = needed by today's
+apps or already exists, so it moves/ports during the split; the rest are new
+components, one story each, when an app needs them.
+
+| Group | Component | Source | Now? | Notes |
+|---|---|---|---|---|
+| **core** (always on) | Button, IconButton | W C R | now | done on `v1.0`. In core, not forms, because dialogs, toolbars, alerts and pagination all use them (proposed; user leaned to forms 2026-10-23) |
+| | Toolbar | W R | now | done on `v1.0` |
+| | Spinner | W C R | now | |
+| | Alert (today `Message`) | W C R | now | |
+| | Skeleton | C R | | conrad has `Skeleton`/`SkeletonSwap` |
+| | Badge, Separator, Kbd, Card, Empty, Status | R | | |
+| | Icon slot | C | now | renders a `ferrox-icons` icon |
+| | Theme toggle | R | | needs `ferrox-theme`'s leptos context |
+| **forms** | Field (label + help + error) | C R | now | conrad `FormField`; fixes id clashes (H12) |
+| | Input (text, password + strength) | W R | now | today `VerifiedPassword`/`EntropyIndicator` |
+| | NumberInput | R | | conrad has `AmountKeypad` for amounts |
+| | DateInput / Date Picker | C R | | conrad `PeriodPicker`/`PeriodChooser` |
+| | Textarea | R | | |
+| | Checkbox | W R | now | today `CheckBox` |
+| | Switch / Toggle | C R | | conrad `Toggle` |
+| | Radio, Radio group | R | | |
+| | Select | W R | now | today `render_options`; data-bound `SelectMenu` stays in lib as an adapter |
+| | MultiSelect | R | | |
+| | Combobox / Autocomplete | W C R | now | today `AutocompleteInput` (UI half) |
+| | Slider, Input OTP, Input Phone, Chips, Dropzone | R | | |
+| **menus** | Dropdown menu | C R | | conrad `Menu` |
+| | Split button | | | main action + chevron opening related actions (e.g. "Edit ▾"); a menu with a button trigger |
+| | Menu button | | | one button with a chevron; looks like a select, each option is an action |
+| | Context menu, Menubar, Command palette | R | | |
+| **overlay** | Dialog | W C R | now | conrad header / body / footer (footer band padding, user request 2026-10-23) |
+| | Alert dialog (confirm) | W C R | now | today `ConfirmDialog`, `DeleteConfirmDialog` (C6) |
+| | Sheet / Drawer | W R | now | today `SideMenu` is a left sheet |
+| | Popover, Tooltip, Hover card | R | | |
+| | Toast | C R | | conrad `Toasts` |
+| **navigation** | Side menu + menu link | W | now | today `SideMenu`/`MenuLink` (needs leptos_router) |
+| | Breadcrumb, Pagination, Bottom nav, Stepper / Wizard | C R | | conrad `Wizard` |
+| **layout** | Panel (title + control box + body) | W C | now | today `ComponentTitleBar` (as a panel header: `Toolbar` title + buttons); collapsible variant = conrad `CollapsiblePanel` |
+| | Tabs | C R | | conrad `Tabs` |
+| | Accordion / Collapsible | C R | | |
+| | Card columns | C | | conrad `CardColumns` |
+| | Page frame, Scroll area, Aspect ratio | C R | | conrad `PageFrame` |
+| **data** | Table | R | | |
+| | Data grid | W R | now | today `DataGrid` (keyed rows, Q10) |
+| | Data table (sort, filter, page) | R | | |
+| **media** | Avatar, Image, Carousel, Marquee, Attachment | R | | probably not needed; listed for completeness |
+| **motion** | Animate, Shimmer, Drag and drop | R | | probably not needed |
+
+Charts are a separate crate, `ferrox-charts` (decided 2026-10-23): line, bar,
+pie, sparkline, on the theme's chart tokens (`--chart-*`), so `ferrox-ui`
+never carries their dependencies.
+
+Not ported: conrad's `ErrorBoundary` (Leptos has its own) and its hooks
+(`useDropdownPosition`, …), which become internals of menus/overlay.
+
+
+## Pieces
+
+Each piece passes this repo's release check once it exists (piece 2), and is
+reviewable alone. Code moves from webapp-lib `v1.0` (`54eb481` + later), with
+webapp-lib's history as the record (fresh first commit here).
+
+0. **Bootstrap** — done (2026-10-23). Workspace `Cargo.toml` (`[workspace.package]` version
+   `0.1.0`, shared deps), `LICENSE-MIT` + `LICENSE-APACHE`, `README.md`,
+   `.gitignore`, this plan. First commit, push `master`; check GitHub's
+   default branch is `master`.
+1. **`ferrox-theme` + `ferrox-theme-build`.** Move `lib/src/theme`,
+   `lib/style/{tokens.css,themes/}`, `webapp-lib-build`. Not the conrad sync
+   script: ferrox-ui owns the CSS now, so drop the "TIER 1 / edit it in conrad"
+   headers. Rename identifiers and the storage key
+   (`webapp-lib.theme` → `ferrox.theme`, with a one-time read of the old key so
+   users keep their choice). Add the generated CSS file (C9), idempotent
+   `init`/`register` (H9), a `ThemeFile` constructor (H8), `#[non_exhaustive]`
+   (H7), configurable default family (X5).
+2. **Demo + e2e + release check.** Move the demo's theme page, theme bar and
+   the Playwright setup (`fixtures.ts`, `themes.spec.ts`, smoke test),
+   `scripts/release-check.sh`. The theme tests pass here unchanged; the
+   pre-paint test gains a check that the page is styled before mount.
+3. **`ferrox-ui` skeleton + `core`.** Crate, group features, `init()` CSS
+   injection. Move `Button`, `IconButton`, `Toolbar` with `focus.css`,
+   `buttons.css` (now an owned file, not generated from conrad), `toolbar.css`, the `/buttons` demo page and
+   `buttons.spec.ts`. Review items for primitives from here on: `MaybeProp`
+   classes and no `style` props (X3), text props (X4), id props (H12), newtype
+   contexts (H11).
+4. **Feature hygiene.** cargo-hack: every group builds alone, in the release
+   check.
+5. **`ferrox-icons`.** Build-time SVG discovery, first icons: close, plus,
+   menu, refresh, check, delete, chevron. Own plan (the SVG icon story).
+6. **Port today's webapp-lib primitives**, one group per piece, each with its
+   demo page and e2e tests: `core` rest (`Spinner`, `Alert`) → `overlay`
+   (`Dialog` with conrad's footer band, `Alert dialog`, `Sheet`) → `forms`
+   (`Field`, `Input` with password strength, `Checkbox`, `Select`,
+   `Combobox`) → `navigation` (side menu) → `layout` (`Panel`, from
+   `ComponentTitleBar`) → `data` (`Data grid`).
+7. **Docs.** README per crate (purpose, every public item with an example),
+   root README as the map, CHANGELOG. Tag `v0.1.0` when webapp-lib is ready to
+   switch.
+
+New components from the inventory come after, one story each.
+
+## Open points
+
+Decided 2026-10-23: licence `MIT OR Apache-2.0`; fresh first commit; ferrox-ui
+owns its CSS (conrad departs).
+
+Still open (none block piece 0):
+
+1. **Buttons:** plain `Button`/`IconButton` in `core` (proposed: other groups
+   need them), split button and menu button in `menus`; or all buttons in
+   `forms`?
+2. **Name check:** `ferrox-ui` / `ferrox-theme` / `ferrox-icons` free on
+   crates.io? (Matters only if we publish there; git tags work regardless.)
+3. **Fonts:** ship Cormorant Garamond / DM Mono (OFL) self-hosted in
+   `ferrox-theme`, or leave fonts to apps? Decide by piece 1.
+4. The `ferrox-theme-build` version check (webapp-lib `plans/crate-split.md`).
+5. The rest of the inventory: add, drop, move?
