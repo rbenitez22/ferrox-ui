@@ -81,14 +81,17 @@ These rules keep the markup static and safe to set with `inner_html`.
 
 - `leptos` 0.8 (CSR).
 - Sizing works without any CSS (the `1em` attributes). ferrox-ui's `.icon`
-  class adds `display: block` and `pointer-events: none` for icons inside
+  class (`style/core/icon.css`) adds `display: block` and `pointer-events: none` for icons inside
   buttons.
 
 ## Planned
 
-`plans/ferrox-icons.md`: a demo gallery page with e2e tests, the `.icon` CSS
-in its own core sheet, and the demo's buttons drawn with these icons. Later:
-app-supplied icons through the same checks.
+`plans/ferrox-icons.md`: the demo's buttons drawn with these icons, and a
+check that release builds drop unused icons. Later: app-supplied icons
+through the same checks.
+
+The demo's `/icons` page shows every icon; `demo/e2e/tests/icons.spec.ts`
+tests them in Chromium and Firefox.
 
 ## Licence
 

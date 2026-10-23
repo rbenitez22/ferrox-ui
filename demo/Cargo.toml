@@ -10,6 +10,7 @@ leptos        = { workspace = true }
 leptos_router = { workspace = true }
 ferrox-theme  = { path = "../ferrox-theme", features = ["leptos"] }
 ferrox-ui     = { path = "../ferrox-ui" }
+ferrox-icons  = { path = "../ferrox-icons" }
 web-sys       = { workspace = true, features = ["Window", "Document", "Element", "CssStyleDeclaration", "Location"] }
 
 # Wired exactly as an app would be (apps use a git dependency instead of a path).

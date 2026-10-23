@@ -9,6 +9,7 @@
 const CORE: &[(&str, &str)] = &[
     ("ferrox-ui-focus", include_str!("../style/core/focus.css")),
     ("ferrox-ui-buttons", include_str!("../style/core/buttons.css")),
+    ("ferrox-ui-icon", include_str!("../style/core/icon.css")),
     ("ferrox-ui-toolbar", include_str!("../style/core/toolbar.css")),
 ];
 

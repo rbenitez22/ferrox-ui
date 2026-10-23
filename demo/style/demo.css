@@ -121,3 +121,31 @@
     color: var(--text-subtle);
     word-break: break-all;
 }
+
+/* Icons page: the gallery, and text sizes for "Size follows the font". */
+.demo-icons {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: var(--space-sm);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.demo-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-sm);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    color: var(--text);
+    font-size: 1.5rem;
+}
+.demo-icon code {
+    color: var(--text-subtle);
+    font-size: 0.75rem;
+}
+.demo-text-16 { font-size: 16px; }
+.demo-text-24 { font-size: 24px; }
+.demo-text-32 { font-size: 32px; }

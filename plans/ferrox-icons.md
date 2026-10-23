@@ -6,7 +6,7 @@ one `const` per icon. A single `Icon` component renders any of them:
 `<Icon icon=CLOSE/>`. Because icons are values, components can take one as a
 prop (`<MenuLink icon=DELETE …>`) and an app can choose one at runtime.
 
-Status: approved (2026-10-23). Pieces 1–2 done (2026-10-23); piece 3 next.
+Status: approved (2026-10-23). Pieces 1–3 done (2026-10-23); piece 4 next.
 
 Changes from the design during piece 1:
 - `IconData` has only `name` and `body`. Validation requires Lucide's root

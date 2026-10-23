@@ -5,7 +5,7 @@ use leptos::prelude::*;
 use leptos_router::components::{Route, Router, Routes, A};
 use leptos_router::path;
 
-use crate::pages::{buttons::ButtonsPage, themes::ThemesPage};
+use crate::pages::{buttons::ButtonsPage, icons::IconsPage, themes::ThemesPage};
 use crate::theme_bar::ThemeBar;
 
 #[component]
@@ -19,6 +19,7 @@ pub fn App() -> impl IntoView {
                     <nav class="demo-nav">
                         <A href="/">"Themes"</A>
                         <A href="/buttons">"Buttons"</A>
+                        <A href="/icons">"Icons"</A>
                     </nav>
                 </header>
                 <ThemeBar />
@@ -26,6 +27,7 @@ pub fn App() -> impl IntoView {
                     <Routes fallback=|| view! { <p>"Page not found."</p> }>
                         <Route path=path!("/") view=ThemesPage />
                         <Route path=path!("/buttons") view=ButtonsPage />
+                        <Route path=path!("/icons") view=IconsPage />
                     </Routes>
                 </main>
             </div>

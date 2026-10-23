@@ -1,0 +1,13 @@
+/* Icons (`.icon`, drawn by ferrox-icons' `Icon`). Part of ferrox-ui `core`.
+   Size and colour come from the icon itself (1em, currentColor); this sheet
+   only fits it into the boxes around it. */
+
+/* A drawn mark (`Icon`): a block, so no line box adds space under it. It takes
+   no pointer events, so hovering it is hovering the button around it: an SVG
+   under the pointer otherwise stands in for the button, and Firefox then looks
+   for the SVG's own `<title>` and shows no tooltip from the button's `title`. */
+.icon {
+  display: block;
+  flex: none;
+  pointer-events: none;
+}

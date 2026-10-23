@@ -5,6 +5,7 @@ import { test, expect, openApp } from '../fixtures';
 const ROUTES = [
   { path: '/', heading: 'Surfaces' },
   { path: '/buttons', heading: 'Families' },
+  { path: '/icons', heading: 'All icons' },
 ];
 
 for (const { path, heading } of ROUTES) {
