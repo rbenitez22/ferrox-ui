@@ -121,3 +121,83 @@ test.describe('LoadingOverlay', () => {
     await expect(overlay).toHaveCount(0, { timeout: 4000 });
   });
 });
+
+test.describe('Alert', () => {
+  test.use({ colorScheme: 'light' });
+
+  const SEVERITIES = [
+    { severity: 'info', role: 'status', icon: 'info', text: 'Changes apply', token: 'info' },
+    { severity: 'success', role: 'status', icon: 'success', text: 'reconciled', token: 'success' },
+    { severity: 'warning', role: 'status', icon: 'warning', text: 'no transactions', token: 'warning' },
+    { severity: 'error', role: 'alert', icon: 'error', text: 'refused', token: 'danger' },
+  ];
+
+  /** The alert of a severity, found by part of its text. */
+  const alert = (page: Page, severity: string, text: string) =>
+    section(page, 'Alerts').locator(`.alert--${severity}`).filter({ hasText: text });
+
+  /** `var(--name)` as the page computes it for `property`, e.g. a colour. */
+  function resolved(page: Page, property: string, value: string): Promise<string> {
+    return page.evaluate(([p, v]) => {
+      const probe = document.createElement('div');
+      probe.style.setProperty(p, v);
+      document.body.append(probe);
+      const out = getComputedStyle(probe).getPropertyValue(p);
+      probe.remove();
+      return out;
+    }, [property, value]);
+  }
+
+  test('only an error interrupts: role alert, the rest status', async ({ page }) => {
+    for (const { severity, role, text } of SEVERITIES) {
+      await expect(alert(page, severity, text)).toHaveAttribute('role', role);
+    }
+  });
+
+  test("each severity draws its own icon, and icon=false draws none", async ({ page }) => {
+    for (const { severity, icon, text } of SEVERITIES) {
+      const icons = alert(page, severity, text).locator('svg.alert__icon');
+      await expect(icons).toHaveCount(1);
+      await expect(icons).toHaveAttribute('data-icon', icon);
+    }
+    await expect(alert(page, 'info', 'No icon').locator('svg')).toHaveCount(0);
+  });
+
+  test("text and border take the severity's tokens, in every theme", async ({ page }) => {
+    const check = async () => {
+      for (const { severity, text, token } of SEVERITIES) {
+        const style = await alert(page, severity, text).evaluate((el) => {
+          const s = getComputedStyle(el);
+          return { color: s.color, border: s.borderLeftColor };
+        });
+        expect(style.color, severity).toBe(await resolved(page, 'color', `var(--${token}-text)`));
+        expect(style.border, severity).toBe(await resolved(page, 'color', `var(--${token}-base)`));
+      }
+    };
+    await check();
+    await page.getByLabel('Theme').selectOption('jamaica');
+    await page.getByLabel('Mode').selectOption('dark');
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'jamaica-dark');
+    await check();
+  });
+
+  test('only a dismissible alert has a close button; it calls on_dismiss', async ({ page }) => {
+    for (const { severity, text } of SEVERITIES) {
+      await expect(alert(page, severity, text).getByRole('button')).toHaveCount(0);
+    }
+    const dismissible = alert(page, 'error', 'Dismissible');
+    await dismissible.getByRole('button', { name: 'Dismiss' }).click();
+    await expect(dismissible).toHaveCount(0);
+
+    await section(page, 'Alerts').getByRole('button', { name: 'Show the dismissible alert again' }).click();
+    await expect(dismissible).toHaveCount(1);
+  });
+
+  test('a one-line alert is as tall with a close button as without', async ({ page }) => {
+    // Wide enough that both texts fit on one line.
+    await page.setViewportSize({ width: 1600, height: 900 });
+    const plain = await alert(page, 'error', 'refused').boundingBox();
+    const withClose = await alert(page, 'error', 'Dismissible').boundingBox();
+    expect(withClose!.height).toBeCloseTo(plain!.height, 0);
+  });
+});

@@ -160,3 +160,10 @@
     align-items: center;
     gap: var(--space-sm);
 }
+
+/* A column of blocks with even gaps (the alerts on the feedback page). */
+.demo-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}

@@ -26,7 +26,7 @@ changing it does not trigger a rebuild.
 | `/` | `pages/themes.rs` | Every surface, text, role (explicit and derived slots) and chart token of the active theme, with the values the browser computed |
 | `/buttons` | `pages/buttons.rs` | `Button` (families, quiet, sizes, disabled, saving), `IconButton` (plain, pressed, danger, disabled), `Toolbar` (standard, compact, grouped) |
 | `/icons` | `pages/icons.rs` | Every ferrox-icons icon (`ALL`), one icon at 16/24/32px (it is 1em), and an icon chosen at runtime (chevron right/down) |
-| `/feedback` | `pages/feedback.rs` | `Spinner` (region, inline in a row action's place, field), shown on demand so the delayed reveal can be watched; `LoadingOverlay` for 2s |
+| `/feedback` | `pages/feedback.rs` | `Spinner` (region, inline in a row action's place, field), shown on demand so the delayed reveal can be watched; `LoadingOverlay` for 2s; `Alert` (each severity, no icon, dismissible) |
 
 The header and the theme bar (`theme_bar.rs`, plain `<select>`s for family and
 mode, plus the active `data-theme`) are on every page.
@@ -80,7 +80,7 @@ E2E_FRESH=1 npm test   # own server on :3299, fresh build (what the release chec
 | `tests/smoke.spec.ts` | every route loads |
 | `tests/buttons.spec.ts` | Button / IconButton / Toolbar, including "no neighbour moves" on hover, press and saving |
 | `tests/icons.spec.ts` | Every icon draws (SVG namespace, non-empty box), is decorative, follows the font size and the text colour in every theme; a runtime choice swaps the drawing |
-| `tests/feedback.spec.ts` | Spinners: status role + hidden label, reveal armed on `--loading-delay`, sizes, 0.8s spin, reduced motion (2.4s, still revealed); the overlay covers the page and goes |
+| `tests/feedback.spec.ts` | Spinners: status role + hidden label, reveal armed on `--loading-delay`, sizes, 0.8s spin, reduced motion (2.4s, still revealed); the overlay covers the page and goes. Alerts: role per severity, icon per severity (none with `icon=false`), text and border from the severity tokens in two themes, dismiss, and the close button adds no height |
 | `tests/themes.spec.ts` | choosing, persisting, pre-paint, styled before mount, loading screen, fonts, legacy key, `?theme=`, system mode, fallbacks |
 
 Writing a test:

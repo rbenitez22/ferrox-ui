@@ -1,0 +1,66 @@
+/* Alerts (`.alert`). Part of ferrox-ui `core`. Tokens only and class-only.
+
+   The in-page / in-form message. An alert NEVER times out: it is the reason a
+   submit failed, and it stays until resolved or dismissed. Only a toast
+   dismisses itself, and anything the user must act on is never a toast.
+
+   Status roles only: there is no primary alert; an alert reports a state, it
+   does not act. Severity shows three ways (tint, left border, icon), so it
+   does not rest on colour alone. */
+
+.alert {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-md);
+  border-left: 3px solid transparent;
+  font-size: 0.95rem;
+}
+
+.alert--info {
+  background: var(--info-tint);
+  border-left-color: var(--info-base);
+  color: var(--info-text);
+}
+
+.alert--success {
+  background: var(--success-tint);
+  border-left-color: var(--success-base);
+  color: var(--success-text);
+}
+
+/* The non-blocking tier. Never prevents submission: if it should block, it
+   is an error. */
+.alert--warning {
+  background: var(--warning-tint);
+  border-left-color: var(--warning-base);
+  color: var(--warning-text);
+}
+
+.alert--error {
+  background: var(--danger-tint);
+  border-left-color: var(--danger-base);
+  color: var(--danger-text);
+}
+
+/* ── Parts ── */
+
+/* A little larger than the text, centred on its first line. */
+.alert__icon {
+  width: 1.2em;
+  height: 1.2em;
+  margin-top: calc((1lh - 1.2em) / 2);
+}
+
+.alert__body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* The close button takes the alert's colour, and its negative margin keeps a
+   one-line alert as tall as one without it. */
+.alert__dismiss {
+  margin-block: calc((1lh - 1.75rem) / 2);
+  color: inherit;
+}

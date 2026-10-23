@@ -1,10 +1,10 @@
-//! Feedback: spinners and the loading overlay (later alerts, skeletons and
+//! Feedback: spinners, the loading overlay and alerts (later skeletons and
 //! toasts), so each pattern can be checked in every theme.
 
 use std::time::Duration;
 
 use ferrox_icons::{Icon, HELP, SEARCH};
-use ferrox_ui::{Button, IconButton, LoadingOverlay, Spinner, SpinnerKind};
+use ferrox_ui::{Alert, AlertSeverity, Button, IconButton, LoadingOverlay, Spinner, SpinnerKind};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -16,6 +16,7 @@ pub fn FeedbackPage() -> impl IntoView {
     view! {
         <Spinners />
         <Overlay />
+        <Alerts />
     }
 }
 
@@ -72,6 +73,35 @@ fn Overlay() -> impl IntoView {
             <Show when=move || shown.get()>
                 <LoadingOverlay text="Signing in…" />
             </Show>
+        </Section>
+    }
+}
+
+/// Each severity, one without its icon, and one that can be dismissed.
+#[component]
+fn Alerts() -> impl IntoView {
+    let dismissed = RwSignal::new(false);
+    view! {
+        <Section title="Alerts">
+            <div class="demo-stack">
+                <Alert severity=AlertSeverity::Info>"Changes apply to new entries only."</Alert>
+                <Alert severity=AlertSeverity::Success>"The statement was reconciled."</Alert>
+                <Alert severity=AlertSeverity::Warning>"This account has no transactions this year."</Alert>
+                <Alert severity=AlertSeverity::Error>"The server refused the change: the period is closed."</Alert>
+                <Alert severity=AlertSeverity::Info icon=false>"No icon: icon=false."</Alert>
+                <Show
+                    when=move || !dismissed.get()
+                    fallback=move || view! {
+                        <div class="demo-row">
+                            <Button on_click=move |_| dismissed.set(false)>"Show the dismissible alert again"</Button>
+                        </div>
+                    }
+                >
+                    <Alert severity=AlertSeverity::Error on_dismiss=move |_| dismissed.set(true)>
+                        "Dismissible: the close button calls on_dismiss, and the page removes the alert."
+                    </Alert>
+                </Show>
+            </div>
         </Section>
     }
 }

@@ -3,7 +3,7 @@
 //!
 //! Components come in feature groups. `core` is always compiled:
 //! [`Button`], [`IconButton`], [`Toolbar`] / [`ToolbarGroup`], [`Spinner`],
-//! [`LoadingOverlay`]. Further groups (`forms`, `menus`, `overlay`,
+//! [`LoadingOverlay`], [`Alert`]. Further groups (`forms`, `menus`, `overlay`,
 //! `navigation`, `layout`, `data`) arrive as they are built.
 //!
 //! Call [`init`] once at startup, before mounting, to add the components'

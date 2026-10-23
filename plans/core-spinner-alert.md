@@ -4,7 +4,7 @@ Piece 6a of `plans/ferrox-ui.md` ("`core` rest: `Spinner`, `Alert`"). Ports
 the behaviour and CSS of conrad's `Spinner.tsx` / `Alert.tsx` and replaces
 webapp-lib's `Spinner` and `Message`.
 
-Status: approved (2026-10-23). Pieces 1–2 done (2026-10-23); piece 3 next.
+Status: approved (2026-10-23). Pieces 1–3 done (2026-10-23); piece 4 (docs) next.
 
 Notes from piece 1:
 - `LoadingOverlay` without `text` gives screen readers a hidden "Loading…",
@@ -15,6 +15,12 @@ Notes from piece 1:
   `SUCCESS`, `WARNING`, `ERROR`), following ferrox-icons' "our own names"
   rule, not Lucide's names (`info`, `circle-check`, `triangle-alert`,
   `circle-alert`) as written above.
+- Piece 3: `Alert` gained `dismiss_label` (default "Dismiss") for the close
+  button, per review item X4 (text props). The icon and the close button are
+  centred on the first line with `1lh`.
+- Seen in piece 3, not fixed here: Patina light's `--success-text` is low
+  contrast on `--success-tint`. That's a theme token question for
+  ferrox-theme, not for Alert.
 
 ## Sources
 
