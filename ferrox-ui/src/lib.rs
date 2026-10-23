@@ -3,7 +3,7 @@
 //!
 //! Components come in feature groups. `core` is always compiled:
 //! [`Button`], [`IconButton`], [`Toolbar`] / [`ToolbarGroup`], [`Spinner`],
-//! [`LoadingOverlay`], [`Alert`]. Feature `overlay`: `Dialog`, `ConfirmDialog`. Further groups
+//! [`LoadingOverlay`], [`Alert`]. Feature `overlay`: `Dialog`, `ConfirmDialog`, `Sheet`. Further groups
 //! (`forms`, `menus`, `navigation`, `layout`, `data`) arrive as they are
 //! built.
 //!

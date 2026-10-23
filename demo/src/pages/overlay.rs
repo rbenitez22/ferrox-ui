@@ -1,10 +1,10 @@
-//! Overlay: dialogs and the confirm dialog (later sheets), each opened from a
+//! Overlay: dialogs, the confirm dialog and sheets, each opened from a
 //! button, with a log of what every way out did, so focus, Esc, Enter, the
 //! footer and the scroll lock can be checked.
 
 use std::time::Duration;
 
-use ferrox_ui::{Button, ButtonFamily, ConfirmDialog, Dialog, DialogAction, DialogSize};
+use ferrox_ui::{Button, ButtonFamily, ConfirmDialog, Dialog, DialogAction, DialogSize, Sheet, SheetSide};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -39,6 +39,13 @@ fn Dialogs(log: RwSignal<Vec<String>>) -> impl IntoView {
         <Section title="Confirm dialog">
             <div class="demo-row">
                 <DeleteConfirm note=note />
+            </div>
+        </Section>
+        <Section title="Sheets">
+            <div class="demo-row">
+                <EdgeSheet side=SheetSide::Left label="Menu" note=note />
+                <EdgeSheet side=SheetSide::Right label="Details" note=note />
+                <EdgeSheet side=SheetSide::Bottom label="Actions" note=note />
             </div>
         </Section>
     }
@@ -171,5 +178,24 @@ fn DeleteConfirm(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
         >
             <p>"This deletes “Groceries” and its 214 transactions."</p>
         </ConfirmDialog>
+    }
+}
+
+/// A sheet at one edge, holding a few controls; its log entries name the edge.
+#[component]
+fn EdgeSheet(side: SheetSide, label: &'static str, note: impl Fn(&str) + Copy + Send + Sync + 'static) -> impl IntoView {
+    let open = RwSignal::new(false);
+    let name = label.to_lowercase();
+    let closed = format!("{name}: closed");
+    let chosen = StoredValue::new(format!("{name}: chose"));
+    view! {
+        <Button family=ButtonFamily::Secondary on_click=move |_| open.set(true)>{format!("{label}…")}</Button>
+        <Sheet open=open side=side title=label on_close=move || { open.set(false); note(&closed); }>
+            <div class="demo-stack">
+                <Button quiet=true on_click=move |_| { open.set(false); note(&chosen.get_value()); }>"Accounts"</Button>
+                <Button quiet=true>"Budgets"</Button>
+                <Button quiet=true>"Reports"</Button>
+            </div>
+        </Sheet>
     }
 }

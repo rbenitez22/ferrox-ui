@@ -5,7 +5,7 @@ footer band, Alert dialog, Sheet. Ports conrad's `Dialog.tsx` /
 `ConfirmDialog.tsx` behaviour and CSS, and replaces webapp-lib's dialog
 helpers and the drawer half of `SideMenu`.
 
-Status: approved (2026-10-23). Pieces 1–2 done (2026-10-23); piece 3 next.
+Status: approved (2026-10-23). Pieces 1–3 done (2026-10-23); piece 4 (docs) next.
 
 Notes from piece 1:
 - Callbacks with no input are zero-argument closures:
@@ -24,6 +24,12 @@ Notes from piece 1:
   `ConfirmDialog` sets. An app may want a non-destructive alert dialog too.
   `ConfirmDialog` also takes `close_label`. Focus opens on the ×, never on
   Delete, so a reflexive Enter closes rather than deletes.
+- Piece 3: a backdrop click closes a Sheet only if the press also started on
+  the backdrop, so a text selection dragged out of the sheet doesn't close
+  it. The slide-in is CSS only (`@starting-style`, `ease-out` over
+  `--react-time`, not the overshooting `--react-ease`); closing has no
+  animation. The left and right sheets are pinned with `inset`, the bottom
+  one has rounded top corners.
 
 ## Sources
 

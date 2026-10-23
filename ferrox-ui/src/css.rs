@@ -21,6 +21,7 @@ const CORE: &[(&str, &str)] = &[
 const OVERLAY: &[(&str, &str)] = &[
     ("ferrox-ui-modal", include_str!("../style/overlay/modal.css")),
     ("ferrox-ui-dialog", include_str!("../style/overlay/dialog.css")),
+    ("ferrox-ui-sheet", include_str!("../style/overlay/sheet.css")),
 ];
 #[cfg(not(feature = "overlay"))]
 const OVERLAY: &[(&str, &str)] = &[];

@@ -19,4 +19,4 @@ overlay = []
 ferrox-icons = { path = "../ferrox-icons" }
 leptos  = { workspace = true }
 wasm-bindgen = { workspace = true }
-web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent", "DomTokenList", "Event", "EventTarget", "HtmlDialogElement", "HtmlElement", "KeyboardEvent"] }
+web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent", "DomTokenList", "Event", "EventTarget", "HtmlDialogElement", "HtmlElement", "KeyboardEvent", "DomRect"] }

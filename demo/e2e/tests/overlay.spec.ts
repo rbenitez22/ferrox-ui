@@ -246,3 +246,98 @@ test.describe('ConfirmDialog', () => {
     await expect(confirm(page).getByRole('button', { name: 'Delete' })).not.toHaveAttribute('aria-disabled', 'true');
   });
 });
+
+test.describe('Sheet', () => {
+  const sheet = (page: Page, title: string) => page.getByRole('dialog', { name: title });
+
+  async function openSheet(page: Page, title: string): Promise<Locator> {
+    await trigger(page, `${title}…`).click();
+    const s = sheet(page, title);
+    await expect(s).toBeVisible();
+    // Let the slide-in finish before measuring.
+    await expect.poll(() => s.evaluate((el) => getComputedStyle(el).transform)).toBe('none');
+    return s;
+  }
+
+  test('each edge: pinned there, at its size', async ({ page }) => {
+    const vp = page.viewportSize()!;
+
+    const left = (await (await openSheet(page, 'Menu')).boundingBox())!;
+    expect(left).toEqual({ x: 0, y: 0, width: 320, height: vp.height });
+    await page.keyboard.press('Escape');
+
+    const right = (await (await openSheet(page, 'Details')).boundingBox())!;
+    expect(right.x + right.width).toBeCloseTo(vp.width, 0);
+    expect(right.height).toBe(vp.height);
+    await page.keyboard.press('Escape');
+
+    const bottom = (await (await openSheet(page, 'Actions')).boundingBox())!;
+    expect(bottom.y + bottom.height).toBeCloseTo(vp.height, 0);
+    expect(bottom.width).toBe(vp.width);
+    expect(bottom.height).toBeLessThanOrEqual(vp.height * 0.85);
+  });
+
+  test('is a real modal: focus inside, page locked, focus back on close', async ({ page }) => {
+    const s = await openSheet(page, 'Menu');
+    expect(await s.evaluate((el) => el.matches(':modal'))).toBe(true);
+    await expect.poll(() => focused(page)).toBe('Close');
+    expect(await bodyLocked(page)).toBe(true);
+    await page.keyboard.press('Escape');
+    await expect(s).toBeHidden();
+    await expect.poll(() => bodyLocked(page)).toBe(false);
+    await expect.poll(() => focused(page)).toBe('Menu…');
+  });
+
+  for (const [how, act] of [
+    ['a backdrop click', (page: Page) => page.mouse.click(page.viewportSize()!.width - 10, 300)],
+    ['Esc', (page: Page) => page.keyboard.press('Escape')],
+    ['the ×', (page: Page) => sheet(page, 'Menu').getByRole('button', { name: 'Close' }).click()],
+  ] as const) {
+    test(`${how} calls on_close once`, async ({ page }) => {
+      await openSheet(page, 'Menu');
+      await act(page);
+      await expect(sheet(page, 'Menu')).toBeHidden();
+      await expect(log(page)).toHaveText(['menu: closed']);
+    });
+  }
+
+  test('clicks inside do not close it; a press dragged out to the backdrop does not either', async ({ page }) => {
+    const s = await openSheet(page, 'Menu');
+    await s.locator('.sheet__body').click({ position: { x: 20, y: 200 } });
+    const title = (await s.locator('.sheet__title').boundingBox())!;
+    await page.mouse.move(title.x + 5, title.y + 5);
+    await page.mouse.down();
+    await page.mouse.move(page.viewportSize()!.width - 10, 300);
+    await page.mouse.up();
+    await expect(s).toBeVisible();
+    await expect(log(page)).toHaveCount(0);
+  });
+
+  test('a choice inside closes it through the app', async ({ page }) => {
+    const s = await openSheet(page, 'Menu');
+    await s.getByRole('button', { name: 'Accounts' }).click();
+    await expect(s).toBeHidden();
+    await expect(log(page)).toHaveText(['menu: chose']);
+  });
+
+  test('slides in over --react-time', async ({ page }) => {
+    const s = await openSheet(page, 'Menu');
+    const t = await s.evaluate((el) => {
+      const c = getComputedStyle(el);
+      return { property: c.transitionProperty, duration: c.transitionDuration };
+    });
+    expect(t).toEqual({ property: 'transform', duration: '0.2s' });
+  });
+});
+
+test.describe('Sheet, reduced motion', () => {
+  test.use({ reducedMotion: 'reduce' });
+
+  test('appears without sliding', async ({ page }) => {
+    await trigger(page, 'Menu…').click();
+    const s = page.getByRole('dialog', { name: 'Menu' });
+    await expect(s).toBeVisible();
+    expect(await s.evaluate((el) => getComputedStyle(el).transitionProperty)).toBe('none');
+    expect(await s.evaluate((el) => getComputedStyle(el).transform)).toBe('none');
+  });
+});
