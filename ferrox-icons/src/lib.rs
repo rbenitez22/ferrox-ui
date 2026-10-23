@@ -66,7 +66,6 @@ mod tests {
     #[test]
     fn the_first_set_is_there() {
         let set = [BAN, CAMERA, CHECK, CHEVRON_DOWN, CHEVRON_RIGHT, CLOSE, DELETE, HELP, LOCK, MENU, PLUS, REFRESH, SEARCH, UNLOCK];
-        assert_eq!(set.len(), ALL.len());
         assert!(set.iter().all(|icon| ALL.contains(icon)));
     }
 }

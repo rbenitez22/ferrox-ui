@@ -22,7 +22,7 @@ plan, with the decisions and the full component inventory, is
 | `ferrox-theme` | Runtime theme switching (families, `system`/`light`/`dark`, stored choice), the pre-paint script, Leptos signals (feature `leptos`). *Moved in.* |
 | `ferrox-theme-build` | Build-script helper: the tokens, built-in themes and fonts; validates an app's theme files; writes the CSS file and fonts the app links in `index.html`. *Moved in.* |
 | `ferrox-ui` | Primitives in feature groups: `core` (always on: `Button`, `IconButton`, `Toolbar`; call `ferrox_ui::init()` before mounting to add their CSS), then `forms`, `menus`, `overlay`, `navigation`, `layout`, `data` as they are built. *Moved in: core.* |
-| `ferrox-icons` | SVG icons (Lucide): each icon a const (`CLOSE`), drawn by one `Icon` component. *In progress: first set of 14.* |
+| `ferrox-icons` | SVG icons (Lucide), checked at build time: each icon a const (`CLOSE`), drawn by one `Icon` component. 14 icons so far, added as components need them. |
 | `ferrox-charts` | Charts on the theme's chart tokens (later) |
 | `demo/` | Showcase of every theme and component, with Playwright end-to-end tests (not published). *Moved in: themes.* |
 

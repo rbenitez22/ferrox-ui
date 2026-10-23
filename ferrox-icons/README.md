@@ -18,8 +18,10 @@ view! {
     // in an icon button: the button's title is the label
     <IconButton title="Close" on_click=move |_| open.set(false)><Icon icon=CLOSE/></IconButton>
 
-    // extra classes (a string, or a Signal<String> to make them reactive)
+    // extra classes: a string, or a Signal<String> to make them reactive
+    // (a bare closure doesn't convert to MaybeProp<String>)
     <Icon icon=CLOSE class="dialog__close-icon"/>
+    <Icon icon=CLOSE class=Signal::derive(move || if busy.get() { "is-busy".into() } else { String::new() })/>
 
     // chosen at runtime: a closure or a signal
     <Icon icon=move || if open.get() { CHEVRON_DOWN } else { CHEVRON_RIGHT }/>
@@ -58,9 +60,17 @@ width="1em" height="1em" aria-hidden="true" focusable="false">`:
 
 ## Adding an icon
 
-1. Copy the Lucide file unchanged to `icons/<our-name>.svg`. The name is
-   kebab-case and becomes the const name (`chevron-down` → `CHEVRON_DOWN`).
+Add icons with the component that first needs them, not ahead of time.
+
+1. Find it on [lucide.dev](https://lucide.dev) and copy
+   `https://raw.githubusercontent.com/lucide-icons/lucide/<commit>/icons/<lucide-name>.svg`
+   unchanged to `icons/<our-name>.svg`. Use the commit in `icons/SOURCES`'s
+   header. If you need a newer commit, update the header too. Our name is
+   kebab-case, says what the icon is for (`close`, not `x`), and becomes the
+   const name (`chevron-down` → `CHEVRON_DOWN`).
 2. Add `<our-name> <lucide-name>` to `icons/SOURCES`.
+3. Add a row to the icons table above. The demo's `/icons` gallery and its
+   e2e tests pick the new icon up from `ALL` by themselves.
 
 The build script checks every file and fails the build with the file name
 and the rule broken:
@@ -88,16 +98,27 @@ every icon, so using it keeps them all; it is for galleries and tests.
 
 - `leptos` 0.8 (CSR).
 - Sizing works without any CSS (the `1em` attributes). ferrox-ui's `.icon`
-  class (`style/core/icon.css`) adds `display: block` and `pointer-events: none` for icons inside
-  buttons.
+  class (`style/core/icon.css`) adds `display: block` and
+  `pointer-events: none` for icons inside buttons.
+- Apps can't make their own `IconData` (`#[non_exhaustive]`, so every drawing
+  is one this crate checked). Until app icons arrive, an app draws its own
+  `<svg class="icon" …>`.
+
+## Testing
+
+- `cargo test -p ferrox-icons`: the build script's rules (each rejection),
+  naming, `SOURCES`, the generated markup, and checks that `ALL` matches
+  `icons/*.svg` and no two icons draw the same.
+- The demo's `/icons` page shows every icon. `demo/e2e/tests/icons.spec.ts`
+  checks in Chromium and Firefox that each icon draws in the SVG namespace, is
+  decorative and 1em, strokes in the text colour in every theme, and swaps
+  its drawing when chosen at runtime.
 
 ## Planned
 
-Icons are added as components need them (see "Adding an icon"). Later:
-app-supplied icons through the same checks (`plans/ferrox-icons.md`).
-
-The demo's `/icons` page shows every icon; `demo/e2e/tests/icons.spec.ts`
-tests them in Chromium and Firefox.
+- More icons as components need them (see "Adding an icon").
+- App-supplied icons through the same checks (a `ferrox-icons-build`, like
+  the themes), when an app asks.
 
 ## Licence
 

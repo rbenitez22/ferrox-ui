@@ -9,7 +9,7 @@ webapp-lib keeps the app plumbing (http, storage, reactive, auth, app-level
 components such as `Login`) and depends on ferrox-ui; see webapp-lib's
 `plans/crate-split.md` for that side.
 
-Status: pieces 0–4 done. Repo `/programming/ferrox-ui`
+Status: pieces 0–5 done. Repo `/programming/ferrox-ui`
 (`git@github.com:rbenitez22/ferrox-ui.git`, branch `master`).
 
 ## Crates (one workspace, this repo)
@@ -32,7 +32,7 @@ ferrox-theme        tokens, themes, runtime switching, CSS file generation
 |---|---|---|
 | `ferrox-theme-build` | theme file discovery + validation, generated CSS file (today's `webapp-lib-build`) | std |
 | `ferrox-theme` | `tokens.css`, `themes/*.css`, `register`/`init`/`set_choice`…, `PREPAINT_SCRIPT`. Feature `leptos`: `provide_theme`/`use_theme` | web-sys, wasm-bindgen; leptos (optional) |
-| `ferrox-icons` | one SVG file per icon → one function per icon | leptos |
+| `ferrox-icons` | one Lucide SVG file per icon → one `IconData` const per icon, drawn by one `Icon` component | leptos; roxmltree (build only) |
 | `ferrox-ui` | primitives + their class-only CSS, injected per enabled group | ferrox-theme, ferrox-icons, leptos; leptos_router only for `navigation` |
 | `ferrox-charts` (later) | charts on the theme's chart tokens | ferrox-theme, leptos (+ chart deps) |
 | `demo/` (not published) | showcase of every theme and component; Playwright e2e in `demo/e2e/` | all of the above, by path |
@@ -187,8 +187,14 @@ webapp-lib's history as the record (fresh first commit here).
    `cargo hack check --each-feature --no-dev-deps` on every library crate;
    cargo-hack is required (the manifest-grep fallback is gone). Switch to
    `--feature-powerset` once ferrox-ui has two or more groups.
-5. **`ferrox-icons`.** Build-time SVG discovery, first icons: close, plus,
-   menu, refresh, check, delete, chevron. Own plan (the SVG icon story).
+5. **`ferrox-icons`** — done (2026-10-23). Own plan: `plans/ferrox-icons.md`.
+   14 Lucide icons (ISC) under our own names, checked at build time and
+   generated as `IconData` consts. One `Icon` component draws them (icons are
+   values, so components can take one as a prop). `.icon` CSS moved to
+   `core/icon.css`. Demo `/icons` page + e2e. Release builds keep only the
+   icons an app names. ferrox-ui itself depends on ferrox-icons from piece 6,
+   when a component first draws an icon. Originally: build-time SVG discovery,
+   first icons: close, plus, menu, refresh, check, delete, chevron.
 6. **Port today's webapp-lib primitives**, one group per piece, each with its
    demo page and e2e tests: `core` rest (`Spinner`, `Alert`) → `overlay`
    (`Dialog` with conrad's footer band, `Alert dialog`, `Sheet`) → `forms`
