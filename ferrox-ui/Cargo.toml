@@ -14,5 +14,6 @@ authors.workspace    = true
 default = []
 
 [dependencies]
+ferrox-icons = { path = "../ferrox-icons" }
 leptos  = { workspace = true }
 web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent"] }

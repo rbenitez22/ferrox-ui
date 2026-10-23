@@ -50,13 +50,19 @@ width="1em" height="1em" aria-hidden="true" focusable="false">`:
 
 | Const | Lucide | | Const | Lucide |
 |---|---|---|---|---|
-| `BAN` | `ban` | | `HELP` | `circle-question-mark` |
-| `CAMERA` | `camera` | | `LOCK` | `lock` |
-| `CHECK` | `check` | | `MENU` | `menu` |
-| `CHEVRON_DOWN` | `chevron-down` | | `PLUS` | `plus` |
-| `CHEVRON_RIGHT` | `chevron-right` | | `REFRESH` | `refresh-cw` |
-| `CLOSE` | `x` | | `SEARCH` | `search` |
+| `BAN` | `ban` | | `LOCK` | `lock` |
+| `CAMERA` | `camera` | | `MENU` | `menu` |
+| `CHECK` | `check` | | `PLUS` | `plus` |
+| `CHEVRON_DOWN` | `chevron-down` | | `REFRESH` | `refresh-cw` |
+| `CHEVRON_RIGHT` | `chevron-right` | | `SEARCH` | `search` |
+| `CLOSE` | `x` | | `SUCCESS` | `circle-check` |
 | `DELETE` | `trash` | | `UNLOCK` | `lock-open` |
+| `ERROR` | `circle-alert` | | `WARNING` | `triangle-alert` |
+| `HELP` | `circle-question-mark` | | | |
+| `INFO` | `info` | | | |
+
+`INFO`, `SUCCESS`, `WARNING` and `ERROR` are the severity marks (ferrox-ui's
+`Alert` draws them).
 
 ## Adding an icon
 

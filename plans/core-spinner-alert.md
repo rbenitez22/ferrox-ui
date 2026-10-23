@@ -4,13 +4,17 @@ Piece 6a of `plans/ferrox-ui.md` ("`core` rest: `Spinner`, `Alert`"). Ports
 the behaviour and CSS of conrad's `Spinner.tsx` / `Alert.tsx` and replaces
 webapp-lib's `Spinner` and `Message`.
 
-Status: approved (2026-10-23). Piece 1 done (2026-10-23); piece 2 next.
+Status: approved (2026-10-23). Pieces 1–2 done (2026-10-23); piece 3 next.
 
 Notes from piece 1:
 - `LoadingOverlay` without `text` gives screen readers a hidden "Loading…",
   so the status is never silent.
 - A region spinner's wrapper (`.spinner-status--region`) centres it with
   `--space-2xl` above and below. The ring itself has no margin.
+- Piece 2: the severity icons are named for what they mean (`INFO`,
+  `SUCCESS`, `WARNING`, `ERROR`), following ferrox-icons' "our own names"
+  rule, not Lucide's names (`info`, `circle-check`, `triangle-alert`,
+  `circle-alert`) as written above.
 
 ## Sources
 
