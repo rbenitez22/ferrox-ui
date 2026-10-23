@@ -82,9 +82,9 @@ pub fn HelpButton(
         if is_open {
             let anchor: Element = button.unchecked_into();
             let floating: HtmlElement = popover.clone().unchecked_into();
-            place(&anchor, &floating);
+            place(&anchor, &floating, false);
             let _ = popover.focus();
-            follow(anchor, floating);
+            follow(anchor, floating, false);
         }
     };
 

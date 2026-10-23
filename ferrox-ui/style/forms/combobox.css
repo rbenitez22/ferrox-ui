@@ -1,0 +1,77 @@
+/* Comboboxes (`.combobox`): a field that filters a list. Part of ferrox-ui
+   `forms`. Tokens only and class-only.
+
+   The list is a popover in the top layer, placed under the field and as
+   wide as it from script (`left`, `top`, `width`, `data-side`), so a dialog
+   body or any `overflow` parent cannot clip it. */
+
+.combobox {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* Room on the right for the controls, so text never runs under them. */
+.combobox > .form-input {
+  padding-right: 4.5rem;
+}
+
+.combobox__controls {
+  position: absolute;
+  top: 50%;
+  right: var(--space-xs);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  transform: translateY(-50%);
+}
+
+.combobox__control {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--text-subtle);
+}
+
+.combobox__control[hidden] {
+  display: none;
+}
+
+/* ── The list ── */
+
+.combobox__list {
+  position: fixed;
+  inset: auto;
+  box-sizing: border-box;
+  margin: 0;
+  padding: var(--space-xs) 0;
+  max-height: 16rem;
+  overflow-y: auto;
+  list-style: none;
+  background: var(--surface-0);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+}
+
+.combobox__option {
+  padding: var(--space-xs) var(--space-md);
+  cursor: pointer;
+}
+
+/* Answers in colour only: a growing row would shove the ones around it. */
+.combobox__option:hover {
+  background: var(--surface-2);
+}
+
+/* The keyboard's active option: tinted, as a pressed icon button is. */
+.combobox__option.is-active {
+  background: var(--primary-tint-strong);
+  color: var(--primary-text);
+}
+
+.combobox__empty {
+  padding: var(--space-xs) var(--space-md);
+  color: var(--text-muted);
+  font-style: italic;
+}

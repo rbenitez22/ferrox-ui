@@ -34,6 +34,7 @@ const FORMS: &[(&str, &str)] = &[
     ("ferrox-ui-controls", include_str!("../style/forms/controls.css")),
     ("ferrox-ui-password", include_str!("../style/forms/password.css")),
     ("ferrox-ui-choices", include_str!("../style/forms/choices.css")),
+    ("ferrox-ui-combobox", include_str!("../style/forms/combobox.css")),
 ];
 #[cfg(not(feature = "forms"))]
 const FORMS: &[(&str, &str)] = &[];

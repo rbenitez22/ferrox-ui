@@ -47,12 +47,16 @@ pub(crate) fn position(anchor: Rect, width: f64, height: f64, viewport_width: f6
 }
 
 /// Places `floating` next to `anchor` now, and records the side it took in
-/// `data-side` (`below` / `above`) for CSS and tests.
-pub(crate) fn place(anchor: &Element, floating: &HtmlElement) {
+/// `data-side` (`below` / `above`) for CSS and tests. With `match_width` it
+/// also takes the anchor's width (a combobox's list under its field).
+pub(crate) fn place(anchor: &Element, floating: &HtmlElement, match_width: bool) {
     let Some(window) = web_sys::window() else { return };
     let viewport_width = window.inner_width().ok().and_then(|w| w.as_f64()).unwrap_or(0.0);
     let viewport_height = window.inner_height().ok().and_then(|h| h.as_f64()).unwrap_or(0.0);
     let a = anchor.get_bounding_client_rect();
+    if match_width {
+        let _ = floating.style().set_property("width", &format!("{}px", a.width()));
+    }
     let f = floating.get_bounding_client_rect();
     let anchor = Rect { left: a.left(), top: a.top(), width: a.width(), height: a.height() };
     let (left, top, side) = position(anchor, f.width(), f.height(), viewport_width, viewport_height);
@@ -66,12 +70,12 @@ pub(crate) fn place(anchor: &Element, floating: &HtmlElement) {
 /// it is an open popover. Per frame rather than on scroll events, so it
 /// follows every way the anchor can move: page scroll, a scrolling parent,
 /// a resize, the layout shifting.
-pub(crate) fn follow(anchor: Element, floating: HtmlElement) {
+pub(crate) fn follow(anchor: Element, floating: HtmlElement, match_width: bool) {
     if !floating.matches(":popover-open").unwrap_or(false) {
         return;
     }
-    place(&anchor, &floating);
-    request_animation_frame(move || follow(anchor, floating));
+    place(&anchor, &floating, match_width);
+    request_animation_frame(move || follow(anchor, floating, match_width));
 }
 
 #[cfg(test)]

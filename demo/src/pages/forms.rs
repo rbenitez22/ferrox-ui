@@ -3,7 +3,10 @@
 
 use std::time::Duration;
 
-use ferrox_ui::{Button, ButtonFamily, Checkbox, Field, Input, InputKind, PasswordInput, Select, SelectOption, Switch, Textarea};
+use ferrox_ui::{
+    Button, ButtonFamily, Checkbox, Combobox, Dialog, DialogAction, Field, Input, InputKind, PasswordInput, Select, SelectOption,
+    Switch, Textarea,
+};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -14,6 +17,7 @@ pub fn FormsPage() -> impl IntoView {
         <Fields />
         <Passwords />
         <Choices />
+        <Comboboxes />
     }
 }
 
@@ -134,6 +138,101 @@ fn Choices() -> impl IntoView {
                 <dt>"currency"</dt><dd data-echo="currency">{move || currency.get()}</dd>
                 <dt>"account"</dt><dd data-echo="account">{move || account.get()}</dd>
             </dl>
+        </Section>
+    }
+}
+
+/// One account to choose: an id, and the name shown and matched.
+#[derive(Clone, Debug, PartialEq)]
+struct Account {
+    id: String,
+    name: String,
+}
+
+const ACCOUNT_NAMES: [&str; 24] = [
+    "Assets:Checking", "Assets:Savings", "Assets:Brokerage", "Assets:Cash",
+    "Liabilities:Visa", "Liabilities:Mortgage", "Income:Salary", "Income:Interest",
+    "Expenses:Groceries", "Expenses:Dining", "Expenses:Rent", "Expenses:Utilities:Power",
+    "Expenses:Utilities:Water", "Expenses:Utilities:Internet", "Expenses:Fuel", "Expenses:Insurance",
+    "Expenses:Clothing", "Expenses:Gifts", "Expenses:Books", "Expenses:Travel",
+    "Expenses:Health", "Expenses:Household", "Expenses:Garden", "Equity:Opening Balances",
+];
+
+fn accounts() -> Vec<Account> {
+    ACCOUNT_NAMES.iter().map(|name| Account { id: name.to_lowercase().replace([':', ' '], "-"), name: name.to_string() }).collect()
+}
+
+/// A combobox of accounts (with refresh), the choice it reports, and the
+/// same combobox inside a dialog, where its list must not be clipped.
+#[component]
+fn Comboboxes() -> impl IntoView {
+    let items = RwSignal::new(accounts());
+    let text = RwSignal::new(String::new());
+    let chosen = RwSignal::new(None::<Account>);
+    let reports = RwSignal::new(0_u32);
+    let refreshing = RwSignal::new(false);
+    let refresh = move || {
+        refreshing.set(true);
+        set_timeout(move || {
+            items.update(|a| a.push(Account { id: "expenses-pets".into(), name: "Expenses:Pets".into() }));
+            refreshing.set(false);
+        }, Duration::from_millis(600));
+    };
+    let on_select = move |account: Option<Account>| {
+        chosen.set(account);
+        reports.update(|n| *n += 1);
+    };
+
+    let dialog_open = RwSignal::new(false);
+    let dialog_text = RwSignal::new(String::new());
+    let dialog_chosen = RwSignal::new(None::<Account>);
+    let saves = RwSignal::new(0_u32);
+    let on_dialog_select = move |account: Option<Account>| dialog_chosen.set(account);
+    view! {
+        <Section title="Combobox">
+            <div class="demo-form">
+                <Field label="Account" hint="Type part of a name, or open the list">
+                    <Combobox
+                        items=items
+                        key_of=|a: &Account| a.id.clone()
+                        label_of=|a: &Account| a.name.clone()
+                        text=text
+                        on_select=on_select
+                        on_refresh=refresh
+                        refreshing=refreshing
+                        placeholder="Choose an account"
+                        name="account-combo"
+                    />
+                </Field>
+            </div>
+            <div class="demo-row">
+                <Button family=ButtonFamily::Secondary on_click=move |_| dialog_open.set(true)>"Combobox in a dialog…"</Button>
+            </div>
+            <dl class="demo-echo">
+                <dt>"text"</dt><dd data-echo="combo-text">{move || text.get()}</dd>
+                <dt>"chosen"</dt><dd data-echo="combo-chosen">{move || chosen.get().map(|a| a.id).unwrap_or_else(|| "(none)".into())}</dd>
+                <dt>"reports"</dt><dd data-echo="combo-reports">{move || reports.get().to_string()}</dd>
+                <dt>"in dialog"</dt><dd data-echo="dialog-chosen">{move || dialog_chosen.get().map(|a| a.id).unwrap_or_else(|| "(none)".into())}</dd>
+                <dt>"saves"</dt><dd data-echo="dialog-saves">{move || saves.get().to_string()}</dd>
+            </dl>
+            <Dialog
+                open=dialog_open
+                title="Move a split"
+                on_close=move || dialog_open.set(false)
+                affirm=DialogAction::new("Save", move || { saves.update(|n| *n += 1); dialog_open.set(false); })
+            >
+                <Field label="To account">
+                    <Combobox
+                        items=items
+                        key_of=|a: &Account| a.id.clone()
+                        label_of=|a: &Account| a.name.clone()
+                        text=dialog_text
+                        on_select=on_dialog_select
+                        autofocus=true
+                        name="dialog-combo"
+                    />
+                </Field>
+            </Dialog>
         </Section>
     }
 }

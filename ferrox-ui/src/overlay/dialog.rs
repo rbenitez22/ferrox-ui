@@ -162,7 +162,9 @@ pub fn Dialog(
     let enter_action = affirm.clone().filter(|_| submit_on_enter);
     let on_keydown = move |ev: KeyboardEvent| {
         let Some(action) = &enter_action else { return };
-        if ev.key() == "Enter" && action.ready() && !takes_enter(&ev) {
+        // A control that handled Enter itself (a combobox choosing an option)
+        // has prevented its default: then it is not a submit.
+        if ev.key() == "Enter" && !ev.default_prevented() && action.ready() && !takes_enter(&ev) {
             ev.prevent_default();
             action.on_click.run(());
         }

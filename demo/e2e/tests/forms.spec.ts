@@ -230,7 +230,7 @@ test.describe('Switch', () => {
 
 test.describe('Select', () => {
   const currency = (page: Page) => page.getByLabel('Currency');
-  const account = (page: Page) => page.getByLabel('Account');
+  const account = (page: Page) => page.locator('select[name=account]');
 
   test('starts on its placeholder, which cannot be chosen', async ({ page }) => {
     await expect(currency(page)).toHaveValue('');
@@ -256,7 +256,7 @@ test.describe('Select', () => {
   });
 
   test('refresh is a button; a spinner holds its place while refreshing', async ({ page }) => {
-    const refresh = page.getByRole('button', { name: 'Refresh' });
+    const refresh = page.locator('.select').getByRole('button', { name: 'Refresh' });
     await refresh.click();
     await expect(refresh).toBeDisabled();
     await expect(refresh.getByRole('status')).toHaveText('Refreshing…');
@@ -267,7 +267,7 @@ test.describe('Select', () => {
 
   test('the same element keeps focus and its choice when options change', async ({ page }) => {
     await account(page).selectOption('savings');
-    await page.getByRole('button', { name: 'Refresh' }).click();
+    await page.locator('.select').getByRole('button', { name: 'Refresh' }).click();
     await account(page).evaluate((el) => {
       el.setAttribute('data-mark', 'kept');
       (el as HTMLSelectElement).focus();
@@ -280,5 +280,115 @@ test.describe('Select', () => {
   test('draws its own caret', async ({ page }) => {
     const image = await currency(page).evaluate((el) => getComputedStyle(el).backgroundImage);
     expect(image).toContain('linear-gradient');
+  });
+});
+
+test.describe('Combobox', () => {
+  const input = (page: Page) => page.locator('input[name=account-combo]');
+  const listbox = async (page: Page) => page.locator(`[id="${await input(page).getAttribute('aria-controls')}"]`);
+  const options = async (page: Page) => (await listbox(page)).getByRole('option');
+
+  test('is a combobox whose list opens as you type, filtered', async ({ page }) => {
+    await expect(input(page)).toHaveAttribute('role', 'combobox');
+    await expect(input(page)).toHaveAttribute('aria-expanded', 'false');
+    await input(page).fill('util');
+    await expect(input(page)).toHaveAttribute('aria-expanded', 'true');
+    await expect(await options(page)).toHaveText(['Expenses:Utilities:Power', 'Expenses:Utilities:Water', 'Expenses:Utilities:Internet']);
+    expect(await (await listbox(page)).evaluate((el) => el.matches(':popover-open'))).toBe(true);
+  });
+
+  test('arrows move the active option; Enter chooses it', async ({ page }) => {
+    await input(page).fill('util');
+    await input(page).press('ArrowDown');
+    await input(page).press('ArrowDown');
+    await input(page).press('ArrowUp');
+    const first = (await options(page)).first();
+    await expect(first).toHaveAttribute('aria-selected', 'true');
+    await expect(input(page)).toHaveAttribute('aria-activedescendant', (await first.getAttribute('id'))!);
+    await input(page).press('Enter');
+    await expect(input(page)).toHaveValue('Expenses:Utilities:Power');
+    await expect(echo(page, 'combo-chosen')).toHaveText('expenses-utilities-power');
+    await expect(input(page)).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('a click chooses; Tab chooses the active one and moves on', async ({ page }) => {
+    await input(page).fill('groc');
+    await (await options(page)).first().click();
+    await expect(echo(page, 'combo-chosen')).toHaveText('expenses-groceries');
+    await expect(input(page)).toBeFocused();
+
+    await input(page).fill('rent');
+    await input(page).press('ArrowDown');
+    await input(page).press('Tab');
+    await expect(echo(page, 'combo-chosen')).toHaveText('expenses-rent');
+    await expect(input(page)).not.toBeFocused();
+  });
+
+  test('Esc closes the list, then clears the text', async ({ page }) => {
+    await input(page).fill('sav');
+    await input(page).press('Escape');
+    await expect(input(page)).toHaveAttribute('aria-expanded', 'false');
+    await expect(input(page)).toHaveValue('sav');
+    await input(page).press('Escape');
+    await expect(input(page)).toHaveValue('');
+    await expect(echo(page, 'combo-chosen')).toHaveText('(none)');
+  });
+
+  test('leaving with text that names nothing reports no choice', async ({ page }) => {
+    await input(page).fill('nothing like it');
+    await expect((await options(page)).first()).toHaveText('No matches');
+    await page.getByLabel('Name').focus();
+    await expect(echo(page, 'combo-chosen')).toHaveText('(none)');
+    await expect(echo(page, 'combo-reports')).toHaveText('1');
+  });
+
+  test('the chevron shows everything; clear empties it; both stay out of the Tab order', async ({ page }) => {
+    const field = page.locator('.combobox').filter({ has: input(page) });
+    const chevron = field.getByRole('button', { name: 'Show all' });
+    await expect(chevron).toHaveAttribute('tabindex', '-1');
+    await chevron.click();
+    await expect(await options(page)).toHaveCount(24);
+    await expect(input(page)).toBeFocused();
+
+    await (await options(page)).nth(1).click();
+    await field.getByRole('button', { name: 'Clear' }).click();
+    await expect(input(page)).toHaveValue('');
+    await expect(echo(page, 'combo-chosen')).toHaveText('(none)');
+  });
+
+  test('refresh shows a spinner, then the new items', async ({ page }) => {
+    const refresh = page.locator('.combobox').filter({ has: input(page) }).getByRole('button', { name: 'Refresh' });
+    await refresh.click();
+    await expect(refresh).toBeDisabled();
+    await expect(refresh).toBeEnabled();
+    await input(page).fill('pets');
+    await expect(await options(page)).toHaveText(['Expenses:Pets']);
+  });
+
+  test('inside a dialog: not clipped, Enter chooses without saving, Esc keeps the dialog', async ({ page }) => {
+    await page.getByRole('button', { name: 'Combobox in a dialog…' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Move a split' });
+    const field = dialog.locator('input[name=dialog-combo]');
+    await expect(field).toBeFocused();
+    await field.fill('e');
+    const box = dialog.locator(`[id="${await field.getAttribute('aria-controls')}"]`);
+    const last = box.getByRole('option').last();
+    await last.scrollIntoViewIfNeeded();
+    const b = (await last.boundingBox())!;
+    const dialogBox = (await dialog.boundingBox())!;
+    expect(b.y + b.height).toBeGreaterThan(dialogBox.y + dialogBox.height - 80);
+    const hit = await page.evaluate(([x, y]) => document.elementFromPoint(x, y)?.textContent, [b.x + b.width / 2, b.y + b.height / 2]);
+    expect(hit).toBe(await last.textContent());
+
+    await field.press('ArrowDown');
+    await field.press('Enter');
+    await expect(echo(page, 'dialog-saves')).toHaveText('0');
+    await expect(dialog).toBeVisible();
+    await expect(echo(page, 'dialog-chosen')).not.toHaveText('(none)');
+
+    await field.fill('as');
+    await field.press('Escape');
+    await expect(dialog).toBeVisible();
+    await expect(field).toHaveAttribute('aria-expanded', 'false');
   });
 });

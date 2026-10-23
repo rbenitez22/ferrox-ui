@@ -2,6 +2,7 @@
 //! message to its control, and the controls.
 
 mod checkbox;
+mod combobox;
 mod field;
 mod input;
 mod password;
@@ -11,6 +12,7 @@ mod switch;
 mod textarea;
 
 pub use checkbox::{checkbox_classes, Checkbox};
+pub use combobox::{matches_text, Combobox};
 pub use field::{field_classes, Field};
 pub use input::{Input, InputKind};
 pub use password::PasswordInput;

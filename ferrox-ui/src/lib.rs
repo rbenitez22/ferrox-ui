@@ -5,7 +5,8 @@
 //! [`Button`], [`IconButton`], [`Toolbar`] / [`ToolbarGroup`], [`Spinner`],
 //! [`LoadingOverlay`], [`Alert`], [`HelpButton`] / [`HelpTopic`]. Feature
 //! `overlay`: `Dialog`, `ConfirmDialog`, `Sheet`. Feature `forms`: `Field`,
-//! `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`.
+//! `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`,
+//! `Combobox`.
 //! Further groups (`menus`, `navigation`, `layout`, `data`) arrive as they
 //! are built.
 //!

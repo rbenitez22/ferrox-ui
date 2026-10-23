@@ -1,7 +1,7 @@
 //! The `core` group: always compiled. Primitives every other group builds on.
 
 mod alert;
-mod anchor;
+pub(crate) mod anchor;
 mod button;
 mod help_button;
 mod help_request;

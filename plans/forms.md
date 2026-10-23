@@ -6,7 +6,7 @@ conrad's `FormField.tsx`, `Autocomplete.tsx` and its `.form-*` rules, and
 replaces webapp-lib's form primitives. The data-loading halves stay in
 webapp-lib as adapters.
 
-Status: approved (2026-10-23). Pieces 1–3 done (2026-10-23); piece 4 next.
+Status: approved (2026-10-23). Pieces 1–4 done (2026-10-23); piece 5 (docs) next.
 
 Notes from piece 1:
 - `Field` hands its wiring down through `<Provider>`, not `provide_context`.
@@ -36,6 +36,14 @@ Notes from piece 1:
   the refresh icon's place inside the button, which stays put and is
   disabled. Select's texts (placeholder "Select…", "Loading…", "Refresh",
   "Refreshing…") are props.
+- Piece 4 (after help): Combobox reuses `core/anchor.rs` (now with
+  `match_width`, so the list is as wide as its field). Its filtering
+  (`matches_text`) and arrow logic (`step_active`) are pure and
+  unit-tested. Esc and Enter are handled on the input with
+  `prevent_default` (Esc also stops propagation), and `Dialog`'s
+  Enter-to-submit now skips a key a control already handled
+  (`default_prevented`), so choosing an option in a dialog doesn't submit
+  it. Option lists re-render (not keyed), so option ids follow positions.
 
 ## Sources
 
