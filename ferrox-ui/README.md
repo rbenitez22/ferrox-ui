@@ -1,8 +1,9 @@
 # ferrox-ui
 
-UI primitives for Leptos CSR apps. Components come in feature groups, and
-they're styled by class-only CSS on [ferrox-theme](../ferrox-theme)'s tokens,
-so every theme reaches every component. Nothing is styled unless it carries a
+UI primitives for Leptos CSR apps. Components come in feature groups (`core`
+always, `overlay` and more by feature), and they're styled by class-only CSS
+on [ferrox-theme](../ferrox-theme)'s tokens, so every theme reaches every
+component. Nothing is styled unless it carries a
 class: no element selectors, no global pseudo-classes.
 
 Part of the [ferrox-ui workspace](../README.md). Apps using webapp-lib reach
@@ -12,7 +13,7 @@ it as `webapp_lib::ui` and don't list it themselves.
 
 ```toml
 [dependencies]
-ferrox-ui = { git = "https://github.com/rbenitez22/ferrox-ui", tag = "v0.1.0" }
+ferrox-ui = { git = "https://github.com/rbenitez22/ferrox-ui", tag = "v0.1.0", features = ["overlay"] }
 ```
 
 ```rust
@@ -31,7 +32,8 @@ call adds nothing.
 | Group | Feature | Contains |
 |---|---|---|
 | `core` | always on | `Button`, `IconButton`, `Toolbar`, `ToolbarGroup`, `Spinner`, `LoadingOverlay`, `Alert` |
-| `forms`, `menus`, `overlay`, `navigation`, `layout`, `data` | one each, planned | see `plans/ferrox-ui.md` |
+| `overlay` | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
+| `forms`, `menus`, `navigation`, `layout`, `data` | one each, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)
 
@@ -43,6 +45,10 @@ call adds nothing.
   `#[non_exhaustive]`: match them with a `_` arm.
 - Each component has a `*_classes` function that returns the class list it
   renders, for markup that needs the same look without the component.
+- User-facing text (button labels, "Close", "Cancel", "Dismiss") is a prop
+  with an English default.
+- A callback with no input is a zero-argument closure:
+  `on_close=move || open.set(false)`.
 
 ## core
 
@@ -199,6 +205,135 @@ Only `Error` interrupts a screen reader (`role="alert"`); the others are
 and doesn't act. `alert_classes(severity, extra)` returns the class list, and
 `AlertSeverity` has `class()`, `icon()` and `role()`.
 
+## overlay (feature `overlay`)
+
+Modals built on the browser's own `<dialog>`, opened with `showModal()`. The
+browser makes the page behind inert, keeps focus inside, and puts the modal in
+the top layer, above everything including `LoadingOverlay`. All three share
+the same behaviour:
+
+- **`open` drives it.** Every way out (Esc, the ×, the dismiss button, a
+  sheet's backdrop) calls `on_close` / `on_cancel`, and the app sets `open`
+  to false. If the browser closes the element itself, the callback runs too,
+  so the app's state and the element never disagree.
+- **Focus** goes to an element marked `autofocus`, otherwise the first
+  control (the ×). On close it returns to whatever opened the modal.
+- **The page doesn't scroll** while a modal is open (`<body>` gets
+  `.dialog-open`). This is counted, so a confirm opened from a dialog keeps
+  the page locked until both close.
+- **The body is mounted only while open**, so each opening starts fresh.
+
+| Use it when | Use |
+|---|---|
+| a task or a form with a clear finish | `Dialog` |
+| a destructive action needs a decision (every one does: no "undo toast" instead) | `ConfirmDialog` |
+| navigation, details or filters that slide in from an edge | `Sheet` |
+
+**Watch your descendant selectors.** A `<dialog>` stays where it's declared
+in the DOM, so an app rule like `.section h2 { margin: … }` also reaches the
+dialog's title. Scope such rules to direct children (`.section > h2`) where
+dialogs are declared.
+
+### `Dialog`, `DialogAction`
+
+A title bar with the ×, the body, and a footer band. **The footer isn't a
+slot.** Pass the actions and the component fixes the order: dismiss,
+alternate, affirm, with the heaviest button last.
+
+```rust
+use ferrox_ui::{Dialog, DialogAction, DialogSize};
+
+let editing = RwSignal::new(false);
+let saving = RwSignal::new(false);
+
+view! {
+    <Button on_click=move |_| editing.set(true)>"Edit account…"</Button>
+    <Dialog
+        open=editing
+        title="Edit account"
+        on_close=move || editing.set(false)
+        affirm=DialogAction::new("Save", move || save()).saving(saving)
+        alternate=DialogAction::new("Save as draft", move || save_draft())
+    >
+        <label>"Name" <input autofocus=true /></label>
+    </Dialog>
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `open`, `title`, `on_close` | required | `on_close` is called by Esc, the × and the dismiss button: the same act |
+| `affirm` | none | the last button; `DialogAction::new(label, fn)`, plus `.danger()` for a destructive commit, `.saving(signal)`, `.disabled(signal)` |
+| `alternate` | none | a lighter way to finish, before `affirm`, always secondary; Enter never reaches it |
+| `dismiss_label` | `"Cancel"` | |
+| `no_dismiss` | `false` | no dismiss button (the × and Esc still close) |
+| `submit_on_enter` | `true` | Enter fires `affirm`, but not from a textarea, a button or a link, and not while it's saving or disabled |
+| `size` | `Md` | `Md` (32rem) or `Wide` (52rem, for a body that's a table) |
+| `alert` | `false` | `role="alertdialog"`, for a dialog that interrupts to ask for a decision |
+| `close_label` | `"Close"` | the ×'s label |
+| `class` | | |
+
+A backdrop click doesn't close a Dialog, so a stray click can't throw away
+typed input. On a phone (≤ 768px) a dialog is full width inside an 8px
+margin, and the × is 44px. `dialog_classes(size, extra)` returns the class
+list.
+
+### `ConfirmDialog`
+
+The standard destructive confirmation (`role="alertdialog"`). The confirm
+button is always in the danger family and comes last. Its label is the verb
+("Delete", "Void", "Archive"), not "OK". The body names exactly what is about
+to be lost. Focus opens on the ×, never on the confirm button.
+
+```rust
+use ferrox_ui::ConfirmDialog;
+
+view! {
+    <ConfirmDialog
+        open=confirming
+        title="Delete account?"
+        confirm_label="Delete"
+        saving=deleting
+        on_confirm=move || delete_account()     // set `deleting`, close when done
+        on_cancel=move || confirming.set(false)
+    >
+        <p>"This deletes “Groceries” and its 214 transactions."</p>
+    </ConfirmDialog>
+}
+```
+
+Props: `open`, `title`, `confirm_label`, `on_confirm`, `on_cancel` (Cancel,
+the × and Esc), `saving` (the confirm button sweeps and refuses clicks),
+`cancel_label` (`"Cancel"`), `close_label` (`"Close"`).
+
+### `Sheet`
+
+A modal panel pinned to an edge, with a title bar, the × and a scrolling
+body. It slides in over `--react-time`; under reduced motion it just appears,
+and closing never waits on an animation. A click on the backdrop closes it,
+but only if the press also started there, so a text selection dragged out of
+the sheet doesn't close it.
+
+```rust
+use ferrox_ui::{Sheet, SheetSide};
+
+view! {
+    <IconButton title="Menu" on_click=move |_| menu.set(true)><Icon icon=MENU/></IconButton>
+    <Sheet open=menu title="Menu" on_close=move || menu.set(false)>
+        <nav>…</nav>
+    </Sheet>
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `open`, `title`, `on_close` | required | `title` is shown and is the sheet's accessible name |
+| `side` | `Left` | `Left` / `Right`: full height, `min(20rem, 85vw)` wide. `Bottom`: full width, at most 85vh tall |
+| `close_label` | `"Close"` | |
+| `class` | | |
+
+`sheet_classes(side, extra)` returns the class list.
+
 ## CSS classes (core)
 
 All of these are injected by `init()`, built only from theme tokens, and
@@ -214,6 +349,16 @@ selected by class only.
 | `spinner.css` | `.spinner`, `.spinner--{region,inline,field}`, `.spinner-status`, `.spinner-status--region`, `.spinner-overlay`, `.spinner-overlay__text`; keyframes `ferrox-spin`, `ferrox-spinner-appear` |
 | `alert.css` | `.alert`, `.alert--{info,success,warning,error}`, `.alert__icon`, `.alert__body`, `.alert__dismiss` |
 
+## CSS classes (overlay)
+
+| Sheet | Classes |
+|---|---|
+| `modal.css` | `.dialog-open` on `<body>`: no page scroll while a modal is open |
+| `dialog.css` | `.dialog`, `.dialog--wide`, `.dialog::backdrop`, `.dialog__title-bar`, `.dialog__title`, `.dialog__close`, `.dialog__body`, `.dialog__footer` |
+| `sheet.css` | `.sheet`, `.sheet--{left,right,bottom}`, `.sheet::backdrop`, `.sheet__title-bar`, `.sheet__title`, `.sheet__close`, `.sheet__body` |
+
+These are injected only when the `overlay` feature is on.
+
 A unit test (`css.rs`) fails if any shipped selector doesn't start with a
 class.
 
@@ -222,24 +367,29 @@ class.
 - `leptos` 0.8 (CSR) and a browser (`web-sys`).
 - ferrox-theme's stylesheet linked in the app's `index.html`
   (ferrox-theme-build). Every component reads its tokens.
-- ferrox-icons, used for Alert's icons and close button (a dependency, not
-  something the app sets up).
+- ferrox-icons, used for Alert's icons and the close buttons (a dependency,
+  not something the app sets up).
+- `overlay`: a browser with `<dialog>`/`showModal()` and `@starting-style`
+  (Chrome 117+, Firefox 129+, Safari 17.5+). Without `@starting-style` a
+  sheet just appears instead of sliding.
 
 ## Testing
 
 - `cargo test -p ferrox-ui`: class lists, roles, and the class-only rule on
   every sheet.
-- The demo (`demo/`) shows every component: `/buttons` and `/feedback`. Its
-  Playwright tests (`demo/e2e/tests/buttons.spec.ts`, `feedback.spec.ts`) run
-  in Chromium and Firefox through `scripts/release-check.sh`.
+- The demo (`demo/`) shows every component: `/buttons`, `/feedback` and
+  `/overlay`. Its Playwright tests (`demo/e2e/tests/buttons.spec.ts`,
+  `feedback.spec.ts`, `overlay.spec.ts`) run in Chromium and Firefox through
+  `scripts/release-check.sh`.
 
 ## Planned
 
 From `plans/ferrox-ui.md`, one group per piece, each with a demo page and e2e
-tests: `overlay` (Dialog, Alert dialog, Sheet), `forms` (Field, Input,
-Checkbox, Select, Combobox), `navigation` (Side menu), `layout` (Panel),
-`data` (Data grid). `core` later gains Skeleton, Badge, Card and a theme
-toggle.
+tests: `forms` (Field, Input, Checkbox, Select, Combobox), `navigation` (Side
+menu, on `Sheet`), `layout` (Panel), `data` (Data grid). `core` later gains
+Skeleton, Badge, Card and a theme toggle. `overlay` later gains
+`TypeToConfirmDialog` (after `forms`), Toast, Popover and Tooltip, and the
+phone variants of Dialog (a bottom sheet, full screen) when an app needs them.
 
 ## Licence
 
