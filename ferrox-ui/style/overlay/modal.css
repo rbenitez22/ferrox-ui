@@ -1,0 +1,10 @@
+/* Shared by every modal (Dialog, ConfirmDialog, Sheet). Part of ferrox-ui
+   `overlay`. */
+
+/* While a modal is open the page behind it does not scroll. Without this,
+   touch scrolling on a phone drags the background, which reads as the
+   dialog drifting. Set on <body> by the modal module, counted, so a confirm
+   opened from a dialog does not unlock the page when it closes. */
+.dialog-open {
+  overflow: hidden;
+}

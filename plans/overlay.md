@@ -5,7 +5,21 @@ footer band, Alert dialog, Sheet. Ports conrad's `Dialog.tsx` /
 `ConfirmDialog.tsx` behaviour and CSS, and replaces webapp-lib's dialog
 helpers and the drawer half of `SideMenu`.
 
-Status: approved (2026-10-23); piece 1 next.
+Status: approved (2026-10-23). Piece 1 done (2026-10-23); piece 2 next.
+
+Notes from piece 1:
+- Callbacks with no input are zero-argument closures:
+  `on_close=move || open.set(false)`, `DialogAction::new("Save", move || save())`.
+  (`UnsyncCallback<()>` converts from `Fn()`.)
+- `close_label` is a `String`, not a signal, because `IconButton`'s `title` is
+  a `String`.
+- Enter also leaves a focused link or button alone, so Enter on "Save as
+  draft" presses that button rather than submitting.
+- A `<dialog>` stays where it's declared in the DOM, so an app's descendant
+  selectors (`.section h2`) reach into it. The demo's `.demo-section h2`
+  pulled the title's margin and pushed the × against the title; the demo rule
+  is now `.demo-section > h2`, and a test checks the title bar layout. Worth
+  saying in the README: scope app rules to direct children near dialogs.
 
 ## Sources
 

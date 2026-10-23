@@ -12,8 +12,11 @@ authors.workspace    = true
 # navigation, layout, data.
 [features]
 default = []
+# Dialog, ConfirmDialog, Sheet: modals on the native <dialog> element.
+overlay = []
 
 [dependencies]
 ferrox-icons = { path = "../ferrox-icons" }
 leptos  = { workspace = true }
-web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent"] }
+wasm-bindgen = { workspace = true }
+web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent", "DomTokenList", "Event", "EventTarget", "HtmlDialogElement", "HtmlElement", "KeyboardEvent"] }

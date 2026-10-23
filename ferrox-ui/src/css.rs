@@ -16,9 +16,18 @@ const CORE: &[(&str, &str)] = &[
     ("ferrox-ui-alert", include_str!("../style/core/alert.css")),
 ];
 
+/// `overlay`: the shared modal rules first, then each modal.
+#[cfg(feature = "overlay")]
+const OVERLAY: &[(&str, &str)] = &[
+    ("ferrox-ui-modal", include_str!("../style/overlay/modal.css")),
+    ("ferrox-ui-dialog", include_str!("../style/overlay/dialog.css")),
+];
+#[cfg(not(feature = "overlay"))]
+const OVERLAY: &[(&str, &str)] = &[];
+
 /// Every stylesheet of the compiled groups, in injection order.
 pub(crate) fn sheets() -> Vec<(&'static str, &'static str)> {
-    CORE.to_vec()
+    CORE.iter().chain(OVERLAY).copied().collect()
 }
 
 /// Adds a `<style id="{id}">` to `<head>`. Does nothing if that id exists, so

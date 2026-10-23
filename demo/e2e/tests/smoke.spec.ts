@@ -7,6 +7,7 @@ const ROUTES = [
   { path: '/buttons', heading: 'Families' },
   { path: '/icons', heading: 'All icons' },
   { path: '/feedback', heading: 'Spinners' },
+  { path: '/overlay', heading: 'Dialogs' },
 ];
 
 for (const { path, heading } of ROUTES) {

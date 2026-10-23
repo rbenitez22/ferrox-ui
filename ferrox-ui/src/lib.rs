@@ -3,8 +3,9 @@
 //!
 //! Components come in feature groups. `core` is always compiled:
 //! [`Button`], [`IconButton`], [`Toolbar`] / [`ToolbarGroup`], [`Spinner`],
-//! [`LoadingOverlay`], [`Alert`]. Further groups (`forms`, `menus`, `overlay`,
-//! `navigation`, `layout`, `data`) arrive as they are built.
+//! [`LoadingOverlay`], [`Alert`]. Feature `overlay`: `Dialog`. Further groups
+//! (`forms`, `menus`, `navigation`, `layout`, `data`) arrive as they are
+//! built.
 //!
 //! Call [`init`] once at startup, before mounting, to add the components'
 //! CSS. The theme itself (tokens, themes, fonts) comes from ferrox-theme.
@@ -17,8 +18,12 @@
 
 mod core;
 mod css;
+#[cfg(feature = "overlay")]
+mod overlay;
 
 pub use core::*;
+#[cfg(feature = "overlay")]
+pub use overlay::*;
 
 /// Adds the CSS of every compiled group to the page. Call once, before
 /// mounting; a second call adds nothing.

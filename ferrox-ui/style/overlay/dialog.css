@@ -1,0 +1,110 @@
+/* Dialogs (`.dialog`, the native <dialog> opened with showModal()). Part of
+   ferrox-ui `overlay`. Tokens only and class-only.
+
+   A title bar, the body, and a footer band. The footer's order is fixed by
+   the component (dismiss, alternate, affirm), so it is not styled per call. */
+
+/* The browser's own dialog styles (padding, border, colours, max sizes) are
+   replaced, not layered on. Shown only when open: `display` on `.dialog`
+   itself would show a closed dialog. */
+.dialog {
+  box-sizing: border-box;
+  width: min(32rem, calc(100% - 2 * var(--space-md)));
+  max-width: none;
+  max-height: min(85vh, calc(100% - 2 * var(--space-md)));
+  padding: 0;
+  background: var(--surface-1);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog::backdrop {
+  background: var(--scrim);
+}
+
+/* For a body that is a table of its own. The phone rule below sets every
+   dialog to the screen's width, and comes later, so this changes nothing
+   there. */
+.dialog--wide {
+  width: min(52rem, calc(100% - 2 * var(--space-md)));
+}
+
+/* ── Title bar ── */
+
+.dialog__title-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--line);
+}
+
+.dialog__title {
+  margin: 0 auto 0 0;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+/* `.icon-btn`'s hover paints `--surface-2`, which is the title bar's ground,
+   so it would show nothing here. */
+.dialog__close:hover {
+  background: var(--neutral-tint);
+}
+
+/* ── Body ── */
+
+.dialog__body {
+  position: relative;
+  flex: 1 1 auto;
+  padding: var(--space-lg);
+  overflow-y: auto;
+}
+
+/* ── Footer band ── */
+
+.dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--surface-2);
+  border-top: 1px solid var(--line);
+}
+
+/* ── Phone ──
+   Full width inside a small margin, never flush to an edge; a close button
+   big enough for a thumb; long unbroken strings wrap. */
+
+@media (max-width: 768px) {
+  .dialog,
+  .dialog--wide {
+    width: calc(100% - 2 * var(--space-sm));
+    max-height: calc(100dvh - 2 * var(--space-sm));
+  }
+
+  .dialog__close {
+    width: 44px;
+    height: 44px;
+  }
+
+  .dialog__title-bar,
+  .dialog__body,
+  .dialog__footer {
+    padding-inline: var(--space-md);
+  }
+
+  .dialog__body {
+    overflow-wrap: anywhere;
+  }
+}
