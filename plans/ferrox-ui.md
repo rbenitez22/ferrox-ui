@@ -9,7 +9,7 @@ webapp-lib keeps the app plumbing (http, storage, reactive, auth, app-level
 components such as `Login`) and depends on ferrox-ui; see webapp-lib's
 `plans/crate-split.md` for that side.
 
-Status: pieces 0–5 done. Repo `/programming/ferrox-ui`
+Status: pieces 0–5 done; piece 6 under way (core done, overlay next). Repo `/programming/ferrox-ui`
 (`git@github.com:rbenitez22/ferrox-ui.git`, branch `master`).
 
 ## Crates (one workspace, this repo)
@@ -196,7 +196,9 @@ webapp-lib's history as the record (fresh first commit here).
    when a component first draws an icon. Originally: build-time SVG discovery,
    first icons: close, plus, menu, refresh, check, delete, chevron.
 6. **Port today's webapp-lib primitives**, one group per piece, each with its
-   demo page and e2e tests: `core` rest (`Spinner`, `Alert`) → `overlay`
+   demo page and e2e tests: `core` rest (`Spinner`, `Alert`; done 2026-10-23,
+   plan `plans/core-spinner-alert.md`, with `LoadingOverlay`, the severity
+   icons, `ferrox-ui/README.md`) → `overlay`
    (`Dialog` with conrad's footer band, `Alert dialog`, `Sheet`) → `forms`
    (`Field`, `Input` with password strength, `Checkbox`, `Select`,
    `Combobox`) → `navigation` (side menu) → `layout` (`Panel`, from
