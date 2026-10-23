@@ -1,0 +1,110 @@
+/* Spinners (`.spinner`) and the loading overlay (`.spinner-overlay`). Part of
+   ferrox-ui `core`. Tokens only and class-only.
+
+   A spinner is chosen by WHAT STAYS USABLE while the work runs, not by how
+   long it takes:
+
+     .spinner-overlay   nothing on screen is valid any more: boot, auth, the
+                        post-login redirect. NEVER a route or data fetch.
+     .btn.is-saving     every committing action (buttons.css).
+     .spinner--region   a pane fetching data whose shape it cannot promise.
+     .spinner--inline   an icon-only row action, in the icon's place.
+     .spinner--field    async work that belongs to one field.
+
+   One indicator per action: a saving button never also raises an overlay.
+
+   Every spinner starts at opacity 0 and is revealed by a second animation
+   delayed by --loading-delay, so work that finishes faster never paints one. */
+
+@keyframes ferrox-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ferrox-spinner-appear {
+  to { opacity: 1; }
+}
+
+/* ── The ring ── */
+
+.spinner {
+  box-sizing: border-box;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border: 5px solid var(--surface-2);
+  border-top-color: var(--primary-base);
+  border-radius: 50%;
+  opacity: 0;
+  animation:
+    ferrox-spin 0.8s linear infinite,
+    ferrox-spinner-appear 1ms linear var(--loading-delay) forwards;
+}
+
+.spinner--region {
+  width: 28px;
+  height: 28px;
+  border-width: 3px;
+}
+
+.spinner--inline,
+.spinner--field {
+  width: 1rem;
+  height: 1rem;
+  border-width: 2px;
+}
+
+.spinner--field {
+  pointer-events: none;
+}
+
+/* ── The status wrapper (`Spinner`): role="status" + the screen-reader label ── */
+
+.spinner-status {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+/* A region spinner stands in for the pane: centred, with room around it. */
+.spinner-status--region {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-2xl) 0;
+}
+
+/* ── The overlay (`LoadingOverlay`) ── */
+
+.spinner-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  background: var(--scrim);
+  z-index: 9999;
+}
+
+.spinner-overlay__text {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary-on-fill);
+  opacity: 0;
+  animation: ferrox-spinner-appear 1ms linear var(--loading-delay) forwards;
+}
+
+/* ── Reduced motion ──
+   Surgical, not `animation: none`: ferrox-spinner-appear is what makes a
+   spinner visible, so it stays. The spin is slowed, not stopped: a still
+   spinner reads as "hung". */
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation:
+      ferrox-spin 2.4s linear infinite,
+      ferrox-spinner-appear 1ms linear var(--loading-delay) forwards;
+  }
+}

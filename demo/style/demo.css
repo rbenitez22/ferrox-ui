@@ -149,3 +149,14 @@
 .demo-text-16 { font-size: 16px; }
 .demo-text-24 { font-size: 24px; }
 .demo-text-32 { font-size: 32px; }
+
+/* Feedback page: a pane for the region spinner, a field with its spinner. */
+.demo-region {
+    border: 1px dashed var(--line);
+    border-radius: var(--radius-md);
+}
+.demo-field {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+}

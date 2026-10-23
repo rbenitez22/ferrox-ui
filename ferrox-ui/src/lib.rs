@@ -2,9 +2,9 @@
 //! ferrox-theme's tokens, so every theme reaches every component.
 //!
 //! Components come in feature groups. `core` is always compiled:
-//! [`Button`], [`IconButton`], [`Toolbar`] / [`ToolbarGroup`]. Further groups
-//! (`forms`, `menus`, `overlay`, `navigation`, `layout`, `data`) arrive as
-//! they are built.
+//! [`Button`], [`IconButton`], [`Toolbar`] / [`ToolbarGroup`], [`Spinner`],
+//! [`LoadingOverlay`]. Further groups (`forms`, `menus`, `overlay`,
+//! `navigation`, `layout`, `data`) arrive as they are built.
 //!
 //! Call [`init`] once at startup, before mounting, to add the components'
 //! CSS. The theme itself (tokens, themes, fonts) comes from ferrox-theme.

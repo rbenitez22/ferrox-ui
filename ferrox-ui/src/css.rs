@@ -4,13 +4,15 @@
 //! is not here: it is the stylesheet the app links in `index.html`
 //! (ferrox-theme-build), so it applies before the WASM loads.
 
-/// `(element id, css)` for `core`, in order: focus ring first, so a filled
-/// button's own outline colour wins.
+/// `(element id, css)` for `core`, in order: the focus ring before the
+/// buttons, so a filled button's own outline colour wins.
 const CORE: &[(&str, &str)] = &[
+    ("ferrox-ui-a11y", include_str!("../style/core/a11y.css")),
     ("ferrox-ui-focus", include_str!("../style/core/focus.css")),
     ("ferrox-ui-buttons", include_str!("../style/core/buttons.css")),
     ("ferrox-ui-icon", include_str!("../style/core/icon.css")),
     ("ferrox-ui-toolbar", include_str!("../style/core/toolbar.css")),
+    ("ferrox-ui-spinner", include_str!("../style/core/spinner.css")),
 ];
 
 /// Every stylesheet of the compiled groups, in injection order.
