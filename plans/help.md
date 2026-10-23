@@ -265,6 +265,21 @@ The demo gets a `/help` page.
 
 After this, forms piece 4 (Combobox) builds on `core/anchor.rs`.
 
+### Follow-up: F1 (proposed by the user 2026-10-23, not started)
+
+F1 opens the help for whatever has focus; Shift+F1 asks the assistant
+directly. It's opt-in (a prop on `HelpAssistant`, or a `<HelpKeys/>`
+component), since it takes over a key.
+
+- Each component with help links its control to its `?` (e.g. a
+  `data-help` id), so F1 finds the exact `?` by walking up from
+  `document.activeElement`.
+- The `?` gets `aria-keyshortcuts="F1"`.
+- Check that `preventDefault` stops Chrome's and Firefox's own F1 help on
+  Windows and Linux. On macOS, F1 is usually brightness without fn, so it's
+  a shortcut on top of the visible `?`, never the only way in.
+- Most useful where the `?` uses `skip_tab` (rows of fields).
+
 ## Decisions (2026-10-23)
 
 All as recommended:
