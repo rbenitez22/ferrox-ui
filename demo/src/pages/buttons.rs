@@ -4,6 +4,7 @@
 use std::time::Duration;
 
 use leptos::prelude::*;
+use ferrox_icons::{Icon, BAN, CAMERA, CLOSE, HELP, PLUS, SEARCH};
 use ferrox_ui::{Button, ButtonFamily, ButtonSize, IconButton, Toolbar, ToolbarGroup};
 
 use crate::section::Section;
@@ -89,12 +90,12 @@ fn IconButtons() -> impl IntoView {
     view! {
         <Section title="Icon buttons">
             <div class="demo-row">
-                <IconButton title="Search"><DemoIcon d=SEARCH /></IconButton>
+                <IconButton title="Search"><Icon icon=SEARCH /></IconButton>
                 <IconButton title="Camera (toggle)" pressed=pressed on_click=move |_| pressed.update(|p| *p = !*p)>
-                    <DemoIcon d=CAMERA />
+                    <Icon icon=CAMERA />
                 </IconButton>
-                <IconButton title="Remove" danger=true><DemoIcon d=CROSS /></IconButton>
-                <IconButton title="Disabled" disabled=true><DemoIcon d=BAN /></IconButton>
+                <IconButton title="Remove" danger=true><Icon icon=CLOSE /></IconButton>
+                <IconButton title="Disabled" disabled=true><Icon icon=BAN /></IconButton>
             </div>
         </Section>
     }
@@ -113,39 +114,21 @@ fn Toolbars() -> impl IntoView {
             <h3 class="demo-role-name">"compact"</h3>
             <Toolbar compact=true>
                 <ToolbarGroup>
-                    <IconButton title="Search"><DemoIcon d=SEARCH /></IconButton>
+                    <IconButton title="Search"><Icon icon=SEARCH /></IconButton>
                     <IconButton title="Camera" pressed=camera on_click=move |_| camera.update(|c| *c = !*c)>
-                        <DemoIcon d=CAMERA />
+                        <Icon icon=CAMERA />
                     </IconButton>
-                    <IconButton title="Clear filter"><DemoIcon d=BAN /></IconButton>
+                    <IconButton title="Clear filter"><Icon icon=BAN /></IconButton>
                 </ToolbarGroup>
                 <ToolbarGroup>
-                    <IconButton title="Help"><DemoIcon d=HELP /></IconButton>
+                    <IconButton title="Help"><Icon icon=HELP /></IconButton>
                 </ToolbarGroup>
             </Toolbar>
             <h3 class="demo-role-name">"compact, title and small buttons"</h3>
             <Toolbar compact=true title="Accounts">
-                <IconButton title="Add"><DemoIcon d=PLUS /></IconButton>
+                <IconButton title="Add"><Icon icon=PLUS /></IconButton>
                 <Button size=ButtonSize::Sm family=ButtonFamily::Secondary>"Expand all"</Button>
             </Toolbar>
         </Section>
-    }
-}
-
-// Demo-only SVGs until the SVG icon story lands: 24×24 strokes.
-const SEARCH: &str = "M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14z M21 21l-4.35-4.35";
-const CAMERA: &str = "M4 8h3l2-3h6l2 3h3v11H4z M12 10a3.5 3.5 0 1 0 0 7a3.5 3.5 0 1 0 0-7z";
-const BAN: &str = "M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18z M5.6 5.6l12.8 12.8";
-const HELP: &str = "M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3 M12 17h.01";
-const CROSS: &str = "M6 6l12 12 M18 6L6 18";
-const PLUS: &str = "M12 5v14 M5 12h14";
-
-#[component]
-fn DemoIcon(d: &'static str) -> impl IntoView {
-    view! {
-        <svg class="icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d=d />
-        </svg>
     }
 }

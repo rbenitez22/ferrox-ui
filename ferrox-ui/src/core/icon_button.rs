@@ -16,11 +16,11 @@ pub fn icon_button_classes(danger: bool, extra: &str) -> String {
 /// - `title` is required: the glyph has no text, so it is the button's only
 ///   label. It is also set as `aria-label`.
 /// - `pressed` makes it a switch (`aria-pressed`); on reads as tinted.
-/// - `children` is the icon (an SVG; see the SVG icon story).
+/// - `children` is the icon: ferrox-icons' `Icon`, or any `<svg class="icon">`.
 ///
 /// ```ignore
 /// <IconButton title="Search" on_click=move |_| open_search()>
-///     <svg class="icon" …/>
+///     <Icon icon=SEARCH/>
 /// </IconButton>
 /// <IconButton title="Camera" pressed=camera_on on_click=move |_| camera_on.update(|v| *v = !*v)>…</IconButton>
 /// <IconButton title="Remove line" danger=true on_click=move |_| remove()>…</IconButton>

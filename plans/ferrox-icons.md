@@ -6,7 +6,7 @@ one `const` per icon. A single `Icon` component renders any of them:
 `<Icon icon=CLOSE/>`. Because icons are values, components can take one as a
 prop (`<MenuLink icon=DELETE …>`) and an app can choose one at runtime.
 
-Status: approved (2026-10-23). Pieces 1–3 done (2026-10-23); piece 4 next.
+Status: approved (2026-10-23). Pieces 1–4 done (2026-10-23); piece 5 (docs) next.
 
 Changes from the design during piece 1:
 - `IconData` has only `name` and `body`. Validation requires Lucide's root
@@ -20,6 +20,12 @@ Changes from the design during piece 1:
   kebab-case stems can't clash once converted.
 - Piece 2: Lucide renamed `trash-2` → `trash` (the old `trash-2` drawing) and
   `circle-help` → `circle-question-mark`. The current names are used.
+- Piece 4: the demo can't show that unused icons are dropped, because its
+  gallery uses `ALL`. It was measured instead with a throwaway crate (release,
+  wasm32, `opt-level = "z"`, LTO) that uses only `CLOSE`: `CLOSE`'s drawing is
+  in the `.wasm`, and no other icon's drawing or name is. It's a one-off, not
+  a release-check step. Consts are only kept when something uses them, so this
+  holds unless icons become `static`s or a runtime registry.
 - A reactive `class` is a `Signal<String>`. Leptos's `MaybeProp<String>`
   doesn't take a bare closure.
 

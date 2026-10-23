@@ -77,6 +77,13 @@ and the rule broken:
 
 These rules keep the markup static and safe to set with `inner_html`.
 
+## Build size
+
+An app's release build carries only the icons it names. In a release WASM
+build (`opt-level = "z"`, LTO) that uses only `CLOSE`, `CLOSE`'s drawing is
+in the `.wasm` and no other icon's is (measured 2026-10-23). `ALL` names
+every icon, so using it keeps them all; it is for galleries and tests.
+
 ## Requirements
 
 - `leptos` 0.8 (CSR).
@@ -86,9 +93,8 @@ These rules keep the markup static and safe to set with `inner_html`.
 
 ## Planned
 
-`plans/ferrox-icons.md`: the demo's buttons drawn with these icons, and a
-check that release builds drop unused icons. Later: app-supplied icons
-through the same checks.
+Icons are added as components need them (see "Adding an icon"). Later:
+app-supplied icons through the same checks (`plans/ferrox-icons.md`).
 
 The demo's `/icons` page shows every icon; `demo/e2e/tests/icons.spec.ts`
 tests them in Chromium and Firefox.
