@@ -6,7 +6,20 @@ conrad's `FormField.tsx`, `Autocomplete.tsx` and its `.form-*` rules, and
 replaces webapp-lib's form primitives. The data-loading halves stay in
 webapp-lib as adapters.
 
-Status: approved (2026-10-23); piece 1 next.
+Status: approved (2026-10-23). Piece 1 done (2026-10-23); piece 2 next.
+
+Notes from piece 1:
+- `Field` hands its wiring down through `<Provider>`, not `provide_context`.
+  A Leptos 0.8 component has no reactive owner of its own, so a plain
+  `provide_context` leaked to the controls *after* the field, and an input
+  outside any field took the previous field's id. The e2e unique-id test
+  caught it.
+- `unique_id` moved from the overlay modal module to `src/ids.rs`, shared by
+  `overlay` and `forms`.
+- Controls show the theme's focus ring (`:focus-visible` on the focus-ring
+  tokens), as buttons do.
+- The release check now runs `--feature-powerset` (8 combinations for
+  ferrox-ui).
 
 ## Sources
 

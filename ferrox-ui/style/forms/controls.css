@@ -1,0 +1,77 @@
+/* Text controls (`.form-input`, `.form-textarea`). Part of ferrox-ui
+   `forms`. Tokens only and class-only: an app's own unclassed inputs are
+   left alone. */
+
+.form-input,
+.form-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.4em 0.7em;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text);
+  background: var(--surface-0);
+  border: 1px solid var(--text-subtle);
+  border-radius: var(--radius-sm);
+  appearance: none;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+/* A field answers the pointer in colour only, never in size: a growing field
+   would shove the form around it. Declared before focus and invalid so both
+   win; `:where` keeps the disabled guard from adding specificity. */
+.form-input:hover:where(:not(:disabled)),
+.form-textarea:hover:where(:not(:disabled)) {
+  border-color: var(--text-muted);
+}
+
+/* Pointer focus too, on purpose: the press takes the same colour, so the
+   field answers before focus lands. */
+.form-input:focus,
+.form-textarea:focus,
+.form-input:active,
+.form-textarea:active {
+  border-color: var(--primary-base);
+}
+
+/* The keyboard's focus ring: the theme's, as on buttons, not the browser's. */
+.form-input:focus-visible,
+.form-textarea:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 0;
+}
+
+/* A field with an error says so on its own border, not only in the message
+   below it. */
+.form-input.is-invalid,
+.form-textarea.is-invalid {
+  border-color: var(--danger-base);
+}
+
+.form-input:disabled,
+.form-textarea:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--text-subtle);
+  font-style: italic;
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* Phone: never below 16px, or iOS zooms the page when a field takes focus. */
+@media (max-width: 768px) {
+  .form-input,
+  .form-textarea {
+    font-size: max(1rem, 16px);
+  }
+}

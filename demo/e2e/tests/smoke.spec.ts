@@ -8,6 +8,7 @@ const ROUTES = [
   { path: '/icons', heading: 'All icons' },
   { path: '/feedback', heading: 'Spinners' },
   { path: '/overlay', heading: 'Dialogs' },
+  { path: '/forms', heading: 'Fields' },
 ];
 
 for (const { path, heading } of ROUTES) {

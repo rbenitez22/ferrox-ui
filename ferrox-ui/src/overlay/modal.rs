@@ -25,8 +25,6 @@ thread_local! {
     /// How many modals hold the scroll lock (a confirm opened from a dialog
     /// makes two).
     static LOCKS: Cell<usize> = const { Cell::new(0) };
-    /// The last id handed out by `unique_id`.
-    static LAST_ID: Cell<usize> = const { Cell::new(0) };
 }
 
 /// One modal's wiring. Put `node_ref` on the `<dialog>`, `on_cancel` on its
@@ -104,15 +102,6 @@ impl Modal {
     }
 }
 
-/// A page-unique id, `{prefix}-{n}`, so two modals never share one.
-pub(crate) fn unique_id(prefix: &str) -> String {
-    let n = LAST_ID.with(|last| {
-        last.set(last.get() + 1);
-        last.get()
-    });
-    format!("{prefix}-{n}")
-}
-
 /// Focus the `[autofocus]` element, else the first control, else the dialog.
 fn focus_first(dialog: &HtmlDialogElement) {
     let target = dialog
@@ -163,17 +152,4 @@ fn set_body_class(on: bool) {
     let Some(body) = document().body() else { return };
     let classes = body.class_list();
     let _ = if on { classes.add_1(SCROLL_LOCK_CLASS) } else { classes.remove_1(SCROLL_LOCK_CLASS) };
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn unique_ids_differ() {
-        let a = unique_id("ferrox-dialog-title");
-        let b = unique_id("ferrox-dialog-title");
-        assert_ne!(a, b);
-        assert!(a.starts_with("ferrox-dialog-title-"));
-    }
 }

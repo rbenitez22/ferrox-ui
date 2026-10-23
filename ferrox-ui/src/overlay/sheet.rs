@@ -4,7 +4,8 @@ use leptos::{component, view, IntoView};
 use wasm_bindgen::JsCast;
 use web_sys::{Element, MouseEvent};
 
-use super::modal::{unique_id, Modal};
+use super::modal::Modal;
+use crate::ids::unique_id;
 use crate::IconButton;
 
 // ---------------------------------------------------------------------------

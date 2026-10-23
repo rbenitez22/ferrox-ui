@@ -1,0 +1,36 @@
+/* Fields (`.field`): a label, one control, at most one message. Part of
+   ferrox-ui `forms`. Tokens only and class-only.
+
+   A problem one field can fix is shown under that field; anything
+   cross-field goes to an Alert at the top of the form. A hint and an error
+   never show together. */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+}
+
+.field__label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.field__hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* The field's problem. It never times out: it clears when the field is
+   fixed. */
+.field__error {
+  font-size: 0.82rem;
+  color: var(--danger-text);
+  font-family: var(--font-mono);
+}

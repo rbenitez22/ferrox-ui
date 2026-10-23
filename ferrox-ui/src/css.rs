@@ -26,9 +26,18 @@ const OVERLAY: &[(&str, &str)] = &[
 #[cfg(not(feature = "overlay"))]
 const OVERLAY: &[(&str, &str)] = &[];
 
+/// `forms`: the field, then the controls.
+#[cfg(feature = "forms")]
+const FORMS: &[(&str, &str)] = &[
+    ("ferrox-ui-field", include_str!("../style/forms/field.css")),
+    ("ferrox-ui-controls", include_str!("../style/forms/controls.css")),
+];
+#[cfg(not(feature = "forms"))]
+const FORMS: &[(&str, &str)] = &[];
+
 /// Every stylesheet of the compiled groups, in injection order.
 pub(crate) fn sheets() -> Vec<(&'static str, &'static str)> {
-    CORE.iter().chain(OVERLAY).copied().collect()
+    CORE.iter().chain(OVERLAY).chain(FORMS).copied().collect()
 }
 
 /// Adds a `<style id="{id}">` to `<head>`. Does nothing if that id exists, so

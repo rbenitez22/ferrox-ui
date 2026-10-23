@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The release gate: run before tagging a release. Stops at the first failing step.
 #
-#   1. every crate builds with each of its features alone (and with none)
+#   1. every crate builds with every combination of its features (and none)
 #   2. clippy, warnings are errors
 #   3. cargo test --workspace
 #   4. the demo builds with Trunk (from scratch: generated CSS removed first)
@@ -25,9 +25,10 @@ if ! cargo hack --version >/dev/null 2>&1; then
     echo "cargo-hack is required: cargo install cargo-hack" >&2
     exit 1
 fi
-# Switch to --feature-powerset once ferrox-ui has two or more groups.
+# Every combination of features, not just each alone: groups must build
+# together in any mix an app picks.
 for crate in "${crates[@]}"; do
-    cargo hack check -p "$crate" --each-feature --no-dev-deps
+    cargo hack check -p "$crate" --feature-powerset --no-dev-deps
 done
 
 step "2/5 clippy"
