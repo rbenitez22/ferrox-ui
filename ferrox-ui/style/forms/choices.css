@@ -1,0 +1,107 @@
+/* Checkboxes (`.checkbox`) and switches (`.switch`). Part of ferrox-ui
+   `forms`. Tokens only and class-only.
+
+   Not two paints of one control: a checkbox states an intention a later
+   Save carries out; a switch is the act itself. */
+
+/* ── Checkbox: the box and its words are one <label>, one target ── */
+
+.checkbox {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.checkbox__row {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+}
+
+.checkbox__input {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  accent-color: var(--primary-base);
+  cursor: inherit;
+}
+
+.checkbox__input:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.checkbox__input:disabled,
+.checkbox__input:disabled + .checkbox__label {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* A checkbox with an error says so on the box, not only in the message. */
+.checkbox.is-invalid .checkbox__input {
+  outline: 2px solid var(--danger-base);
+  outline-offset: 1px;
+}
+
+/* ── Switch: one <button role="switch">; track, knob and words inside ── */
+
+.switch {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.switch:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: var(--radius-sm);
+}
+
+.switch:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* The track carries the state: `--line` at rest, the primary fill once on.
+   Sized in em, so the switch keeps its proportion to the text around it. */
+.switch__track {
+  flex: none;
+  display: flex;
+  align-items: center;
+  width: 2.25em;
+  height: 1.25em;
+  padding: 0.125em;
+  box-sizing: border-box;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  transition: background var(--transition-fast);
+}
+
+.switch__knob {
+  width: 1em;
+  height: 1em;
+  border-radius: var(--radius-pill);
+  background: var(--surface-1);
+  box-shadow: var(--shadow-sm);
+  /* Slides rather than being laid out again. */
+  transition: transform var(--transition-fast);
+}
+
+.switch[aria-checked='true'] .switch__track {
+  background: var(--primary-fill);
+}
+
+.switch[aria-checked='true'] .switch__knob {
+  transform: translateX(1em);
+  background: var(--primary-on-fill);
+}

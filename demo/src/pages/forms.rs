@@ -1,7 +1,9 @@
 //! Forms: fields and their controls, each with its value echoed below, so
 //! labels, messages, invalid states and two-way binding can be checked.
 
-use ferrox_ui::{Button, ButtonFamily, Field, Input, InputKind, PasswordInput, Textarea};
+use std::time::Duration;
+
+use ferrox_ui::{Button, ButtonFamily, Checkbox, Field, Input, InputKind, PasswordInput, Select, SelectOption, Switch, Textarea};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -11,6 +13,7 @@ pub fn FormsPage() -> impl IntoView {
     view! {
         <Fields />
         <Passwords />
+        <Choices />
     }
 }
 
@@ -72,6 +75,64 @@ fn Passwords() -> impl IntoView {
             <dl class="demo-echo">
                 <dt>"password"</dt><dd data-echo="password">{move || password.get()}</dd>
                 <dt>"new password"</dt><dd data-echo="new-password">{move || new_password.get()}</dd>
+            </dl>
+        </Section>
+    }
+}
+
+/// Checkboxes (a hint, an error until ticked), a switch, and selects: a
+/// plain one, and one that loads and refreshes its options.
+#[component]
+fn Choices() -> impl IntoView {
+    let recurring = RwSignal::new(false);
+    let terms = RwSignal::new(false);
+    let archived = RwSignal::new(false);
+    let currency = RwSignal::new(String::new());
+    let account = RwSignal::new(String::new());
+    let loading = RwSignal::new(false);
+    let refreshing = RwSignal::new(false);
+    let accounts = RwSignal::new(vec![
+        SelectOption::new("checking", "Checking"),
+        SelectOption::new("savings", "Savings"),
+    ]);
+    let currencies = Signal::stored(vec![
+        SelectOption::new("eur", "Euro"),
+        SelectOption::new("usd", "US dollar"),
+        SelectOption::new("gbp", "Pound sterling"),
+    ]);
+    let terms_error = Signal::derive(move || (!terms.get()).then(|| "Tick this to continue.".to_string()));
+    let refresh = move || {
+        refreshing.set(true);
+        set_timeout(move || {
+            accounts.update(|a| a.push(SelectOption::new("brokerage", "Brokerage")));
+            refreshing.set(false);
+        }, Duration::from_millis(600));
+    };
+    view! {
+        <Section title="Choices">
+            <div class="demo-form">
+                <Checkbox checked=recurring label="Repeat every month" hint="Until you stop it" name="recurring" />
+                <Checkbox checked=terms label="I accept the terms" error=terms_error name="terms" />
+                <div class="demo-row">
+                    <Switch checked=archived label="Show archived accounts" />
+                    <Switch checked=loading label="Accounts loading" />
+                </div>
+                <Field label="Currency">
+                    <Select value=currency options=currencies placeholder="Choose a currency" name="currency" />
+                </Field>
+                <Field label="Account">
+                    <Select value=account options=accounts loading=loading on_refresh=refresh refreshing=refreshing name="account" />
+                </Field>
+            </div>
+            <div class="demo-row">
+                <Button family=ButtonFamily::Secondary on_click=move |_| currency.set("gbp".into())>"Choose pounds from code"</Button>
+            </div>
+            <dl class="demo-echo">
+                <dt>"recurring"</dt><dd data-echo="recurring">{move || recurring.get().to_string()}</dd>
+                <dt>"terms"</dt><dd data-echo="terms">{move || terms.get().to_string()}</dd>
+                <dt>"archived"</dt><dd data-echo="archived">{move || archived.get().to_string()}</dd>
+                <dt>"currency"</dt><dd data-echo="currency">{move || currency.get()}</dd>
+                <dt>"account"</dt><dd data-echo="account">{move || account.get()}</dd>
             </dl>
         </Section>
     }

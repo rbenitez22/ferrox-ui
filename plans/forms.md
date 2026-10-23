@@ -6,7 +6,7 @@ conrad's `FormField.tsx`, `Autocomplete.tsx` and its `.form-*` rules, and
 replaces webapp-lib's form primitives. The data-loading halves stay in
 webapp-lib as adapters.
 
-Status: approved (2026-10-23). Pieces 1–2 done (2026-10-23); piece 3 next.
+Status: approved (2026-10-23). Pieces 1–3 done (2026-10-23); piece 4 next.
 
 Notes from piece 1:
 - `Field` hands its wiring down through `<Provider>`, not `provide_context`.
@@ -28,6 +28,14 @@ Notes from piece 1:
   `min_password_entropy`. The meter's word comes from `StrengthLabels`
   (English by default), and the bits are on `data-bits`, not in the visible
   text. The field is described by its hint and the meter together.
+- Piece 3: Checkbox carries its own `hint` / `error` (as a Field does),
+  reusing `.field__hint` / `.field__error`. Select marks the chosen option
+  with `prop:selected` per option rather than `prop:value` on the select, so
+  the choice holds whatever order the options and the value update in. The
+  options are a keyed `<For>`. While refreshing, an inline `Spinner` takes
+  the refresh icon's place inside the button, which stays put and is
+  disabled. Select's texts (placeholder "Select…", "Loading…", "Refresh",
+  "Refreshing…") are props.
 
 ## Sources
 

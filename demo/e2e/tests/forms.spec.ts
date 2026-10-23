@@ -177,3 +177,108 @@ test.describe('PasswordInput', () => {
     await expect(echo(page, 'new-password')).toHaveText('s3cret!');
   });
 });
+
+test.describe('Checkbox', () => {
+  test('the words are its label: clicking them ticks it', async ({ page }) => {
+    const box = page.getByRole('checkbox', { name: 'Repeat every month' });
+    await expect(box).not.toBeChecked();
+    await page.getByText('Repeat every month').click();
+    await expect(box).toBeChecked();
+    await expect(echo(page, 'recurring')).toHaveText('true');
+  });
+
+  test('Space ticks it from the keyboard', async ({ page }) => {
+    const box = page.getByRole('checkbox', { name: 'Repeat every month' });
+    await box.focus();
+    await page.keyboard.press('Space');
+    await expect(box).toBeChecked();
+  });
+
+  test('hint, then error, as in a Field', async ({ page }) => {
+    const recurring = page.getByRole('checkbox', { name: 'Repeat every month' });
+    expect(await description(recurring)).toBe('Until you stop it');
+    await expect(recurring).not.toHaveAttribute('aria-invalid', 'true');
+
+    const terms = page.getByRole('checkbox', { name: 'I accept the terms' });
+    expect(await description(terms)).toBe('Tick this to continue.');
+    await expect(terms).toHaveAttribute('aria-invalid', 'true');
+    await terms.check();
+    await expect(terms).not.toHaveAttribute('aria-invalid', 'true');
+    expect(await description(terms)).toBeNull();
+  });
+});
+
+test.describe('Switch', () => {
+  test('is a switch named by its words; click and Space flip it', async ({ page }) => {
+    const sw = page.getByRole('switch', { name: 'Show archived accounts' });
+    await expect(sw).toHaveAttribute('aria-checked', 'false');
+    await sw.click();
+    await expect(sw).toHaveAttribute('aria-checked', 'true');
+    await expect(echo(page, 'archived')).toHaveText('true');
+    await page.keyboard.press('Space');
+    await expect(sw).toHaveAttribute('aria-checked', 'false');
+  });
+
+  test('the knob slides across when on', async ({ page }) => {
+    const sw = page.getByRole('switch', { name: 'Show archived accounts' });
+    const knob = sw.locator('.switch__knob');
+    const before = (await knob.boundingBox())!.x;
+    await sw.click();
+    await expect.poll(async () => (await knob.boundingBox())!.x - before).toBeGreaterThan(10);
+  });
+});
+
+test.describe('Select', () => {
+  const currency = (page: Page) => page.getByLabel('Currency');
+  const account = (page: Page) => page.getByLabel('Account');
+
+  test('starts on its placeholder, which cannot be chosen', async ({ page }) => {
+    await expect(currency(page)).toHaveValue('');
+    const placeholder = currency(page).locator('option').first();
+    await expect(placeholder).toHaveText('Choose a currency');
+    await expect(placeholder).toHaveAttribute('disabled', '');
+  });
+
+  test('choosing sets the value; setting the value chooses', async ({ page }) => {
+    await currency(page).selectOption('usd');
+    await expect(echo(page, 'currency')).toHaveText('usd');
+    await page.getByRole('button', { name: 'Choose pounds from code' }).click();
+    await expect(currency(page)).toHaveValue('gbp');
+  });
+
+  test('loading: disabled, busy, and says so', async ({ page }) => {
+    await page.getByRole('switch', { name: 'Accounts loading' }).click();
+    await expect(account(page)).toBeDisabled();
+    await expect(account(page)).toHaveAttribute('aria-busy', 'true');
+    await expect(account(page).locator('option').first()).toHaveText('Loading…');
+    await page.getByRole('switch', { name: 'Accounts loading' }).click();
+    await expect(account(page)).toBeEnabled();
+  });
+
+  test('refresh is a button; a spinner holds its place while refreshing', async ({ page }) => {
+    const refresh = page.getByRole('button', { name: 'Refresh' });
+    await refresh.click();
+    await expect(refresh).toBeDisabled();
+    await expect(refresh.getByRole('status')).toHaveText('Refreshing…');
+    await expect(account(page).locator('option', { hasText: 'Brokerage' })).toHaveCount(1);
+    await expect(refresh).toBeEnabled();
+    await expect(refresh.locator('svg.icon')).toHaveAttribute('data-icon', 'refresh');
+  });
+
+  test('the same element keeps focus and its choice when options change', async ({ page }) => {
+    await account(page).selectOption('savings');
+    await page.getByRole('button', { name: 'Refresh' }).click();
+    await account(page).evaluate((el) => {
+      el.setAttribute('data-mark', 'kept');
+      (el as HTMLSelectElement).focus();
+    });
+    await expect(account(page).locator('option', { hasText: 'Brokerage' })).toHaveCount(1);
+    expect(await page.evaluate(() => document.activeElement?.getAttribute('data-mark'))).toBe('kept');
+    await expect(account(page)).toHaveValue('savings');
+  });
+
+  test('draws its own caret', async ({ page }) => {
+    const image = await currency(page).evaluate((el) => getComputedStyle(el).backgroundImage);
+    expect(image).toContain('linear-gradient');
+  });
+});
