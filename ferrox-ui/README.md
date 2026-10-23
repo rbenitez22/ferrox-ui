@@ -31,9 +31,10 @@ call adds nothing.
 
 | Group | Feature | Contains |
 |---|---|---|
-| `core` | always on | `Button`, `IconButton`, `Toolbar`, `ToolbarGroup`, `Spinner`, `LoadingOverlay`, `Alert` |
+| `core` | always on | `Button`, `IconButton`, `Toolbar`, `ToolbarGroup`, `Spinner`, `LoadingOverlay`, `Alert`; help: `HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`, `HelpRequest` |
 | `overlay` | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
-| `forms`, `menus`, `navigation`, `layout`, `data` | one each, planned | see `plans/ferrox-ui.md` |
+| `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select` (documented with the group's last piece; see the rustdoc meanwhile) |
+| `menus`, `navigation`, `layout`, `data` | one each, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)
 
@@ -49,6 +50,8 @@ call adds nothing.
   with an English default.
 - A callback with no input is a zero-argument closure:
   `on_close=move || open.set(false)`.
+- Components with a label or a title take `help` (a `HelpTopic`): see
+  [Help](#help-in-core).
 
 ## core
 
@@ -132,7 +135,8 @@ view! {
 }
 ```
 
-`Toolbar` takes `title`, `compact` and `class`; `ToolbarGroup` takes `class`.
+`Toolbar` takes `title`, `compact`, `help` (a `?` right after the title) and
+`class`; `ToolbarGroup` takes `class`.
 `toolbar_classes(compact, extra)` returns the class list.
 
 ### `Spinner`, `LoadingOverlay`
@@ -271,6 +275,7 @@ view! {
 | `size` | `Md` | `Md` (32rem) or `Wide` (52rem, for a body that's a table) |
 | `alert` | `false` | `role="alertdialog"`, for a dialog that interrupts to ask for a decision |
 | `close_label` | `"Close"` | the ×'s label |
+| `help` | none | a `?` in the title bar, before the × |
 | `class` | | |
 
 A backdrop click doesn't close a Dialog, so a stray click can't throw away
@@ -304,7 +309,8 @@ view! {
 
 Props: `open`, `title`, `confirm_label`, `on_confirm`, `on_cancel` (Cancel,
 the × and Esc), `saving` (the confirm button sweeps and refuses clicks),
-`cancel_label` (`"Cancel"`), `close_label` (`"Close"`).
+`cancel_label` (`"Cancel"`), `close_label` (`"Close"`), `help` (a `?` before
+the ×).
 
 ### `Sheet`
 
@@ -330,15 +336,112 @@ view! {
 | `open`, `title`, `on_close` | required | `title` is shown and is the sheet's accessible name |
 | `side` | `Left` | `Left` / `Right`: full height, `min(20rem, 85vw)` wide. `Bottom`: full width, at most 85vh tall |
 | `close_label` | `"Close"` | |
+| `help` | none | a `?` in the title bar, before the × |
 | `class` | | |
 
 `sheet_classes(side, extra)` returns the class list.
 
-## Help context: recommended keys
+## Help (in `core`)
 
-`HelpScope` context is free-form key/value pairs; every help request carries
-them, outermost scope first. These names are recommended so an assistant (and
-a memory store such as Patina) can rely on them:
+Any component with a label or a title can carry help. Give it a topic and a
+discreet `?` appears beside the label. It opens the topic in a popover: a
+short, structured explanation that works offline. Inside a `HelpAssistant`,
+the popover also offers **Ask about this**, which hands the app a
+`HelpRequest`: the topic, which component, its label, and the context the app
+declared around it. The app sends that to its chat, a model, or a memory
+store. ferrox-ui never calls a model.
+
+**When to give help:** one topic per thing that can carry a `?`, and only
+where a user would ask. A screen of `?`s is noise. A topic too small to stand
+on its own means the `?` belongs on the thing around it.
+
+### `HelpTopic`
+
+The explanation, as structured data (not Markdown or HTML, so nothing parses
+a string or trusts tags in one). The app owns the wording and its
+translation. It's cheap to clone.
+
+```rust
+use std::sync::LazyLock;
+use ferrox_ui::HelpTopic;
+
+static SPLIT_AMOUNT: LazyLock<HelpTopic> = LazyLock::new(|| {
+    HelpTopic::new("split-amount", "Amounts on a split")          // id, title
+        .paragraph("Each line moves money into or out of one account.")
+        .list(["Positive: money comes in", "Negative: money goes out"])
+        .table(["Sign", "Means"], [["+", "in"], ["-", "out"]])
+        .guide("/help#split-amount")                             // "Full guide"
+});
+```
+
+The `id` is stable: an assistant and a guide find the topic by it. The
+`title` names the `?`.
+
+### The `help` prop
+
+| Component | Where the `?` sits | Also |
+|---|---|---|
+| `Field` | right after the label, outside the `<label>` | `help_skip_tab`, `help_shares_value` |
+| `Checkbox` | after its words, outside the `<label>` (clicking it never ticks the box) | `help_skip_tab`, `help_shares_value` ("true" / "false") |
+| `Switch` | beside the switch, not inside it | `help_skip_tab` |
+| `Toolbar` | right after the title | |
+| `Dialog`, `ConfirmDialog`, `Sheet` | in the title bar, just before the × | |
+
+```rust
+<Field label="Amount" help=SPLIT_AMOUNT.clone()>
+    <Input value=amount />
+</Field>
+```
+
+`help` takes a `MaybeHelp`, which converts from a `HelpTopic` or an
+`Option<HelpTopic>`. `help_skip_tab` keeps the `?` out of the Tab order for a
+field in a row (it stays clickable and reachable by a screen reader).
+
+### `HelpButton`
+
+The `?` on its own, for anywhere else: beside a heading, in a table header.
+The components above place one for you.
+
+```rust
+<h2>"Statement balance" <HelpButton topic=STATEMENT_BALANCE.clone() /></h2>
+```
+
+- **It names what it explains:** "Help: {title}", as its label and tooltip,
+  so a screen reader knows which `?` it landed on.
+- The popover is the browser's own: Esc or a click elsewhere closes it, one
+  is open at a time, and Esc gives focus back to the `?`. It sits below the
+  `?` (above when there's no room), stays inside the viewport, and follows
+  the page as it scrolls.
+- Props: `topic`, `skip_tab`, `kind` / `about` / `value` (what a request says
+  carries the `?`; components set these), `help_label` (`"Help"`),
+  `guide_label` (`"Full guide"`), `ask_label` (`"Ask about this"`), `class`.
+- Put it where block content is allowed: not inside a `<label>` or a
+  `<button>`.
+
+### `HelpScope`: context for an assistant
+
+Declare what an assistant should know where you know it. Scopes nest; a
+request gathers them outermost first. A scope reaches only its own children.
+
+```rust
+<HelpScope context=[("mcp_server", "conrad"), ("domain", "bookkeeping")]>
+    <HelpScope context=[("screen", "reconcile")]>
+        <HelpScope context=move || vec![
+            ("entity".into(), "account".into()),
+            ("account_id".into(), account.get()),
+        ]>
+            <Field label="Statement balance" help=STATEMENT_BALANCE.clone()> … </Field>
+        </HelpScope>
+    </HelpScope>
+</HelpScope>
+```
+
+`context` is an array or a `Vec` of pairs, or a closure returning them for
+context that follows the page. It's read when the user asks, so it's always
+current.
+
+**Recommended keys.** The keys are free-form; these names let an assistant
+(and a memory store such as Patina) rely on them:
 
 | Key | Meaning | Example |
 |---|---|---|
@@ -350,13 +453,58 @@ a memory store such as Patina) can rely on them:
 | `mcp_server` | the MCP server that knows about this area | `conrad` |
 | `mcp_tool` | the tool best placed to answer here | `conrad_get_transaction` |
 
-Put `mcp_server` in a scope at the app's root and `mcp_tool` and ids at the
+Put `mcp_server` in a scope at the app's root, and `mcp_tool` and ids at the
 screen or section that knows them. Stable mappings can live in the app's
-`on_ask` handler instead. They are **hints**: which tools a model may call is
-decided by the client, never by the page, and the model may pick a better
-tool. A full help section (topics, `HelpButton`, `HelpScope`,
-`HelpAssistant`, privacy) arrives with the help docs (`plans/help.md`,
-piece 4).
+`on_ask` handler instead. A rule of thumb: the page declares what only the
+page knows, such as the current entity's id. MCP keys are **hints**: which
+tools a model may call is decided by the client, never by the page, and the
+model may pick a better tool. `domain`, `screen` and `entity` map onto
+memory tags (Patina's `recall_tagged`).
+
+### `HelpAssistant` and `HelpRequest`
+
+Wrap the app (or a part of it). Every help popover inside offers "Ask about
+this".
+
+```rust
+use ferrox_ui::{HelpAssistant, HelpRequest};
+
+view! {
+    <HelpAssistant on_ask=move |request: HelpRequest| chat.ask(request)>
+        <Router>…</Router>
+    </HelpAssistant>
+}
+```
+
+| `HelpRequest` field | |
+|---|---|
+| `topic_id`, `topic_title` | the topic |
+| `component` | what carries the `?`: `field`, `checkbox`, `switch`, `toolbar`, `dialog`, `alertdialog`, `sheet`, or `help` for a bare `HelpButton` |
+| `label` | that component's label or title |
+| `context` | every enclosing scope's pairs, outermost first |
+| `value` | the control's value, only when the component opted in |
+
+`to_prompt_context()` renders it as plain lines for a prompt:
+
+```text
+topic: split-amount (Amounts on a split)
+component: field
+label: Amount
+screen: reconcile
+account_id: checking
+```
+
+`HelpRequest::new(&topic, component, label)` with `.with_context(…)` and
+`.with_value(…)` builds one, for testing a handler. Without a
+`HelpAssistant`, help is just the topics; nothing else changes.
+
+### Privacy
+
+A request carries only what the developer declared: the topic, the
+component, its label, and scope context. A control's **value** is sent only
+when that component says `help_shares_value=true`. `PasswordInput` never
+offers its value, so a password can't be sent even then. Keep ids and
+private details out of `HelpScope` unless the assistant should see them.
 
 ## CSS classes (core)
 
@@ -369,17 +517,18 @@ selected by class only.
 | `focus.css` | the focus ring for `.btn` and `.icon-btn` |
 | `buttons.css` | `.btn`, `.btn--{primary,secondary,cancel,danger}`, `.btn--quiet`, `.btn--{sm,lg}`, `.is-saving`; `.icon-btn`, `.icon-btn--danger`, `[aria-pressed='true']` |
 | `icon.css` | `.icon`: an SVG icon as a block with no pointer events |
-| `toolbar.css` | `.toolbar`, `.toolbar--compact`, `.toolbar__title`, `.toolbar__group` |
+| `toolbar.css` | `.toolbar`, `.toolbar--compact`, `.toolbar__title`, `.toolbar__group`, `.toolbar__heading` (a title with its `?`) |
 | `spinner.css` | `.spinner`, `.spinner--{region,inline,field}`, `.spinner-status`, `.spinner-status--region`, `.spinner-overlay`, `.spinner-overlay__text`; keyframes `ferrox-spin`, `ferrox-spinner-appear` |
 | `alert.css` | `.alert`, `.alert--{info,success,warning,error}`, `.alert__icon`, `.alert__body`, `.alert__dismiss` |
+| `help.css` | `.help-btn` (the `?`, with `.icon-btn`), `.help-popover`, `__title`, `__body`, `__paragraph`, `__list`, `__table` / `__heading` / `__cell`, `__actions`, `__link`, `__ask`; `[data-side]` below or above |
 
 ## CSS classes (overlay)
 
 | Sheet | Classes |
 |---|---|
 | `modal.css` | `.dialog-open` on `<body>`: no page scroll while a modal is open |
-| `dialog.css` | `.dialog`, `.dialog--wide`, `.dialog::backdrop`, `.dialog__title-bar`, `.dialog__title`, `.dialog__close`, `.dialog__body`, `.dialog__footer` |
-| `sheet.css` | `.sheet`, `.sheet--{left,right,bottom}`, `.sheet::backdrop`, `.sheet__title-bar`, `.sheet__title`, `.sheet__close`, `.sheet__body` |
+| `dialog.css` | `.dialog`, `.dialog--wide`, `.dialog::backdrop`, `.dialog__title-bar`, `.dialog__title`, `.dialog__help`, `.dialog__close`, `.dialog__body`, `.dialog__footer` |
+| `sheet.css` | `.sheet`, `.sheet--{left,right,bottom}`, `.sheet::backdrop`, `.sheet__title-bar`, `.sheet__title`, `.sheet__help`, `.sheet__close`, `.sheet__body` |
 
 These are injected only when the `overlay` feature is on.
 
@@ -396,24 +545,28 @@ class.
 - `overlay`: a browser with `<dialog>`/`showModal()` and `@starting-style`
   (Chrome 117+, Firefox 129+, Safari 17.5+). Without `@starting-style` a
   sheet just appears instead of sliding.
+- Help: a browser with the Popover API (`popover`, `popovertarget`; Chrome
+  114+, Firefox 125+, Safari 17+).
 
 ## Testing
 
 - `cargo test -p ferrox-ui`: class lists, roles, and the class-only rule on
   every sheet.
-- The demo (`demo/`) shows every component: `/buttons`, `/feedback` and
-  `/overlay`. Its Playwright tests (`demo/e2e/tests/buttons.spec.ts`,
-  `feedback.spec.ts`, `overlay.spec.ts`) run in Chromium and Firefox through
-  `scripts/release-check.sh`.
+- The demo (`demo/`) shows every component: `/buttons`, `/feedback`,
+  `/overlay`, `/forms` and `/help` (with a fake assistant that shows the
+  request it receives). Its Playwright tests (`demo/e2e/tests/*.spec.ts`)
+  run in Chromium and Firefox through `scripts/release-check.sh`.
 
 ## Planned
 
 From `plans/ferrox-ui.md`, one group per piece, each with a demo page and e2e
-tests: `forms` (Field, Input, Checkbox, Select, Combobox), `navigation` (Side
+tests: `forms` (Combobox, then its docs), `navigation` (Side
 menu, on `Sheet`), `layout` (Panel), `data` (Data grid). `core` later gains
 Skeleton, Badge, Card and a theme toggle. `overlay` later gains
 `TypeToConfirmDialog` (after `forms`), Toast, Popover and Tooltip, and the
 phone variants of Dialog (a bottom sheet, full screen) when an app needs them.
+Help later gains a topic registry (checked `related` links, a `/help` guide
+rendered from the same topics) and `help` on new components as they land.
 
 ## Licence
 

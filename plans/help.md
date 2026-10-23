@@ -8,7 +8,7 @@ assistant, the same popover offers **"Ask about this"**. That hands the app a
 declared around it (page → section → field). The app sends it to its chat,
 LLM or Patina recall. ferrox-ui never talks to a model itself.
 
-Status: approved (2026-10-23). Pieces 1–3 done (2026-10-23); piece 4 (docs) next.
+Status: approved (2026-10-23). Done (2026-10-23): pieces 1–4. Forms piece 4 (Combobox) is next, on `core/anchor.rs`.
 
 Notes from piece 1:
 - The `?` opens the popover declaratively (`popovertarget`), so the browser
