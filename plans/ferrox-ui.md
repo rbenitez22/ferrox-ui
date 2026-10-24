@@ -9,7 +9,7 @@ webapp-lib keeps the app plumbing (http, storage, reactive, auth, app-level
 components such as `Login`) and depends on ferrox-ui; see webapp-lib's
 `plans/crate-split.md` for that side.
 
-Status: pieces 0–5 done; piece 6 under way (core, overlay, help (plan `plans/help.md`), forms (plan `plans/forms.md`) navigation (plan `plans/navigation.md`) and layout (plan `plans/layout.md`) done; `plans/generalise.md` done (the user's stack out of the ported components; Combobox/Select `on_create`); data (plan `plans/data.md`) done 2026-10-24; next: `menus` (needs a plan); then the help follow-ups F1, `?` only while active, and help signals (`plans/help.md`), before webapp-lib piece 2). Repo `/programming/ferrox-ui`
+Status: pieces 0–5 done; piece 6 under way (core, overlay, help (plan `plans/help.md`), forms (plan `plans/forms.md`) navigation (plan `plans/navigation.md`) and layout (plan `plans/layout.md`) done; `plans/generalise.md` done (the user's stack out of the ported components; Combobox/Select `on_create`); data (plan `plans/data.md`) done 2026-10-24; next: `menus` (`plans/menus.md`, approved 2026-10-24, with ContextMenu); then the help follow-ups F1, `?` only while active, and help signals (`plans/help.md`), before webapp-lib piece 2). Repo `/programming/ferrox-ui`
 (`git@github.com:rbenitez22/ferrox-ui.git`, branch `master`).
 
 ## Crates (one workspace, this repo)
@@ -98,10 +98,11 @@ components, one story each, when an app needs them.
 | | MultiSelect | R | | |
 | | Combobox / Autocomplete | W C R | now | today `AutocompleteInput` (UI half) |
 | | Slider, Input OTP, Input Phone, Chips, Dropzone | R | | |
-| **menus** | Dropdown menu (popup menu) | C R | after `data` | conrad `Menu`. Scheduled 2026-10-23: row actions, a user menu, an overflow "More" all need one |
-| | Split button | | | main action + chevron opening related actions (e.g. "Edit ▾"); a menu with a button trigger |
-| | Menu button | | after `data` | one button with a chevron; looks like a select, each option is an action |
-| | Context menu, Menubar, Command palette | R | | |
+| **menus** | Dropdown menu (popup menu) | C R | now | conrad `Menu`. Scheduled 2026-10-23: row actions, a user menu, an overflow "More" all need one |
+| | Split button | | now | main action + chevron opening related actions (e.g. "Edit ▾"); a menu with a button trigger |
+| | Menu button | | now | one button with a chevron; looks like a select, each option is an action |
+| | Context menu | R | now | added to `plans/menus.md` as piece 4 (2026-10-24): `Menu`'s items opened by right-click, Shift+F10 / Menu key, long press |
+| | Menubar, Command palette | R | | |
 | **overlay** | Dialog | W C R | now | conrad header / body / footer (footer band padding, user request 2026-10-23) |
 | | Alert dialog (confirm) | W C R | now | today `ConfirmDialog`, `DeleteConfirmDialog` (C6) |
 | | Sheet / Drawer | W R | now | today `SideMenu` is a left sheet |
