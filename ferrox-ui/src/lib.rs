@@ -9,7 +9,7 @@
 //! `Combobox`. Feature `navigation`: `NavList`, `NavLink`,
 //! `NavGroup`, `SideMenu`, `SideMenuButton`. Feature `layout`: `Panel` (also collapsible),
 //! `Card`. Feature `data`: `DataView`,
-//! `DataLayoutSwitch`.
+//! `DataLayoutSwitch`, `Pagination`.
 //! Further groups (`menus`) arrive as they are built.
 //!
 //! Call [`init`] once at startup, before mounting, to add the components'

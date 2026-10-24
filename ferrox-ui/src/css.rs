@@ -57,11 +57,12 @@ const LAYOUT: &[(&str, &str)] = &[
 #[cfg(not(feature = "layout"))]
 const LAYOUT: &[(&str, &str)] = &[];
 
-/// `data`: the data view, then its layout switch.
+/// `data`: the data view, its layout switch, pagination.
 #[cfg(feature = "data")]
 const DATA: &[(&str, &str)] = &[
     ("ferrox-ui-data-view", include_str!("../style/data/data-view.css")),
     ("ferrox-ui-layout-switch", include_str!("../style/data/layout-switch.css")),
+    ("ferrox-ui-pagination", include_str!("../style/data/pagination.css")),
 ];
 #[cfg(not(feature = "data"))]
 const DATA: &[(&str, &str)] = &[];

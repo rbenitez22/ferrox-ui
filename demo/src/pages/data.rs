@@ -1,11 +1,11 @@
 //! Data: a DataView of recipes driven by buttons and switches (update,
 //! append, re-order, layouts, loading, error), a tag cloud, a view whose
-//! empty state is a view, and two infinite feeds (in a scroll box, and at
-//! the page's foot, scrolled by the window).
+//! empty state is a view, a paged list, and two infinite feeds (in a scroll
+//! box, and at the page's foot, scrolled by the window).
 
 use std::time::Duration;
 
-use ferrox_ui::{Button, ButtonFamily, Card, CardSize, DataLayout, DataLayoutSwitch, DataView, Switch};
+use ferrox_ui::{Button, ButtonFamily, Card, CardSize, DataLayout, DataLayoutSwitch, DataView, Pagination, Switch};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -42,6 +42,7 @@ pub fn DataPage() -> impl IntoView {
         <Recipes />
         <Tags />
         <Lists />
+        <Paged />
         <Feed title="Feed in a box" name="box" page=2 total=20 layout=DataLayout::List boxed=true />
         <Feed title="Feed" name="page" page=6 total=24 layout=DataLayout::List boxed=false />
     }
@@ -153,6 +154,46 @@ fn Lists() -> impl IntoView {
                     <Button on_click=add>"Add a list"</Button>
                 }
             />
+        </Section>
+    }
+}
+
+/// Items per page in the paged list.
+const PER_PAGE: usize = 10;
+
+/// A paged list: `Pagination` under a `DataView` showing that page's slice,
+/// with buttons that change the page count and set the page from code.
+#[component]
+fn Paged() -> impl IntoView {
+    let page = RwSignal::new(1_usize);
+    let page_count = RwSignal::new(20_usize);
+    let slice = Signal::derive(move || {
+        let first = (page.get() - 1) * PER_PAGE + 1;
+        (first..first + PER_PAGE).filter(|n| *n <= page_count.get() * PER_PAGE).collect::<Vec<usize>>()
+    });
+    let set_count = move |count: usize| {
+        page_count.set(count);
+        page.set(1);
+    };
+    view! {
+        <Section title="Pagination">
+            <div class="demo-row">
+                <Button family=ButtonFamily::Secondary on_click=move |_| set_count(20)>"20 pages"</Button>
+                <Button family=ButtonFamily::Secondary on_click=move |_| set_count(5)>"5 pages"</Button>
+                <Button family=ButtonFamily::Secondary on_click=move |_| set_count(1)>"1 page"</Button>
+                <Button family=ButtonFamily::Secondary on_click=move |_| page.set(20)>"Go to page 20 from code"</Button>
+            </div>
+            <DataView
+                items=slice
+                key_of=|n: &usize| n.to_string()
+                item=|n: usize| view! { <span>{format!("Item {n}")}</span> }
+                label="Paged items"
+                layout=DataLayout::Wrap
+            />
+            <Pagination page=page page_count=page_count label="Item pages" />
+            <dl class="demo-echo">
+                <dt>"page"</dt><dd data-echo="page">{move || page.get().to_string()}</dd>
+            </dl>
         </Section>
     }
 }

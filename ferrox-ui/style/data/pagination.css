@@ -1,0 +1,90 @@
+/* Pagination (`.pagination`): Previous, page numbers, Next. Part of
+   ferrox-ui `data`. Tokens only and class-only.
+
+   Always the same number of slots (see `page_window`), each a fixed width,
+   so paging never moves the buttons. On a phone the numbers give way to
+   "6 / 20". */
+
+.pagination__list {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pagination__slot,
+.pagination__step {
+  display: flex;
+}
+
+.pagination__page,
+.pagination__gap {
+  display: grid;
+  place-items: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  box-sizing: border-box;
+}
+
+.pagination__page {
+  padding: 0 var(--space-xs);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.pagination__page:hover {
+  background: var(--surface-2);
+}
+
+.pagination__page:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
+
+.pagination__page[aria-current='page'] {
+  background: var(--primary-fill);
+  color: var(--primary-on-fill);
+  font-weight: 700;
+}
+
+.pagination__gap {
+  color: var(--text-muted);
+}
+
+.pagination__step .icon-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+/* Only on a phone. */
+.pagination__position {
+  display: none;
+  padding: 0 var(--space-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Phone: Previous, "6 / 20", Next, as 44px targets. */
+@media (max-width: 768px) {
+  .pagination__slot {
+    display: none;
+  }
+
+  .pagination__position {
+    display: block;
+  }
+
+  .pagination__step .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+}

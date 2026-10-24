@@ -18,7 +18,11 @@ when a page lands asked for one page too many. Piece 3 done (2026-10-24):
 `DataLayoutSwitch`, `DataLayoutLabels` (group "Layout"; "Small grid",
 "Grid", "Large grid", "List", "Strip", "Cloud"), `layout_icon`; icons
 `LAYOUT_GRID`, `LIST`, `GALLERY_HORIZONTAL`, `TAGS`; `layout-switch.css`.
-Piece 4 (Pagination) next.
+Piece 4 done (2026-10-24): `Pagination`, `PaginationLabels`, `page_window`,
+`PageItem`, icon `CHEVRON_LEFT`, `pagination.css`. `page_window` shows one
+neighbour each side in a fixed seven slots (`1 … 5 [6] 7 … 20`; the sketch
+below showed two), which is what keeps the width constant. Numbers are
+keyed by page, so the pressed one keeps focus. Piece 5 (docs) next.
 
 ## Where it comes from
 
