@@ -5,7 +5,8 @@ through one item template and laid out as the screen needs (a grid of cards,
 a list of rows, a strip, a cloud of chips), with its loading, error and empty
 states, infinite scroll, a layout switch and pagination.
 
-Status: approved (2026-10-23), all open points as recommended. Piece 1 done
+Status: done (2026-10-24), all five pieces. Approved 2026-10-23, all open
+points as recommended. Piece 1 done
 (2026-10-24): `DataView`, `DataLayout`, `CardSize`, `data-view.css`, demo
 `/data`. Markup as built: the root is a `<div class="data-view
 data-view--grid-md">` holding the states and the `<ul class="data-view__list">`
@@ -22,7 +23,9 @@ Piece 4 done (2026-10-24): `Pagination`, `PaginationLabels`, `page_window`,
 `PageItem`, icon `CHEVRON_LEFT`, `pagination.css`. `page_window` shows one
 neighbour each side in a fixed seven slots (`1 … 5 [6] 7 … 20`; the sketch
 below showed two), which is what keeps the width constant. Numbers are
-keyed by page, so the pressed one keeps focus. Piece 5 (docs) next.
+keyed by page, so the pressed one keeps focus. Piece 5 done (2026-10-24): the data section of `ferrox-ui/README.md`
+(overview, pages or infinite scroll, requirements, planned), root and demo
+READMEs.
 
 ## Where it comes from
 

@@ -1003,8 +1003,51 @@ extra)` returns the class list.
 
 ## data (feature `data`)
 
-*Built; the overview and the rest of this section's docs come with
-`plans/data.md` piece 5.*
+Record lists: many records drawn through one item template, laid out as
+the screen needs, with their loading, error and empty states, and two ways
+to reach the rest of a long list.
+
+| Component | For |
+|---|---|
+| `DataView` | the list itself: one template per record (usually a `Card` in a grid, a row in a list), four layouts, its states beside it, optional infinite scroll |
+| `DataLayoutSwitch` | lets the user pick the layout; sits in a `Panel`'s actions |
+| `Pagination` | pages of anything; the app slices or fetches the page |
+
+Putting them together:
+
+```rust
+use ferrox_ui::{Card, DataLayout, DataLayoutSwitch, DataView, Pagination, Panel};
+
+let layout = RwSignal::new(DataLayout::default());
+let page = RwSignal::new(1);
+
+view! {
+    <Panel title="Recipes" actions=move || view! { <DataLayoutSwitch layout=layout /> }>
+        <DataView
+            items=Signal::derive(move || recipes_on(page.get()))
+            key_of=|r: &Recipe| r.id.clone()
+            item=|r: Recipe| view! { <Card title=r.name.clone() href=format!("/recipes/{}", r.id)>…</Card> }
+            label="Recipes"
+            layout=layout
+            loading=loading
+            error=error
+            on_retry=move || reload()
+        />
+        <Pagination page=page page_count=page_count />
+    </Panel>
+}
+```
+
+**Pages or infinite scroll?** The app's choice, per list. Pages
+(`Pagination`) where users come back to a place: admin lists, search
+results, anything worth linking to. Infinite scroll (`DataView`'s
+`on_more`) for feeds read from the top. Not both on one list.
+
+None of them fetch, sort, filter or route: whatever loads the records owns
+that, and owns the signals (`layout`, `page`), so remembering a choice (in
+storage, in the URL) is the app's. Selecting records, tables with columns
+and sorting, and virtualised rendering for thousands of items are not here
+(see Planned).
 
 ### `DataView<T>`
 
@@ -1405,21 +1448,23 @@ class.
   `<Router>`.
 - Help and `Combobox`: a browser with the Popover API (`popover`, `popovertarget`; Chrome
   114+, Firefox 125+, Safari 17+).
+- `data`: `IntersectionObserver` for `DataView`'s infinite scroll (every
+  current browser). Uses `js-sys`.
 
 ## Testing
 
 - `cargo test -p ferrox-ui`: class lists, roles, and the class-only rule on
   every sheet.
 - The demo (`demo/`) shows every component: `/buttons`, `/feedback`,
-  `/overlay`, `/forms`, `/navigation`, `/layout` and `/help` (with a fake assistant that shows the
+  `/overlay`, `/forms`, `/navigation`, `/layout`, `/data` and `/help` (with a fake assistant that shows the
   request it receives). Its Playwright tests (`demo/e2e/tests/*.spec.ts`)
   run in Chromium and Firefox through `scripts/release-check.sh`.
 
 ## Planned
 
 From `plans/ferrox-ui.md`, one group per piece, each with a demo page and e2e
-tests: `data` (`DataView`: one item template, usually a `Card`, laid out as a grid, a list or a column; `Pagination`), then `menus` (dropdown menu, menu button). `core` later gains
-Skeleton, Badge, Card and a theme toggle. `overlay` later gains
+tests: `menus` (dropdown menu, menu button) next. `core` later gains
+Skeleton, Badge and a theme toggle. `overlay` later gains
 `TypeToConfirmDialog`, Toast, Popover and Tooltip, and the
 phone variants of Dialog (a bottom sheet, full screen) when an app needs them.
 Help later gains a topic registry (checked `related` links, a `/help` guide
@@ -1427,9 +1472,12 @@ rendered from the same topics) and `help` on new components as they land.
 `forms` later gains Combobox groups and multi-select, and
 NumberInput, DateInput, Radio and the rest of the inventory when an app needs
 them. `navigation` later gains a persistent sidebar that folds to a rail of
-icons, count badges on links (with `core`'s Badge), Breadcrumb, Pagination,
-Bottom nav and Stepper. `layout` later gains Tabs and Accordion (a stack of
-collapsible panels), when an app needs them.
+icons, count badges on links (with `core`'s Badge), Breadcrumb, Bottom nav
+and Stepper. `layout` later gains Tabs and Accordion (a stack of
+collapsible panels), when an app needs them. `data` later gains selecting
+records (one or many, with listbox or grid roles), Table and DataTable
+(columns, sorting, filtering) and virtualised rendering, when an app needs
+them.
 
 ## Licence
 

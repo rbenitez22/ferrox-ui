@@ -9,7 +9,7 @@ webapp-lib keeps the app plumbing (http, storage, reactive, auth, app-level
 components such as `Login`) and depends on ferrox-ui; see webapp-lib's
 `plans/crate-split.md` for that side.
 
-Status: pieces 0–5 done; piece 6 under way (core, overlay, help (plan `plans/help.md`), forms (plan `plans/forms.md`) navigation (plan `plans/navigation.md`) and layout (plan `plans/layout.md`) done; `plans/generalise.md` done (the user's stack out of the ported components; Combobox/Select `on_create`); next: `data` (`plans/data.md`, approved), then `menus`; then the help follow-ups F1, `?` only while active, and help signals (`plans/help.md`), before webapp-lib piece 2). Repo `/programming/ferrox-ui`
+Status: pieces 0–5 done; piece 6 under way (core, overlay, help (plan `plans/help.md`), forms (plan `plans/forms.md`) navigation (plan `plans/navigation.md`) and layout (plan `plans/layout.md`) done; `plans/generalise.md` done (the user's stack out of the ported components; Combobox/Select `on_create`); data (plan `plans/data.md`) done 2026-10-24; next: `menus` (needs a plan); then the help follow-ups F1, `?` only while active, and help signals (`plans/help.md`), before webapp-lib piece 2). Repo `/programming/ferrox-ui`
 (`git@github.com:rbenitez22/ferrox-ui.git`, branch `master`).
 
 ## Crates (one workspace, this repo)
@@ -110,14 +110,14 @@ components, one story each, when an app needs them.
 | **navigation** | Side menu + menu link | W | now | today `SideMenu`/`MenuLink` (needs leptos_router) |
 | | Breadcrumb, Bottom nav, Stepper / Wizard | C R | | conrad `Wizard`. Pagination moved to `data` (2026-10-23) |
 | **layout** | Panel (title + control box + body) | W C | now | today `ComponentTitleBar` (as a panel header: `Toolbar` title + buttons); collapsible variant = conrad `CollapsiblePanel` |
-| | Card | R | now | moved from `core` (2026-10-23): a surface for one thing, optionally a link or a button as a whole; the record template for `DataView` |
+| | Card | R | done | moved from `core` (2026-10-23): a surface for one thing, optionally a link or a button as a whole; the record template for `DataView` |
 | | Tabs | C R | | conrad `Tabs`; when an app needs it |
 | | Accordion / Collapsible | C R | | a stack of collapsible `Panel`s, optionally one open at a time; when an app needs it |
 | | Card columns | C | | conrad `CardColumns` |
 | | Page frame, Scroll area, Aspect ratio | C R | | conrad `PageFrame` |
 | **data** | Table | R | | |
-| | DataView (was "Data grid") | W R | now | a record list rendered through one item template (usually a `Card`), laid out as a grid of cards, a list of rows or a column, optionally switchable; loading / empty / error states; keyed rows (Q10). Lineage: PrimeFaces' `DataGrid` / `DataView` → webapp-lib `DataGrid` + `ListComponentView` → rusty-skillet's `DataListView` (empty message, loading, infinite scroll), the user's attempt at improving it. Named `DataView`, since "data grid" usually means a spreadsheet-like table |
-| | Pagination | C R | now | moved from `navigation` (2026-10-23): pages through a `DataView`; no router needed |
+| | DataView (was "Data grid") | W R | done | a record list rendered through one item template (usually a `Card`), laid out as a grid of cards, a list of rows or a column, optionally switchable; loading / empty / error states; keyed rows (Q10). Lineage: PrimeFaces' `DataGrid` / `DataView` → webapp-lib `DataGrid` + `ListComponentView` → rusty-skillet's `DataListView` (empty message, loading, infinite scroll), the user's attempt at improving it. Named `DataView`, since "data grid" usually means a spreadsheet-like table |
+| | Pagination | C R | done | moved from `navigation` (2026-10-23): pages through a `DataView`; no router needed |
 | | Data table (sort, filter, page) | R | | |
 | **media** | Avatar, Image, Carousel, Marquee, Attachment | R | | probably not needed; listed for completeness |
 | **motion** | Animate, Shimmer, Drag and drop | R | | probably not needed |
