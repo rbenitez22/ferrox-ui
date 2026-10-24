@@ -27,6 +27,7 @@ call adds nothing.
 | use one component: its props, example and behaviour | `docs/<component>.md`, linked from its group's page below |
 | learn the rules every component follows (names, callbacks, words, `class`) | [`docs/conventions.md`](docs/conventions.md) |
 | style your own markup like a component | [`docs/css-classes.md`](docs/css-classes.md) |
+| work through an agent | [`agent-kit/`](agent-kit/README.md): install it into the app; the agent then needs only "use ferrox-ui" |
 
 ## Groups
 

@@ -1,0 +1,7 @@
+# What each adapter installs into an app: adapter, source (in the kit), destination (in the app), tab-separated.
+# A source folder is copied file by file (its tests/ left out); install.spec.md says how.
+generic	core	.ferrox/core
+generic	check	.ferrox/check
+generic	kit.tsv	.ferrox/kit.tsv
+generic	VERSION	.ferrox/VERSION
+generic	BOOTSTRAP.md	.ferrox/BOOTSTRAP.md

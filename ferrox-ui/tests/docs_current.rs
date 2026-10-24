@@ -8,6 +8,10 @@
 //!   `<!-- /example -->`. A Rust block without the markers, a marker naming
 //!   no region, and a region no page shows all fail.
 //!
+//! - The agent kit's rendered blocks (`<!-- rendered: <name> -->`, in
+//!   `agent-kit/core/AGENTS.md` and `agent-kit/README.md`) show `kit.tsv`,
+//!   `check/rules.tsv` and `docs/choosing.md`.
+//!
 //! When the docs differ from what they're made from, the test fails; run it
 //! with `FERROX_BLESS=1` to rewrite them instead.
 
@@ -51,6 +55,93 @@ fn every_example_is_its_compiled_region() {
     }
     let unused: Vec<&String> = regions.keys().filter(|name| !shown.contains(name)).collect();
     assert!(unused.is_empty(), "regions no page shows: {unused:?}");
+}
+
+#[test]
+fn the_kit_shows_its_sources() {
+    let kit = crate_dir().join("agent-kit");
+    let blocks = BTreeMap::from([
+        ("tasks".to_string(), render_tasks(&kit)),
+        ("rules".to_string(), render_rules(&kit)),
+        ("choosing".to_string(), render_choosing()),
+        ("kit".to_string(), render_kit_table(&kit)),
+    ]);
+    for page in [kit.join("core/AGENTS.md"), kit.join("README.md")] {
+        let text = fs::read_to_string(&page).unwrap_or_else(|e| panic!("{}: {e}", page.display()));
+        let rendered = render_blocks(&text, &blocks).unwrap_or_else(|e| panic!("{}: {e}", page.display()));
+        check_or_bless(&page, &rendered);
+    }
+}
+
+/// `kit.tsv`'s lines: kind, id, path, purpose.
+fn kit_rows(kit: &Path) -> Vec<Vec<String>> {
+    fs::read_to_string(kit.join("kit.tsv"))
+        .unwrap()
+        .lines()
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .map(|l| l.split('\t').map(str::to_string).collect())
+        .collect()
+}
+
+fn render_tasks(kit: &Path) -> String {
+    kit_rows(kit)
+        .iter()
+        .filter(|row| row[0] == "task")
+        .map(|row| format!("- `{}`: {} (`{{{{KIT}}}}/{}`)", row[1], row[3], row[2]))
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+fn render_kit_table(kit: &Path) -> String {
+    let mut out = vec!["| Kind | Piece | File | What it's for |".to_string(), "|---|---|---|---|".to_string()];
+    for row in kit_rows(kit) {
+        out.push(format!("| {} | `{}` | [`{}`]({}) | {} |", row[0], row[1], row[2], row[2], row[3]));
+    }
+    out.join("\n")
+}
+
+fn render_rules(kit: &Path) -> String {
+    fs::read_to_string(kit.join("check/rules.tsv"))
+        .unwrap()
+        .lines()
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .map(|l| {
+            let f: Vec<&str> = l.split('\t').collect();
+            format!("- `{}`: {}. Instead: {}.", f[0], f[5], f[6])
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+/// `docs/choosing.md`'s tables, one level down (its `## group`s become `###`).
+fn render_choosing() -> String {
+    let text = fs::read_to_string(crate_dir().join("docs/choosing.md")).unwrap();
+    let from = text.find("\n## ").map(|i| i + 1).unwrap_or(0);
+    text[from..].lines().map(|l| if l.starts_with("## ") { format!("#{l}") } else { l.to_string() }).collect::<Vec<_>>().join("\n").trim().to_string()
+}
+
+/// Fills each `<!-- rendered: <name> -->` … `<!-- /rendered -->` block,
+/// indented as its opening marker is.
+fn render_blocks(text: &str, blocks: &BTreeMap<String, String>) -> Result<String, String> {
+    const OPEN: &str = "<!-- rendered: ";
+    const CLOSE: &str = "<!-- /rendered -->";
+    let mut out = String::new();
+    let mut rest = text;
+    while let Some(at) = rest.find(OPEN) {
+        let line_start = rest[..at].rfind('\n').map(|i| i + 1).unwrap_or(0);
+        let indent = &rest[line_start..at];
+        out.push_str(&rest[..at]);
+        let after = &rest[at + OPEN.len()..];
+        let name_end = after.find(" -->").ok_or("an unclosed rendered marker")?;
+        let name = after[..name_end].trim();
+        let close = after.find(CLOSE).ok_or(format!("block {name} has no {CLOSE}"))?;
+        let content = blocks.get(name).ok_or(format!("no source for the rendered block {name}"))?;
+        let body: Vec<String> = content.lines().map(|l| if l.is_empty() { String::new() } else { format!("{indent}{l}") }).collect();
+        out.push_str(&format!("{OPEN}{name} -->\n{}\n{indent}{CLOSE}", body.join("\n")));
+        rest = &after[close + CLOSE.len()..];
+    }
+    out.push_str(rest);
+    Ok(out)
 }
 
 /// Every `docs/*.md` page, sorted.

@@ -1,0 +1,8 @@
+# What the kit holds: one line per piece, tab-separated: kind, id, path (in the kit), purpose.
+# kind: entry (read first), task (a procedure for one job), role (a brief for a second pair of eyes).
+entry	agents	core/AGENTS.md	Read first, before any UI work: what ferrox-ui is, how to work with it, its rules, and which component fits which need
+task	setup	core/tasks/setup.md	Add ferrox-ui to a Leptos CSR app, or start a new app from the starter
+task	screen	core/tasks/screen.md	Build a screen (a list, a form, a detail page, settings, the app shell) from a recipe
+task	component	core/tasks/component.md	Find the right component for a need and use it correctly
+task	check	core/tasks/check.md	Run the drift check on the app and fix what it finds
+role	reviewer	core/roles/reviewer.md	Review UI changes against ferrox-ui's rules and report file:line findings, changing nothing

@@ -551,6 +551,27 @@ a CHANGELOG started with the renames.
   showcase) trips 19 real findings (raw controls on purpose, its own
   layout CSS); it isn't held to the check.
 
+## Notes from piece 8 (the kit, agent-neutral, 2026-10-24)
+
+- `agent-kit/`: `core/AGENTS.md` (about 2,000 tokens with its rendered
+  blocks: the tasks from `kit.tsv`, the rules from `check/rules.tsv`, the
+  component table from `docs/choosing.md`), `core/tasks/{setup,screen,
+  component,check}.md`, `core/roles/reviewer.md`, `kit.tsv`, `VERSION`,
+  `BOOTSTRAP.md`, `ADAPTING.md`, `README.md` (its table rendered from
+  `kit.tsv`), `install/{install.sh,install.ps1,install.spec.md,
+  targets.tsv}` (`--generic`, `--dry-run`; backs up an old `.ferrox` to the
+  first free `.ferrox.bak[.N]`).
+- Paths in the kit's Markdown are `{{KIT}}/…`; the installer fills them
+  with `.ferrox` (hidden, so the drift check skips the kit itself). The
+  setup task points at the starter (`DOCS/../../starter`) instead of
+  restating it.
+- Tests: the installers give the same output and the same files (executable
+  bits kept, no placeholder left, `tests/` left out); a dry run writes
+  nothing; usage errors; `core/` and `BOOTSTRAP.md` name no particular
+  agent (a deny-list); `kit.tsv`'s paths exist; `VERSION` is the crate's.
+- The root README's "With an agent" is now: install `--generic`, paste
+  the paragraph.
+
 ## Pieces
 
 Each is small and reviewed on its own.

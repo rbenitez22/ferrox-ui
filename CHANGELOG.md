@@ -47,6 +47,11 @@ From the names audit in `plans/agent-first.md` (piece 3).
 - `.ferrox-app` styles plain links (an `<a>` with no class) in the theme's
   link colour.
 - Recipes: whole screens in `demo/src/recipes`, listed in `docs/recipes.md`.
+- The agent kit's agent-neutral core (`ferrox-ui/agent-kit/`): `core/AGENTS.md`
+  (the entry point, its rules and component table rendered from their
+  sources), four task procedures and a reviewer's brief, `kit.tsv`,
+  `BOOTSTRAP.md` (any agent), `ADAPTING.md` (writing an adapter), and the
+  installer (`install --generic`) in bash and PowerShell with its spec.
 - The drift check (`ferrox-ui/agent-kit/check/`): `ferrox-check` lists
   where an app drifts from ferrox-ui, with the fix; `ferrox-docs` prints
   the docs of the ferrox-ui an app builds against. Each in bash and

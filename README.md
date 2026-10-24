@@ -52,13 +52,18 @@ starter's files. Copy each part into yours:
 
 …and `style/ferrox/` in `.gitignore` ([`starter/.gitignore`](starter/.gitignore)): it's generated.
 
-**With an agent:** tell it "use ferrox-ui from `<this clone>`: take the
-setup from `starter/`; copy whole screens from `ferrox-ui/docs/recipes.md`;
-pick components with `ferrox-ui/docs/choosing.md`, look them up in
-`ferrox-ui/docs/index.md`, and read a component's page in `ferrox-ui/docs/`
-before using it". A kit
-made for agents (an entry point, task instructions, a drift check, an
-installer, for any agent) is being built: [`plans/agent-first.md`](plans/agent-first.md).
+**With an agent:** install the agent kit into your app, then paste one
+paragraph into your agent's instructions for the project:
+
+```sh
+ferrox-ui/agent-kit/install/install.sh --generic path/to/app   # install.ps1 on Windows
+```
+
+The paragraph is in `path/to/app/.ferrox/BOOTSTRAP.md`. From then on,
+"use ferrox-ui" is the whole UI directive: the kit tells the agent how to
+set up, build screens from recipes, pick components, and check its work.
+The kit works with any agent that reads files and runs commands; see
+[its README](ferrox-ui/agent-kit/README.md).
 
 **Versions.** Every crate here shares one version and one git reference.
 Use the same reference (the starter's `rev`, later a release tag) for all
