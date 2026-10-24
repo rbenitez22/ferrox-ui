@@ -310,3 +310,11 @@
 .demo-wide-menu {
     --menu-max-width: 34rem;
 }
+
+/* /layout page layout: a frame to show a PageGrid's edges, and an outline
+   on each flow's children so the gaps show. */
+.demo-frame {
+    border: 1px dashed var(--line);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-md);
+}

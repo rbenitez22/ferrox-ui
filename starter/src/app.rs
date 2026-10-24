@@ -1,4 +1,5 @@
-//! One page, built only from ferrox-ui: a list of items in a panel, each a
+//! One page, built only from ferrox-ui: the page itself (`PageGrid`: its
+//! width, padding and `<main>`), a list of items in a panel, each a
 //! card with its actions in a menu, an add dialog, a delete confirmation, and
 //! the loading and empty states. Replace `Item` and the in-memory store with
 //! your own data; the shape of the page stays.
@@ -8,7 +9,7 @@ use std::time::Duration;
 use ferrox_icons::{Icon, DELETE, EDIT, MORE_VERTICAL, PLUS};
 use ferrox_ui::{
     Button, Card, ConfirmDialog, DataView, Dialog, DialogAction, Field, HeadingLevel, IconButton, Input, Menu, MenuItem,
-    MenuTrigger, Panel,
+    MenuTrigger, PageGrid, Panel,
 };
 use leptos::prelude::*;
 
@@ -98,26 +99,28 @@ pub fn App() -> impl IntoView {
     };
 
     view! {
-        <Panel
-            title="Items"
-            heading_level=HeadingLevel::H1
-            actions=move || view! {
-                <IconButton label="Add item" on_click=move || open_add()><Icon icon=PLUS /></IconButton>
-            }
-        >
-            <DataView
-                items=items
-                key_of=|item: &Item| item.id.to_string()
-                item=card
-                label="Items"
-                loading=loading
-                loading_label="Loading items…"
-                empty_view=move || view! {
-                    <p>"No items yet."</p>
-                    <Button on_click=move || open_add()>"Add an item"</Button>
+        <PageGrid>
+            <Panel
+                title="Items"
+                heading_level=HeadingLevel::H1
+                actions=move || view! {
+                    <IconButton label="Add item" on_click=move || open_add()><Icon icon=PLUS /></IconButton>
                 }
-            />
-        </Panel>
+            >
+                <DataView
+                    items=items
+                    key_of=|item: &Item| item.id.to_string()
+                    item=card
+                    label="Items"
+                    loading=loading
+                    loading_label="Loading items…"
+                    empty_view=move || view! {
+                        <p>"No items yet."</p>
+                        <Button on_click=move || open_add()>"Add an item"</Button>
+                    }
+                />
+            </Panel>
+        </PageGrid>
         <Dialog
             open=dialog_open
             title=Signal::derive(move || if editing.get().is_some() { "Rename item".to_string() } else { "Add item".to_string() })

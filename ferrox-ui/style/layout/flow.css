@@ -1,0 +1,37 @@
+/* Stack and Cluster: children in a column, or a wrapping row, a token gap
+   between. Part of ferrox-ui `layout`. Tokens only and class-only. */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* ── Gaps ── */
+
+.stack--gap-none, .cluster--gap-none { gap: 0; }
+.stack--gap-xs, .cluster--gap-xs { gap: var(--space-xs); }
+.stack--gap-sm, .cluster--gap-sm { gap: var(--space-sm); }
+.stack--gap-md, .cluster--gap-md { gap: var(--space-md); }
+.stack--gap-lg, .cluster--gap-lg { gap: var(--space-lg); }
+.stack--gap-xl, .cluster--gap-xl { gap: var(--space-xl); }
+
+/* ── Across the flow ── */
+
+.stack--align-stretch, .cluster--align-stretch { align-items: stretch; }
+.stack--align-start, .cluster--align-start { align-items: flex-start; }
+.stack--align-center, .cluster--align-center { align-items: center; }
+.stack--align-end, .cluster--align-end { align-items: flex-end; }
+
+/* ── Along a cluster's row ── */
+
+.cluster--justify-start { justify-content: flex-start; }
+.cluster--justify-center { justify-content: center; }
+.cluster--justify-end { justify-content: flex-end; }
+.cluster--justify-between { justify-content: space-between; }

@@ -48,9 +48,11 @@ const NAVIGATION: &[(&str, &str)] = &[
 #[cfg(not(feature = "navigation"))]
 const NAVIGATION: &[(&str, &str)] = &[];
 
-/// `layout`: the panel, then the card.
+/// `layout`: the page grid and flows, then the panel and the card.
 #[cfg(feature = "layout")]
 const LAYOUT: &[(&str, &str)] = &[
+    ("ferrox-ui-page-grid", include_str!("../style/layout/page-grid.css")),
+    ("ferrox-ui-flow", include_str!("../style/layout/flow.css")),
     ("ferrox-ui-panel", include_str!("../style/layout/panel.css")),
     ("ferrox-ui-card", include_str!("../style/layout/card.css")),
 ];

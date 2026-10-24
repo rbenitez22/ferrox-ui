@@ -42,6 +42,12 @@ From the names audit in `plans/agent-first.md` (piece 3).
 
 ### Added
 
+- `layout`: `PageGrid` (the page: a width cap, padding, `<main>` and an
+  optional side column that moves under it on a phone), `Stack` and
+  `Cluster` (a column, or a wrapping row, with a token gap), and `Gap`,
+  `Align`, `Justify`, `PageWidth`, `SidePosition`. `.ferrox-app` resets
+  `<body>`'s margin.
+
 - `class` on `MenuItem`, `MenuLink` and `LoadingOverlay`;
   `menu_item_classes` takes the extra classes.
 - `.ferrox-app` (in the theme stylesheet): the page's ground on `<body>`.

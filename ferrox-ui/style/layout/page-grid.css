@@ -1,0 +1,58 @@
+/* Page grids (`.page-grid`): a page's content, capped at a width and centred,
+   with the page's padding, and an optional side column that moves under the
+   main one on a phone. Part of ferrox-ui `layout`. Tokens only and
+   class-only. */
+
+.page-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-lg);
+  box-sizing: border-box;
+  width: 100%;
+  margin-inline: auto;
+  padding: var(--space-lg) var(--space-lg) var(--space-2xl);
+}
+
+.page-grid--narrow { max-width: 40rem; }
+.page-grid--medium { max-width: 64rem; }
+.page-grid--wide { max-width: 80rem; }
+.page-grid--full { max-width: none; }
+
+/* The columns space their children (panels) themselves. */
+.page-grid__main,
+.page-grid__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  min-width: 0;
+}
+
+/* ── A side column, beside the main one ── */
+
+.page-grid--side-end {
+  grid-template-columns: minmax(0, 1fr) 18rem;
+}
+
+.page-grid--side-start {
+  grid-template-columns: 18rem minmax(0, 1fr);
+}
+
+.page-grid--side-start > .page-grid__side {
+  order: -1;
+}
+
+/* Phone: less padding, one column, the side under the main one. */
+@media (max-width: 768px) {
+  .page-grid {
+    padding: var(--space-md) var(--space-md) var(--space-xl);
+  }
+
+  .page-grid--side-end,
+  .page-grid--side-start {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .page-grid--side-start > .page-grid__side {
+    order: 0;
+  }
+}

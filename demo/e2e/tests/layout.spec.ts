@@ -343,3 +343,64 @@ test.describe('Card', () => {
     expect(parseFloat(await css(compact, 'padding-top'))).toBeLessThan(parseFloat(await css(card(page, 'Plain card'), 'padding-top')));
   });
 });
+
+test.describe('Page layout', () => {
+  const boxesOf = (page: Page, selector: string) =>
+    page.locator(selector).evaluate((el) => Array.from(el.children).map((c) => c.getBoundingClientRect().toJSON() as DOMRect));
+
+  test('Stack: one under another, a token gap between, full width', async ({ page }) => {
+    const stack = page.locator('[data-demo=stack]');
+    const width = (await box(stack)).width;
+    const kids = await boxesOf(page, '[data-demo=stack]');
+    expect(kids).toHaveLength(3);
+    for (let i = 1; i < kids.length; i++) expect(Math.round(kids[i].y - (kids[i - 1].y + kids[i - 1].height))).toBe(24);
+    for (const k of kids) expect(Math.abs(k.width - width)).toBeLessThan(1);
+  });
+
+  test('Cluster: side by side; Between puts the first at the start and the last at the end', async ({ page }) => {
+    const cluster = page.locator('[data-demo=cluster]');
+    const c = await box(cluster);
+    const cancel = await box(cluster.getByRole('button', { name: 'Cancel' }));
+    const publish = await box(cluster.getByRole('button', { name: 'Publish' }));
+    const draft = await box(cluster.getByRole('button', { name: 'Save draft' }));
+    expect(Math.abs(cancel.x - c.x)).toBeLessThan(1);
+    expect(Math.abs(publish.x + publish.width - (c.x + c.width))).toBeLessThan(1);
+    expect(Math.round(publish.x - (draft.x + draft.width))).toBe(8);
+  });
+
+  test('PageGrid: a side column beside the main one, capped width, padded', async ({ page }) => {
+    const grid = page.locator('[data-demo=grid-end] .page-grid');
+    const g = await box(grid);
+    expect(g.width).toBeLessThanOrEqual(64 * 16 + 1);
+    const main = await box(grid.locator('.page-grid__main'));
+    const side = await box(grid.locator('.page-grid__side'));
+    expect(side.x).toBeGreaterThan(main.x + main.width);
+    expect(Math.round(side.width)).toBe(288);
+    expect(Math.round(main.x - g.x)).toBe(24);
+    const cards = await boxesOf(page, '[data-demo=grid-end] .page-grid__main');
+    expect(Math.round(cards[1].y - (cards[0].y + cards[0].height))).toBe(24);
+  });
+
+  test('PageGrid: the side at the start; Narrow caps at 40rem', async ({ page }) => {
+    const grid = page.locator('[data-demo=grid-start] .page-grid');
+    expect((await box(grid)).width).toBeLessThanOrEqual(40 * 16 + 1);
+    const main = await box(grid.locator('.page-grid__main'));
+    const side = await box(grid.locator('.page-grid__side'));
+    expect(side.x + side.width).toBeLessThan(main.x);
+  });
+
+  test('PageGrid on a phone: one column, the side under the main one', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    for (const which of ['grid-end', 'grid-start']) {
+      const grid = page.locator(`[data-demo=${which}] .page-grid`);
+      const main = await box(grid.locator('.page-grid__main'));
+      const side = await box(grid.locator('.page-grid__side'));
+      expect(side.y).toBeGreaterThan(main.y + main.height - 1);
+      expect(Math.round(main.x - (await box(grid)).x)).toBe(16);
+    }
+  });
+
+  test('landmark=false: the frames add no main or aside', async ({ page }) => {
+    await expect(page.locator('[data-demo^=grid] main, [data-demo^=grid] aside')).toHaveCount(0);
+  });
+});

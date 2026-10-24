@@ -1,10 +1,14 @@
 //! Layout: panels as a page's title and as sections, with their actions,
-//! permissions, help and variants.
+//! permissions, help and variants; cards; and the page layout components
+//! (Stack, Cluster, PageGrid).
 
 use std::sync::LazyLock;
 
 use ferrox_icons::{Icon, DELETE, PLUS, SEARCH};
-use ferrox_ui::{Button, ButtonFamily, ButtonSize, Card, Field, HeadingLevel, HelpTopic, IconButton, Input, Panel, PanelTone, Switch};
+use ferrox_ui::{
+    Align, Button, ButtonFamily, ButtonSize, Card, Cluster, Field, Gap, HeadingLevel, HelpTopic, IconButton, Input, Justify, PageGrid,
+    PageWidth, Panel, PanelTone, SidePosition, Stack, Switch,
+};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -21,6 +25,7 @@ pub fn LayoutPage() -> impl IntoView {
         <Variants />
         <Collapsible />
         <Cards />
+        <PageLayout />
     }
 }
 
@@ -180,6 +185,43 @@ fn Cards() -> impl IntoView {
                 <Card title="Compact card" compact=true>
                     <p>"For dense lists."</p>
                 </Card>
+            </div>
+        </Section>
+    }
+}
+
+/// Stack and Cluster, and two PageGrids in frames (not landmarks: the demo's
+/// shell has its own `<main>`), one with the side at the end, one at the start.
+#[component]
+fn PageLayout() -> impl IntoView {
+    let side = |name: &'static str| move || view! { <Card title=name compact=true><p>"Side column."</p></Card> };
+    view! {
+        <Section title="Page layout">
+            <h3>"Stack"</h3>
+            <Stack gap=Gap::Lg class="demo-flow" attr:data-demo="stack">
+                <Card title="First" compact=true><p>"One"</p></Card>
+                <Card title="Second" compact=true><p>"Two"</p></Card>
+                <Card title="Third" compact=true><p>"Three"</p></Card>
+            </Stack>
+            <h3>"Cluster"</h3>
+            <Cluster justify=Justify::Between class="demo-flow" attr:data-demo="cluster">
+                <Button family=ButtonFamily::Cancel>"Cancel"</Button>
+                <Cluster gap=Gap::Sm align=Align::Center>
+                    <Button family=ButtonFamily::Secondary>"Save draft"</Button>
+                    <Button>"Publish"</Button>
+                </Cluster>
+            </Cluster>
+            <h3>"PageGrid"</h3>
+            <div class="demo-frame" data-demo="grid-end">
+                <PageGrid width=PageWidth::Medium landmark=false side=side("Filters")>
+                    <Card title="Main" compact=true><p>"The main column."</p></Card>
+                    <Card title="More main" compact=true><p>"Spaced by the column."</p></Card>
+                </PageGrid>
+            </div>
+            <div class="demo-frame" data-demo="grid-start">
+                <PageGrid width=PageWidth::Narrow landmark=false side=side("Contents") side_position=SidePosition::Start>
+                    <Card title="Article" compact=true><p>"A narrow page, its side at the start."</p></Card>
+                </PageGrid>
             </div>
         </Section>
     }

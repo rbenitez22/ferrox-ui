@@ -19,6 +19,20 @@ test('mounts: a page panel, then the loaded items', async ({ page }) => {
   await expect(cards(page).first().getByRole('heading')).toHaveText('First item');
 });
 
+test('the page is a padded <main>, its width capped', async ({ page }) => {
+  const main = page.getByRole('main');
+  await expect(main.getByRole('heading', { level: 1, name: 'Items' })).toBeVisible();
+  // The page's padding inside the grid, and no browser margin around it
+  // (.ferrox-app): the grid starts at the window's edge on a narrow window.
+  await page.setViewportSize({ width: 800, height: 900 });
+  const grid = (await page.locator('.page-grid').boundingBox())!;
+  const panel = (await page.locator('.panel').first().boundingBox())!;
+  expect(grid.x).toBe(0);
+  expect(Math.round(panel.x - grid.x)).toBe(24);
+  await page.setViewportSize({ width: 1600, height: 900 });
+  expect((await page.locator('.page-grid').boundingBox())!.width).toBeLessThanOrEqual(64 * 16 + 1);
+});
+
 test('adds an item through the dialog', async ({ page }) => {
   await expect(cards(page)).toHaveCount(2);
   await page.getByRole('button', { name: 'Add item' }).click();

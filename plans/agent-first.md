@@ -471,6 +471,22 @@ commit), 4 (the callback sweep), 5 (overlays own their state), 10 (built
 once), 11 (`DataView` redraw); demo, starter, tests and README with each;
 a CHANGELOG started with the renames.
 
+## Notes from piece 4 (layout primitives, 2026-10-24)
+
+- `PageGrid` (width cap, padding, `<main>` / `<aside>` landmarks, an
+  optional side column under the main one on a phone), `Stack`, `Cluster`;
+  `Gap` on the spacing tokens, `Align`, `Justify`, `PageWidth`,
+  `SidePosition`. `landmark=false` for a shell with its own `<main>` (the
+  demo).
+- The columns space their children by `--space-lg`, so a page of panels
+  needs no wrapper.
+- `.ferrox-app` now resets `<body>`'s margin: the starter showed 32px at
+  the edge (the browser's 8px plus the page's 24px).
+- The starter's page is a `PageGrid`: padded, capped at 64rem, a `<main>`.
+- The demo's own layout CSS (`.demo-row`, `.demo-stack`, `.demo-main`) is
+  left as it is: the demo is a showcase, the recipes (piece 6) are what
+  agents copy.
+
 ## Pieces
 
 Each is small and reviewed on its own.

@@ -35,7 +35,7 @@ call adds nothing.
 | `overlay` | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
 | `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
 | `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
-| `layout` | `layout` | `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card` |
+| `layout` | `layout` | `PageGrid`, `Stack`, `Cluster` (with `PageWidth`, `SidePosition`, `Gap`, `Align`, `Justify`), `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card` |
 | `data` | `data` | `DataView` (with infinite scroll), `DataLayout`, `CardSize`, `DataLayoutSwitch`, `DataLayoutLabels`, `Pagination`, `PaginationLabels`, `page_window`, `PageItem` |
 | `menus` | `menus` | `Menu`, `MenuTrigger`, `MenuAlign`, `MenuItem`, `MenuLink`, `MenuDivider`, `SplitButton`, `ContextMenu` |
 
@@ -880,13 +880,73 @@ is the app's (or webapp-lib's), and a page frame is `layout`'s, later.
 
 ## layout (feature `layout`)
 
-Boxes that title and hold content. No dependencies beyond `core`.
+The page itself, the space between things, and boxes that title and hold
+content. No dependencies beyond `core`. With these, an app needs no CSS of
+its own for layout.
 
 | Use it for | Use |
 |---|---|
+| the page: its width, padding and `<main>`, and a side column (filters, a summary) that moves under it on a phone | `PageGrid` |
+| things one under another with even space: fields, panels, a card's lines | `Stack` |
+| things side by side, wrapping: a row of buttons, tags, a label and its value | `Cluster` |
 | a page's own title and content, or a titled section of a page, with its buttons (add, search) | `Panel` |
 | a section most users skip, or one that loads data only some need | `Panel collapsible=true` |
 | one thing in a list (a record, an item, a choice), as a whole a link or a button if it opens something | `Card` |
+
+### `PageGrid`
+
+```rust
+use ferrox_ui::{PageGrid, PageWidth, Panel, HeadingLevel};
+
+view! {
+    <PageGrid width=PageWidth::Wide side=move || view! { <Panel title="Filters">…</Panel> }>
+        <Panel title="Recipes" heading_level=HeadingLevel::H1>…</Panel>
+        <Panel title="Recently made">…</Panel>
+    </PageGrid>
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `width` | `PageWidth::Medium` | the content's cap, centred: `Narrow` 40rem (a form, reading), `Medium` 64rem, `Wide` 80rem (grids of cards), `Full` |
+| `side` | none | a side column, 18rem wide, beside the main one; under it on a phone (≤ 768px). Built once |
+| `side_position` | `SidePosition::End` | `Start` puts the side column first (on a phone it still goes under the main one) |
+| `landmark` | `true` | the main column is `<main>` and the side `<aside>`; `false` inside a shell that has its own `<main>` |
+| `class` | | extra classes on the grid |
+| children | | the main column |
+
+The page's padding is `--space-lg` (`--space-md` on a phone, less at the
+bottom). Both columns space their children by `--space-lg`, so panels need
+no wrapper. `page_grid_classes(width, side, extra)` returns the class list.
+
+### `Stack` and `Cluster`
+
+```rust
+use ferrox_ui::{Align, Button, ButtonFamily, Cluster, Gap, Justify, Stack};
+
+view! {
+    <Stack gap=Gap::Lg>
+        <Field label="Name"><Input value=name /></Field>
+        <Field label="Minutes"><Input value=minutes kind=InputKind::Number /></Field>
+        <Cluster justify=Justify::End>
+            <Button family=ButtonFamily::Cancel on_click=move || cancel()>"Cancel"</Button>
+            <Button on_click=move || save()>"Save"</Button>
+        </Cluster>
+    </Stack>
+}
+```
+
+| | `Stack` | `Cluster` |
+|---|---|---|
+| Flow | a column | a row that wraps |
+| `gap` | `Gap::Md` (16px) | `Gap::Sm` (8px) |
+| `align` (across) | `Align::Stretch` (full width) | `Align::Center` |
+| `justify` (along) | | `Justify::Start`; `Center`, `End`, `Between` |
+| `class` | extra classes | extra classes |
+
+`Gap` is on the spacing tokens: `None`, `Xs` (4px), `Sm` (8px), `Md`
+(16px), `Lg` (24px), `Xl` (32px). `Align`: `Stretch`, `Start`, `Center`,
+`End`. `stack_classes` and `cluster_classes` return the class lists.
 
 ### `Panel`
 
@@ -1607,6 +1667,8 @@ These are injected only when the `navigation` feature is on.
 
 | Sheet | Classes |
 |---|---|
+| `page-grid.css` | `.page-grid`, `.page-grid--{narrow,medium,wide,full}`, `.page-grid--side-{end,start}`, `.page-grid__main`, `.page-grid__side` |
+| `flow.css` | `.stack`, `.cluster`, `.stack--gap-{none,xs,sm,md,lg,xl}` (and `.cluster--gap-…`), `.stack--align-{stretch,start,center,end}` (and `.cluster--align-…`), `.cluster--justify-{start,center,end,between}` |
 | `panel.css` | `.panel`, `.panel--{compact,flush,warning,danger,collapsible}`, `.panel__header` (the band), `.panel__heading` (the title and its `?`), `.panel__title`, `.panel__actions`, `.panel__body`; collapsible: `.panel__toggle` (`[aria-expanded='true']`), `.panel__title-text`, `.panel__summary`, `.panel__chevron`, `.panel__body[hidden]` |
 | `card.css` | `.card`, `.card--clickable`, `.card--compact`, `.card__header`, `.card__title`, `.card__link` (the title as a link or button, its `::after` the stretched target), `.card__actions`, `.card__body` |
 

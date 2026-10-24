@@ -7,8 +7,8 @@
 //! `overlay`: `Dialog`, `ConfirmDialog`, `Sheet`. Feature `forms`: `Field`,
 //! `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`,
 //! `Combobox`. Feature `navigation`: `NavList`, `NavLink`,
-//! `NavGroup`, `SideMenu`, `SideMenuButton`. Feature `layout`: `Panel` (also collapsible),
-//! `Card`. Feature `data`: `DataView`,
+//! `NavGroup`, `SideMenu`, `SideMenuButton`. Feature `layout`: `PageGrid`, `Stack`,
+//! `Cluster`, `Panel` (also collapsible), `Card`. Feature `data`: `DataView`,
 //! `DataLayoutSwitch`, `Pagination`. Feature `menus`: `Menu`, `MenuItem`,
 //! `MenuLink`, `MenuDivider`, `SplitButton`, `ContextMenu`.
 //!
