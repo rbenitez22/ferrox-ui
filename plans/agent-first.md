@@ -1,6 +1,6 @@
 # Agent first: ferrox-ui for a developer working through an agent
 
-Status: approved (2026-10-24), open points as recommended (point 11, `pwsh` on this machine, still to ask). Revised the same day before approval: the kit as the deliverable (the user's `ai-toolkit` untouched); every script in bash and PowerShell with a spec for other languages; an agent-agnostic core with generated adapters and a path for unknown agents; one source per fact; the kit inside the crate; a front door.
+Status: approved (2026-10-24), open points as recommended (`pwsh` installed here for the tests). Revised the same day before approval: the kit as the deliverable (the user's `ai-toolkit` untouched); every script in bash and PowerShell with a spec for other languages; an agent-agnostic core with generated adapters and a path for unknown agents; one source per fact; the kit inside the crate; a front door.
 
 ## The direction (the user, 2026-10-24)
 
@@ -402,6 +402,8 @@ Each is small and reviewed on its own.
    one. The alternative also targets Windows PowerShell 5.1, which is on
    every Windows machine but older and quirkier; worth it only if a user
    can't install 7.
-11. **`pwsh` on this machine** for the tests: installing it is your call
-   (Microsoft's package for Linux). Until then the PowerShell half of the
-   suite skips, loudly.
+11. **`pwsh` on this machine** for the tests: done (2026-10-24, the
+   user's go-ahead). PowerShell 7.6.8 from the official release tarball
+   (SHA-256 checked) in `~/.local/share/powershell/7.6.8`, linked as
+   `~/.local/bin/pwsh`; no root. The PowerShell half of the suite still
+   skips loudly on a machine without `pwsh`.
