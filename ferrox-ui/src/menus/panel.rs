@@ -10,6 +10,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{Element, Event, FocusEvent, HtmlElement, KeyboardEvent};
 
 use super::keys::{move_to, type_ahead};
+use crate::once::built_once;
 
 /// What a menu's items need from it: closing it, focus back where it
 /// belongs (the trigger, or what had focus before a context menu).
@@ -62,12 +63,14 @@ pub(crate) fn MenuPanel(
     label: Signal<String>,
     panel_ref: NodeRef<html::Div>,
     menu_ref: NodeRef<html::Div>,
-    header: Option<ViewFn>,
+    header: Option<ViewFnOnce>,
     built: Signal<bool>,
     context: MenuContext,
     on_toggle: impl Fn(Event) + 'static,
-    items: ViewFn,
+    items: ViewFnOnce,
 ) -> impl IntoView {
+    // Built on first opening, then kept: closures inside may move values.
+    let items = built_once(items);
     let on_key = move |ev: KeyboardEvent| {
         let Some(menu) = menu_ref.get_untracked() else { return };
         let key = ev.key();
@@ -123,7 +126,7 @@ pub(crate) fn MenuPanel(
                 // A `Provider`, not `provide_context`: a component has no owner
                 // of its own, so sibling menus would overwrite each other's.
                 <Show when=move || built.get()>
-                    {let items = items.clone(); view! { <Provider value=context>{items.run()}</Provider> }}
+                    <Provider value=context>{items()}</Provider>
                 </Show>
             </div>
         </div>

@@ -31,7 +31,7 @@ pub fn SplitButton(
     /// Extra classes on the group. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
     /// The menu's `MenuItem`s, `MenuLink`s and `MenuDivider`s.
-    children: ChildrenFn,
+    children: Children,
 ) -> impl IntoView {
     let menu_disabled = Signal::derive(move || disabled.get() || saving.get());
     view! {

@@ -1,4 +1,5 @@
 use ferrox_icons::{Icon, CHEVRON_RIGHT};
+use crate::once::built_once;
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
@@ -83,7 +84,7 @@ pub fn Panel(
     /// H2 by default; H1 for the page's own panel.
     #[prop(optional)] heading_level: HeadingLevel,
     /// Buttons at the right of the band.
-    #[prop(optional, into)] actions: Option<ViewFn>,
+    #[prop(optional, into)] actions: Option<ViewFnOnce>,
     /// The title is a button that opens and closes the body.
     #[prop(optional)] collapsible: bool,
     /// Where a collapsible panel starts: shut unless this is true.
@@ -99,7 +100,7 @@ pub fn Panel(
     #[prop(optional, into)] help: MaybeHelp,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
-    children: ChildrenFn,
+    children: Children,
 ) -> impl IntoView {
     let title_id = unique_id("ferrox-panel-title");
     let body_id = unique_id("ferrox-panel-body");
@@ -107,6 +108,8 @@ pub fn Panel(
     let expanded = expanded.unwrap_or_else(|| RwSignal::new(start_expanded || !collapsible));
     let open = Signal::derive(move || !collapsible || expanded.get());
     let opened = opened_once(open);
+    // Built on first opening, then kept: closures inside may move values.
+    let body = built_once(ViewFnOnce::from(children));
     let title_view = if collapsible {
         heading(heading_level, "panel__title", None, panel_toggle(title, title_id, body_id.clone(), expanded, summary))
     } else {
@@ -124,7 +127,7 @@ pub fn Panel(
                 <div class="panel__actions" hidden=move || !open.get()>{actions.map(|actions| actions.run())}</div>
             </div>
             <div class="panel__body" id=body_id hidden=move || !open.get()>
-                <Show when=move || opened.get()>{children()}</Show>
+                <Show when=move || opened.get()>{body()}</Show>
             </div>
         </section>
     }

@@ -92,12 +92,13 @@ pub fn Menu(
     trigger: MenuTrigger,
     #[prop(optional)] align: MenuAlign,
     /// Shown above the items, outside the menu itself: who is signed in.
-    #[prop(optional, into)] header: Option<ViewFn>,
+    #[prop(optional, into)] header: Option<ViewFnOnce>,
     #[prop(optional, into)] disabled: Signal<bool>,
     /// Extra classes on the wrapper. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
-    /// `MenuItem`s, `MenuLink`s and `MenuDivider`s.
-    children: ChildrenFn,
+    /// `MenuItem`s, `MenuLink`s and `MenuDivider`s, built once, on first
+    /// opening.
+    children: Children,
 ) -> impl IntoView {
     let panel_id = unique_id("ferrox-menu");
     let menu_id = format!("{panel_id}-items");
@@ -242,7 +243,7 @@ pub fn Menu(
                 built=opened_once.into()
                 context=context
                 on_toggle=on_toggle
-                items=ViewFn::from(move || children())
+                items=ViewFnOnce::from(children)
             />
         </div>
     }

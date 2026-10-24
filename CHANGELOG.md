@@ -32,6 +32,10 @@ From the names audit in `plans/agent-first.md` (piece 3).
   did: `open` is an `RwSignal<bool>`, and every dismissive way out (Esc,
   the ×, Cancel, a sheet's backdrop) sets it false itself. `on_close` /
   `on_cancel` are optional notices; drop `on_close=move || open.set(false)`.
+- Content built once takes a run-once closure, so closures inside it may
+  move values: `Menu`'s, `SplitButton`'s and `Panel`'s children
+  (`Children`), `ContextMenu`'s `menu`, `Card`'s and `Panel`'s `actions`,
+  `Menu`'s and `ContextMenu`'s `header` (`ViewFnOnce`).
 
 ### Added
 

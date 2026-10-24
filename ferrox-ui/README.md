@@ -61,6 +61,14 @@ call adds nothing.
   the value itself: `on_select=move |item| …`, `on_create=move |text| …`.
 - Every × is "close" (`on_close`, `close_label`); a dismissive button is
   "cancel" (`cancel_label`).
+- Content you hand a component (its children, `actions`, `header`, a
+  `ContextMenu`'s `menu`) is built once and kept, so closures inside it may
+  move values. The exceptions rebuild on purpose, and there a closure must
+  be able to run again (clone what it needs, or keep it in a signal): a
+  `Dialog`'s, `Sheet`'s and `ConfirmDialog`'s body and a `SideMenu`'s
+  contents (fresh on each opening), and `DataView`'s `item` and
+  `empty_view` (once per item, and each time the list empties). A callback
+  (`on_*`) can always run many times.
 - Components with a label or a title take `help` (a `HelpTopic`): see
   [Help](#help-in-core).
 

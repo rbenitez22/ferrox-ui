@@ -61,9 +61,9 @@ pub fn ContextMenu(
     /// The menu's accessible name: "Recipe actions".
     #[prop(into)] label: Signal<String>,
     /// `MenuItem`s, `MenuLink`s and `MenuDivider`s.
-    #[prop(into)] menu: ViewFn,
+    #[prop(into)] menu: ViewFnOnce,
     /// Shown above the items, outside the menu itself.
-    #[prop(optional, into)] header: Option<ViewFn>,
+    #[prop(optional, into)] header: Option<ViewFnOnce>,
     /// Leaves the browser's own menu in place.
     #[prop(optional, into)] disabled: Signal<bool>,
     /// Extra classes on the area's wrapper. May be reactive.

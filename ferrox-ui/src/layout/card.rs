@@ -41,7 +41,7 @@ pub fn Card(
     /// The whole card is this button. Not with `href`.
     #[prop(optional, into)] on_click: Option<UnsyncCallback<()>>,
     /// The card's own buttons, in its top-right corner.
-    #[prop(optional, into)] actions: Option<ViewFn>,
+    #[prop(optional, into)] actions: Option<ViewFnOnce>,
     #[prop(optional)] compact: bool,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,

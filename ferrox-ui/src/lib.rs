@@ -28,6 +28,8 @@ mod data;
 #[cfg(feature = "forms")]
 mod forms;
 mod ids;
+#[cfg(any(feature = "layout", feature = "menus"))]
+mod once;
 #[cfg(feature = "layout")]
 mod layout;
 #[cfg(feature = "menus")]

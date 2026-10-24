@@ -80,17 +80,16 @@ pub fn App() -> impl IntoView {
         confirming.set(false);
     };
 
-    // A card per item, its actions in a menu. The item goes in a
-    // `StoredValue` (which is `Copy`), because the menu may build its items
-    // more than once and every closure must be able to run again.
+    // A card per item, its actions in a menu.
     let card = move |item: Item| {
         let (title, id) = (item.name.clone(), item.id);
-        let this = StoredValue::new(item);
+        let label = format!("{} actions", item.name);
+        let renamed = item.clone();
         view! {
             <Card title=title actions=move || view! {
-                <Menu label=format!("{} actions", this.read_value().name) trigger=MenuTrigger::icon(MORE_VERTICAL, "More actions")>
-                    <MenuItem icon=EDIT on_select=move || open_rename(this.get_value())>"Rename"</MenuItem>
-                    <MenuItem icon=DELETE danger=true on_select=move || ask_delete(this.get_value())>"Delete"</MenuItem>
+                <Menu label=label trigger=MenuTrigger::icon(MORE_VERTICAL, "More actions")>
+                    <MenuItem icon=EDIT on_select=move || open_rename(renamed.clone())>"Rename"</MenuItem>
+                    <MenuItem icon=DELETE danger=true on_select=move || ask_delete(item.clone())>"Delete"</MenuItem>
                 </Menu>
             }>
                 <p>{format!("Item #{id}")}</p>
