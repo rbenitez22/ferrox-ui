@@ -19,8 +19,8 @@ plan, with the decisions and the full component inventory, is
 
 | Crate | What it is |
 |---|---|
-| `ferrox-theme` | Runtime theme switching (families, `system`/`light`/`dark`, stored choice), the pre-paint script, Leptos signals (feature `leptos`). *Moved in.* |
-| `ferrox-theme-build` | Build-script helper: the tokens, built-in themes and fonts; validates an app's theme files; writes the CSS file and fonts the app links in `index.html`. *Moved in.* |
+| `ferrox-theme` | Runtime theme switching (families, `system`/`light`/`dark`, stored choice), Leptos signals (feature `leptos`). *Moved in.* |
+| `ferrox-theme-build` | Build-script helper: the tokens, built-in themes and fonts; validates an app's theme files; writes the CSS file, fonts and pre-paint script the app links in `index.html`. *Moved in.* |
 | `ferrox-ui` | Primitives in feature groups: `core` (always on: `Button`, `IconButton`, `Toolbar`, `Spinner`, `LoadingOverlay`, `Alert`, help on any component (`HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`: a `?` with an offline topic, and context for an app's assistant); call `ferrox_ui::init()` before mounting to add their CSS), feature `overlay` (`Dialog`, `ConfirmDialog`, `Sheet`), feature `forms` (`Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox`), feature `navigation` (`NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton`), feature `layout` (`Panel`, also collapsible, and `Card`), feature `data` (`DataView` with infinite scroll, `DataLayoutSwitch`, `Pagination`), feature `menus` (`Menu`, `SplitButton`, `ContextMenu`). *Every group done: core, overlay, forms, navigation, layout, data and menus.* [README](ferrox-ui/README.md) |
 | `ferrox-icons` | SVG icons (Lucide), checked at build time: each icon a const (`CLOSE`), drawn by one `Icon` component. 20 icons so far, added as components need them. [README](ferrox-icons/README.md) |
 | `ferrox-charts` | Charts on the theme's chart tokens (later) |
@@ -56,12 +56,13 @@ ferrox-theme-build = { git = "https://github.com/rbenitez22/ferrox-ui", tag = "v
 // build.rs
 fn main() {
     ferrox_theme_build::embed_themes("style/themes");                 // the app's own themes (optional)
-    ferrox_theme_build::write_css("style/ferrox", Some("style/themes")); // CSS + fonts for index.html
+    ferrox_theme_build::write_css("style/ferrox", Some("style/themes")); // CSS, fonts, pre-paint script
 }
 ```
 
 ```html
-<!-- index.html <head>: the pre-paint script first (ferrox_theme::PREPAINT_SCRIPT), then -->
+<!-- index.html <head>: the pre-paint script first (inlined), then the stylesheet -->
+<link data-trunk rel="inline" href="style/ferrox/prepaint.js" />
 <link data-trunk rel="css" href="style/ferrox/ferrox.css" />
 <link data-trunk rel="copy-dir" href="style/ferrox/fonts" />
 ```

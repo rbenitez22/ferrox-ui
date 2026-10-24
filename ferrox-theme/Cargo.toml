@@ -19,3 +19,8 @@ web-sys      = { workspace = true, features = ["Window", "Document", "Element", 
 
 [build-dependencies]
 ferrox-theme-build = { path = "../ferrox-theme-build", version = "0.1.0" }
+
+# The pre-paint script lives in ferrox-theme-build; a test checks it reads
+# this crate's storage keys.
+[dev-dependencies]
+ferrox-theme-build = { path = "../ferrox-theme-build", version = "0.1.0" }

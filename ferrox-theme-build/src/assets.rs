@@ -13,8 +13,20 @@ pub const CSS_FILE: &str = "ferrox.css";
 /// The fonts folder's name inside the output directory.
 pub const FONTS_DIR: &str = "fonts";
 
-/// Writes `ferrox.css` (fonts, tokens, every theme, the loading screen) and
-/// `fonts/` into `out_dir`, relative to the crate root. `themes_dir`, if given,
+/// The pre-paint script's file name inside the output directory.
+pub const PREPAINT_FILE: &str = "prepaint.js";
+
+/// The pre-paint script, written as [`PREPAINT_FILE`]: `index.html` inlines
+/// it in `<head>`, before the stylesheet, with
+/// `<link data-trunk rel="inline" href="style/ferrox/prepaint.js" />`. It
+/// reads the saved choice (ferrox-theme's storage key, or the legacy
+/// webapp-lib one) and sets `data-theme` on `<html>`, so the first paint is
+/// already in the user's theme. It never changes when themes are added: the
+/// saved value carries the resolved light and dark ids.
+pub const PREPAINT_SCRIPT: &str = include_str!("../assets/prepaint.js");
+
+/// Writes `ferrox.css` (fonts, tokens, every theme, the loading screen),
+/// `fonts/` and `prepaint.js` into `out_dir`, relative to the crate root. `themes_dir`, if given,
 /// holds the app's own theme files; one with a built-in's id replaces it.
 ///
 /// Files are only rewritten when their content changes, so a watching
@@ -41,6 +53,7 @@ pub fn write_css(out_dir: &str, themes_dir: Option<&str>) {
     // the next cargo run re-runs this script and writes it again.
     println!("cargo:rerun-if-changed={}", out.join(CSS_FILE).display());
     println!("cargo:rerun-if-changed={}", out.join(FONTS_DIR).display());
+    println!("cargo:rerun-if-changed={}", out.join(PREPAINT_FILE).display());
 }
 
 /// The whole stylesheet. Order matters: tokens before themes, so
@@ -70,6 +83,7 @@ pub(crate) fn write_assets(out: &Path, app_themes: &[ThemeSource]) -> std::io::R
     let fonts = out.join(FONTS_DIR);
     fs::create_dir_all(&fonts)?;
     write_if_changed(&out.join(CSS_FILE), stylesheet(app_themes).as_bytes())?;
+    write_if_changed(&out.join(PREPAINT_FILE), PREPAINT_SCRIPT.as_bytes())?;
     for (name, bytes) in FONT_FILES {
         write_if_changed(&fonts.join(name), bytes)?;
     }
@@ -113,7 +127,7 @@ mod tests {
     }
 
     #[test]
-    fn writes_css_and_fonts_and_leaves_unchanged_files_alone() {
+    fn writes_css_fonts_and_prepaint_and_leaves_unchanged_files_alone() {
         let out = std::env::temp_dir().join(format!("ferrox-assets-{}", std::process::id()));
         write_assets(&out, &[]).unwrap();
         let css_path = out.join(CSS_FILE);
@@ -121,6 +135,7 @@ mod tests {
         for (name, bytes) in FONT_FILES {
             assert_eq!(&fs::read(out.join(FONTS_DIR).join(name)).unwrap(), bytes);
         }
+        assert_eq!(fs::read_to_string(out.join(PREPAINT_FILE)).unwrap(), PREPAINT_SCRIPT);
         let written = fs::metadata(&css_path).unwrap().modified().unwrap();
         std::thread::sleep(std::time::Duration::from_millis(20));
         write_assets(&out, &[]).unwrap();

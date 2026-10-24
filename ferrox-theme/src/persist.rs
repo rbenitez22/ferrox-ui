@@ -1,4 +1,5 @@
-//! The localStorage cache shared with [`super::PREPAINT_SCRIPT`].
+//! The localStorage cache shared with the pre-paint script
+//! (`ferrox_theme_build::PREPAINT_SCRIPT`).
 //!
 //! Stored as `family:mode:light-id:dark-id`. The first two fields are the
 //! choice. The last two are the resolved halves, so the pre-paint script picks
@@ -8,7 +9,7 @@
 use super::choice::ThemeChoice;
 use super::registry::ThemeFamily;
 
-/// localStorage key. Changing it means changing [`super::PREPAINT_SCRIPT`] too.
+/// localStorage key. Changing it means changing `ferrox_theme_build::PREPAINT_SCRIPT` too.
 pub const STORAGE_KEY: &str = "ferrox.theme";
 
 /// The key webapp-lib 1.0 pre-releases used. Read once if [`STORAGE_KEY`] is
@@ -48,6 +49,13 @@ pub(crate) fn write(value: &str) {
 
 #[cfg(test)]
 mod tests {
+
+    #[test]
+    fn the_prepaint_script_reads_these_keys() {
+        let script = ferrox_theme_build::PREPAINT_SCRIPT;
+        assert!(script.contains(&format!("'{STORAGE_KEY}'")));
+        assert!(script.contains(&format!("'{LEGACY_STORAGE_KEY}'")));
+    }
     use super::*;
     use crate::ThemeMode;
 

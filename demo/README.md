@@ -51,10 +51,10 @@ mode, plus the active `data-theme`) are on every page.
 - `build.rs` calls `ferrox_theme_build::embed_themes("style/themes")` (the
   demo's own themes, for `register`) and `write_css("style/ferrox", …)` (the
   stylesheet and fonts, into `style/ferrox/`, git-ignored).
-- `index.html` carries a copy of `ferrox_theme::PREPAINT_SCRIPT`, links
-  `style/ferrox/ferrox.css` and copies `style/ferrox/fonts`, and shows the
-  `.ferrox-loading` screen until the app mounts. `tests/prepaint.rs` fails if
-  the script copy drifts.
+- `index.html` inlines `style/ferrox/prepaint.js` (written by `write_css`,
+  so there's no copy to keep in step), links `style/ferrox/ferrox.css`,
+  copies `style/ferrox/fonts`, and shows the `.ferrox-loading` screen until
+  the app mounts.
 - `Trunk.toml` runs `cargo check` as a pre-build hook, because Trunk resolves
   `index.html`'s links before it runs cargo; without it a clean checkout fails
   to build. It also ignores `e2e/` and `style/ferrox/` when watching.

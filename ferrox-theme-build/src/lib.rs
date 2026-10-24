@@ -53,7 +53,7 @@ mod contract;
 mod embed;
 mod scan;
 
-pub use assets::{write_css, CSS_FILE, FONTS_DIR};
+pub use assets::{write_css, CSS_FILE, FONTS_DIR, PREPAINT_FILE, PREPAINT_SCRIPT};
 pub use builtin::builtin_sources;
 pub use contract::{default_label, family_of, is_valid_id, parse_theme, ThemeError, ThemeMeta, REQUIRED_TOKENS};
 pub use embed::{discover, embed_builtin_themes, embed_themes, embed_themes_for, render, ThemeSource, OUTPUT_FILE};

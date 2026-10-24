@@ -18,7 +18,9 @@
 //! ferrox_theme::set_choice(ThemeChoice::new("jamaica", ThemeMode::System));
 //! ```
 //!
-//! Put [`PREPAINT_SCRIPT`] in `index.html` so the first paint is already themed.
+//! `ferrox-theme-build` also writes `prepaint.js` beside the stylesheet;
+//! `index.html` inlines it (`<link data-trunk rel="inline"
+//! href="style/ferrox/prepaint.js" />`) so the first paint is already themed.
 //!
 //! With the `leptos` feature, [`provide_theme`] / [`use_theme`] give Leptos
 //! signals for the same state. Other code can watch changes with [`on_change`].
@@ -32,7 +34,6 @@ mod context;
 mod dom;
 mod listeners;
 mod persist;
-mod prepaint;
 mod registry;
 mod version;
 
@@ -43,7 +44,6 @@ pub use choice::{ThemeChoice, ThemeMode};
 pub use context::{provide_theme, use_theme, ThemeContext};
 pub use listeners::ListenerId;
 pub use persist::STORAGE_KEY;
-pub use prepaint::PREPAINT_SCRIPT;
 pub use registry::{builtin_themes, families, theme_files, ThemeFamily, ThemeFile, DEFAULT_FAMILY};
 pub use version::{check_build_version, VERSION};
 
