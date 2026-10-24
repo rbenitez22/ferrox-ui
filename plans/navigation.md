@@ -5,8 +5,8 @@ webapp-lib's `SideMenu` / `MenuLink` with a link list that works anywhere and
 a side menu built on `Sheet`. It ports the link styling of conrad's
 `.shell__nav-item` (`ui/src/app/shell.css`) and webapp-lib's `.side-menu a`.
 
-Status: approved (2026-10-23), all open points as recommended. Pieces 1–2
-done (2026-10-23); piece 3 (SideMenu, SideMenuButton) next.
+Status: approved (2026-10-23), all open points as recommended. Pieces 1–3
+done (2026-10-23); piece 4 (docs) next.
 
 Notes from piece 1:
 - leptos_router 0.8.17's `<A>` already treats `/` as current only on `/`
@@ -37,6 +37,26 @@ Notes from piece 2:
   again) aborts the first page's font loads, which Firefox logs as a console
   error. A test that starts on another route gets its own describe.
 - Release check: 334 e2e tests.
+
+Notes from piece 3:
+- `SideMenu` closes on a link click in a microtask, after the router has
+  handled the same click (the router finds the link through the event's
+  composed path), and only for the clicks the router handles: a plain left
+  click on an `<a href>` without `target`. A ctrl-click (new tab) leaves the
+  menu open. Route changes close it through `Effect::watch` on `pathname`
+  (not on the first run).
+- `children` is `ChildrenFn` (the sheet rebuilds its body on each opening),
+  kept in a `StoredValue`. `footer` is `Option<ViewFn>` with `into`, so a
+  plain closure converts (`Option<ChildrenFn>` doesn't).
+- `SideMenuButton` passes `aria-haspopup` / `aria-expanded` to its
+  `IconButton` with `attr:`.
+- The demo's own header now has the menu, outside the routes, as an app
+  would: a menu inside a page would unmount on every navigation and test
+  nothing.
+- Fixed a piece-2 bug the new tests exposed: `NavGroup`'s frame-later check
+  ran after a route change had unmounted the group and panicked on a disposed
+  node ref (`get_untracked`). It now uses `try_get_untracked` / `try_set`.
+- Release check: 358 e2e tests.
 
 ## Sources
 

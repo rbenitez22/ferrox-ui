@@ -1,0 +1,20 @@
+/* Side menus (`.side-menu`): a sheet holding the app's navigation. Part of
+   ferrox-ui `navigation`. Tokens only and class-only; the sheet itself is
+   `overlay`'s. */
+
+/* The links, then the footer pinned to the bottom of the sheet's body. */
+.side-menu__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-height: 100%;
+}
+
+/* Pinned below the links; a hairline splits it off. */
+.side-menu__footer {
+  margin-top: auto;
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--line);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}

@@ -2,6 +2,7 @@
 //! and the target of the Playwright e2e tests. One page per area.
 
 mod app;
+mod menu;
 mod pages;
 mod section;
 mod swatch;

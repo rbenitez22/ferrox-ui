@@ -240,3 +240,123 @@ test.describe('NavGroup, opened inside it', () => {
     await expect(button).toHaveAttribute('aria-expanded', 'false');
   });
 });
+
+// SideMenu and SideMenuButton: the demo's own menu, in its header (src/menu.rs).
+test.describe('SideMenu', () => {
+  test.beforeEach(async ({ page }) => {
+    await openApp(page, '/navigation');
+  });
+
+  function menuButton(page: Page): Locator {
+    return page.getByRole('button', { name: 'Menu', exact: true });
+  }
+
+  function menu(page: Page): Locator {
+    return page.getByRole('dialog', { name: 'ferrox-ui demo' });
+  }
+
+  async function openMenu(page: Page): Promise<Locator> {
+    await menuButton(page).click();
+    await expect(menu(page)).toBeVisible();
+    return menu(page);
+  }
+
+  test('the button says it opens a dialog, and whether it is open', async ({ page }) => {
+    const button = menuButton(page);
+    await expect(button).toHaveAttribute('aria-haspopup', 'dialog');
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
+    await expect(button.locator('svg')).toHaveAttribute('data-icon', 'menu');
+
+    await openMenu(page);
+    await expect(button).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  test('it opens as a modal sheet named by its title, holding a labelled nav', async ({ page }) => {
+    const sheet = await openMenu(page);
+    await expect(sheet).toHaveClass(/\bsheet\b/);
+    await expect(sheet).toHaveClass(/\bside-menu\b/);
+    expect(await sheet.evaluate((el) => el.matches(':modal'))).toBe(true);
+    await expect(sheet.getByRole('navigation', { name: 'Sections' }).getByRole('link', { name: 'Buttons' })).toBeVisible();
+  });
+
+  test('following a link navigates and closes it', async ({ page }) => {
+    const sheet = await openMenu(page);
+    await sheet.getByRole('link', { name: 'Buttons' }).click();
+    await expect(page).toHaveURL(/\/buttons$/);
+    await expect(sheet).toBeHidden();
+    await expect(menuButton(page)).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('a plain router link closes it too', async ({ page }) => {
+    const sheet = await openMenu(page);
+    await sheet.getByRole('link', { name: 'About help' }).click();
+    await expect(page).toHaveURL(/\/help$/);
+    await expect(sheet).toBeHidden();
+  });
+
+  test("the current page's link closes it, though the route stays", async ({ page }) => {
+    const sheet = await openMenu(page);
+    const current = sheet.getByRole('link', { name: 'Navigation', exact: true });
+    await expect(current).toHaveAttribute('aria-current', 'page');
+    await current.click();
+    await expect(sheet).toBeHidden();
+    await expect(page).toHaveURL(/\/navigation$/);
+  });
+
+  test('the back button closes it', async ({ page }) => {
+    await nav(page, 'Nested').getByRole('link', { name: 'Details' }).click();
+    await expect(page).toHaveURL(/\/navigation\/details$/);
+    const sheet = await openMenu(page);
+    await page.goBack();
+    await expect(page).toHaveURL(/\/navigation$/);
+    await expect(sheet).toBeHidden();
+  });
+
+  for (const [way, close] of [
+    ['Esc', async (page: Page) => page.keyboard.press('Escape')],
+    ['the ×', async (page: Page) => menu(page).getByRole('button', { name: 'Close' }).click()],
+    ['the backdrop', async (page: Page) => page.mouse.click(380, 400)],
+  ] as const) {
+    test(`${way} closes it, and focus returns to the button`, async ({ page }) => {
+      await page.setViewportSize({ width: 400, height: 800 });
+      await openMenu(page);
+      await close(page);
+      await expect(menu(page)).toBeHidden();
+      await expect(menuButton(page)).toBeFocused();
+      await expect(menuButton(page)).toHaveAttribute('aria-expanded', 'false');
+    });
+  }
+
+  test('the footer sits at the bottom of the sheet', async ({ page }) => {
+    const sheet = await openMenu(page);
+    const footer = sheet.locator('.side-menu__footer');
+    await expect(footer).toBeVisible();
+    const sheetBox = await box(sheet);
+    const footerBox = await box(footer);
+    expect(sheetBox.y + sheetBox.height - (footerBox.y + footerBox.height)).toBeLessThan(48);
+  });
+
+  test('help puts a ? in the title bar', async ({ page }) => {
+    const sheet = await openMenu(page);
+    await expect(sheet.locator('.sheet__title-bar').getByRole('button', { name: 'Help: The demo menu' })).toBeVisible();
+  });
+
+  test('a collapsible group starts collapsed on each opening, unless the current page is in it', async ({ page }) => {
+    let sheet = await openMenu(page);
+    const group = () => menu(page).getByRole('button', { name: 'Navigation pages' });
+    // On /navigation: the group holds the current page.
+    await expect(group()).toHaveAttribute('aria-expanded', 'true');
+
+    await sheet.getByRole('link', { name: 'Buttons' }).click();
+    await expect(page).toHaveURL(/\/buttons$/);
+    sheet = await openMenu(page);
+    await expect(group()).toHaveAttribute('aria-expanded', 'false');
+
+    await group().click();
+    await expect(group()).toHaveAttribute('aria-expanded', 'true');
+    await page.keyboard.press('Escape');
+    await expect(sheet).toBeHidden();
+    await openMenu(page);
+    await expect(group()).toHaveAttribute('aria-expanded', 'false');
+  });
+});

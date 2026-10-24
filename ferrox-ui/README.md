@@ -34,7 +34,7 @@ call adds nothing.
 | `core` | always on | `Button`, `IconButton`, `Toolbar`, `ToolbarGroup`, `Spinner`, `LoadingOverlay`, `Alert`; help: `HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`, `HelpRequest` |
 | `overlay` | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
 | `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
-| `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`; `SideMenu` coming (`plans/navigation.md`; documented with the group's last piece, see the rustdoc meanwhile) |
+| `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` (`plans/navigation.md`; documented with the group's last piece, see the rustdoc meanwhile) |
 | `menus`, `layout`, `data` | one each, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)

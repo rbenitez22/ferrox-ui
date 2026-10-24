@@ -104,10 +104,12 @@ fn expand_on_arrival(list_ref: NodeRef<Ul>, expanded: RwSignal<bool>) {
     let location = use_location();
     Effect::new(move |_| {
         location.pathname.track();
-        // A frame later, once the router has moved `aria-current`.
+        // A frame later, once the router has moved `aria-current`. By then
+        // the route change may have unmounted the group, so nothing here may
+        // assume it still exists.
         request_animation_frame(move || {
-            if list_ref.get_untracked().is_some_and(|list| holds_current_page(&list)) {
-                expanded.set(true);
+            if list_ref.try_get_untracked().flatten().is_some_and(|list| holds_current_page(&list)) {
+                expanded.try_set(true);
             }
         });
     });

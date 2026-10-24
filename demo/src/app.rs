@@ -1,20 +1,25 @@
-//! Router and page frame: a header with page links and the theme bar, then the page.
+//! Router and page frame: a header with the menu button and page links, the
+//! side menu, the theme bar, then the page.
 
 use ferrox_theme::provide_theme;
+use ferrox_ui::SideMenuButton;
 use leptos::prelude::*;
 use leptos_router::components::{Route, Router, Routes, A};
 use leptos_router::path;
 
+use crate::menu::DemoMenu;
 use crate::pages::{buttons::ButtonsPage, feedback::FeedbackPage, forms::FormsPage, help::HelpPage, icons::IconsPage, navigation::NavigationPage, overlay::OverlayPage, themes::ThemesPage};
 use crate::theme_bar::ThemeBar;
 
 #[component]
 pub fn App() -> impl IntoView {
     provide_theme();
+    let menu = RwSignal::new(false);
     view! {
         <Router>
             <div class="demo-app">
                 <header class="demo-header">
+                    <SideMenuButton open=menu />
                     <span class="demo-title">"ferrox-ui demo"</span>
                     <nav class="demo-nav">
                         <A href="/">"Themes"</A>
@@ -27,6 +32,7 @@ pub fn App() -> impl IntoView {
                         <A href="/navigation">"Navigation"</A>
                     </nav>
                 </header>
+                <DemoMenu open=menu />
                 <ThemeBar />
                 <main class="demo-main">
                     <Routes fallback=|| view! { <p>"Page not found."</p> }>

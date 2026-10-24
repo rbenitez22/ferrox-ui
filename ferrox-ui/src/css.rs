@@ -39,10 +39,11 @@ const FORMS: &[(&str, &str)] = &[
 #[cfg(not(feature = "forms"))]
 const FORMS: &[(&str, &str)] = &[];
 
-/// `navigation`: the link list.
+/// `navigation`: the link list, then the side menu.
 #[cfg(feature = "navigation")]
 const NAVIGATION: &[(&str, &str)] = &[
     ("ferrox-ui-nav", include_str!("../style/navigation/nav.css")),
+    ("ferrox-ui-side-menu", include_str!("../style/navigation/side-menu.css")),
 ];
 #[cfg(not(feature = "navigation"))]
 const NAVIGATION: &[(&str, &str)] = &[];
