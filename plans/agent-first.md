@@ -295,9 +295,8 @@ To keep the three from drifting apart:
   a spec); the shared test suite is what keeps them the same.
 - **One test suite for both.** The same fixtures and expected output run
   against the bash and the PowerShell version, so they must agree line for
-  line. PowerShell runs in CI and locally through `pwsh` on Linux (not
-  installed on this machine yet: the test skips it with a clear message
-  until it is).
+  line. PowerShell runs locally through `pwsh` on Linux (installed here);
+  on a machine without it, that half skips with a clear message.
 
 ### 8c. The front door
 
