@@ -119,3 +119,124 @@ test.describe('NavLink', () => {
     expect((await box(link)).height).toBeGreaterThanOrEqual(44);
   });
 });
+
+test.describe('NavGroup', () => {
+  test.beforeEach(async ({ page }) => {
+    await openApp(page, '/navigation');
+  });
+
+  /** A collapsible group's toggle, in the list named `list`. */
+  function toggle(page: Page, list: string, group: string): Locator {
+    return nav(page, list).getByRole('button', { name: group });
+  }
+
+  /** The list a toggle controls (found by id, so also while it's hidden). */
+  async function controlled(page: Page, button: Locator): Promise<Locator> {
+    const id = await button.getAttribute('aria-controls');
+    if (!id) throw new Error('toggle has no aria-controls');
+    return page.locator(`[id="${id}"]`);
+  }
+
+  test('a plain group: its heading names its list, a hairline splits it off, the heading is not focusable', async ({ page }) => {
+    const grouped = nav(page, 'Grouped');
+    const account = grouped.getByRole('list', { name: 'Account' });
+    await expect(account.getByRole('link')).toHaveCount(2);
+
+    const group = account.locator('xpath=..');
+    await expect(group).toHaveClass(/\bnav-group\b/);
+    expect(await group.evaluate((el) => getComputedStyle(el).borderTopWidth)).toBe('1px');
+
+    const heading = group.locator('.nav-group__heading');
+    await expect(heading).toHaveText(/account/i);
+    expect(await heading.evaluate((el) => (el as HTMLElement).tabIndex)).toBe(-1);
+    await expect(grouped.getByRole('button', { name: 'Account' })).toHaveCount(0);
+  });
+
+  test('a collapsible group starts collapsed; its toggle shows and hides the links', async ({ page }) => {
+    const button = toggle(page, 'Grouped', 'Product database');
+    const list = await controlled(page, button);
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
+    await expect(list).toBeHidden();
+
+    await button.click();
+    await expect(button).toHaveAttribute('aria-expanded', 'true');
+    await expect(list).toBeVisible();
+    await expect(nav(page, 'Grouped').getByRole('list', { name: 'Product database' }).getByRole('link')).toHaveCount(3);
+
+    await button.click();
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
+    await expect(list).toBeHidden();
+  });
+
+  test('Enter and Space toggle it', async ({ page }) => {
+    const button = toggle(page, 'Grouped', 'Product database');
+    await button.focus();
+    await page.keyboard.press('Enter');
+    await expect(button).toHaveAttribute('aria-expanded', 'true');
+    await page.keyboard.press('Space');
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('the chevron turns while expanded', async ({ page }) => {
+    const button = toggle(page, 'Grouped', 'Product database');
+    const chevron = button.locator('svg.nav-group__chevron');
+    await expect(chevron).toHaveAttribute('aria-hidden', 'true');
+    await expect(chevron).toHaveCSS('transform', 'none');
+    await button.click();
+    await expect(chevron).not.toHaveCSS('transform', 'none');
+  });
+
+  test('Tab skips the links of a collapsed group', async ({ page }) => {
+    await toggle(page, 'Grouped', 'Product database').focus();
+    await page.keyboard.press('Tab');
+    await expect(nav(page, 'Grouped').getByRole('link', { name: 'Help' })).toBeFocused();
+  });
+
+  test('start_expanded starts it expanded', async ({ page }) => {
+    const button = toggle(page, 'Group states', 'Starts expanded');
+    await expect(button).toHaveAttribute('aria-expanded', 'true');
+    await expect(await controlled(page, button)).toBeVisible();
+  });
+
+  test('an owned state is two-way', async ({ page }) => {
+    const button = toggle(page, 'Group states', 'Owned by the page');
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
+
+    await page.getByRole('button', { name: 'Toggle from code' }).click();
+    await expect(button).toHaveAttribute('aria-expanded', 'true');
+
+    await button.click();
+    await expect(page.getByText('Owned group: collapsed')).toBeVisible();
+  });
+
+  test('a collapsed group expands itself when the route moves to one of its links', async ({ page }) => {
+    const button = toggle(page, 'Grouped', 'Product database');
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
+
+    await nav(page, 'Nested').getByRole('link', { name: 'Details' }).click();
+    await expect(page).toHaveURL(/\/navigation\/details$/);
+    await expect(button).toHaveAttribute('aria-expanded', 'true');
+    await expect(nav(page, 'Grouped').getByRole('link', { name: 'Details' })).toHaveAttribute('aria-current', 'page');
+  });
+
+  test('a toggle is at least 44px tall on a phone', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect((await box(toggle(page, 'Grouped', 'Product database'))).height).toBeGreaterThanOrEqual(44);
+  });
+});
+
+// Opened straight on a page inside a group: its own describe, so the page is
+// opened once (a second navigation aborts font loads, an error in Firefox).
+test.describe('NavGroup, opened inside it', () => {
+  test.beforeEach(async ({ page }) => {
+    await openApp(page, '/navigation/details');
+  });
+
+  test('a group holding the page it opens on starts expanded, and can still be collapsed', async ({ page }) => {
+    const button = nav(page, 'Grouped').getByRole('button', { name: 'Product database' });
+    await expect(button).toHaveAttribute('aria-expanded', 'true');
+
+    await button.click();
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
+  });
+});

@@ -3,7 +3,7 @@
 //! path below its own.
 
 use ferrox_icons::{HELP, MENU, SEARCH};
-use ferrox_ui::{NavLink, NavList};
+use ferrox_ui::{Button, ButtonFamily, ButtonSize, NavGroup, NavLink, NavList};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -14,6 +14,8 @@ pub fn NavigationPage() -> impl IntoView {
         <LinkList />
         <WithIcons />
         <Nested />
+        <Groups />
+        <GroupStates />
     }
 }
 
@@ -64,6 +66,60 @@ fn Nested() -> impl IntoView {
                     <NavLink href="/navigation" exact=true>"Navigation only"</NavLink>
                     <NavLink href="/navigation/details">"Details"</NavLink>
                 </NavList>
+            </div>
+        </Section>
+    }
+}
+
+/// The shopping-list menu's shape: the app's own pages, then a collapsible
+/// group (holding `/navigation/details`, so arriving there expands it) and a
+/// plain one.
+#[component]
+fn Groups() -> impl IntoView {
+    view! {
+        <Section title="Groups">
+            <div class="demo-nav-column">
+                <NavList label="Grouped">
+                    <NavLink href="/">"Themes"</NavLink>
+                    <NavLink href="/forms">"Forms"</NavLink>
+                    <NavGroup label="Product database" collapsible=true>
+                        <NavLink href="/navigation/details">"Details"</NavLink>
+                        <NavLink href="/buttons">"Buttons"</NavLink>
+                        <NavLink href="/icons">"Icons"</NavLink>
+                    </NavGroup>
+                    <NavGroup label="Account">
+                        <NavLink href="/help">"Help"</NavLink>
+                        <NavLink href="/overlay">"Overlay"</NavLink>
+                    </NavGroup>
+                </NavList>
+            </div>
+        </Section>
+    }
+}
+
+/// `start_expanded`, and a group whose state the page owns.
+#[component]
+fn GroupStates() -> impl IntoView {
+    let remembered = RwSignal::new(false);
+    view! {
+        <Section title="Group states">
+            <div class="demo-nav-column">
+                <NavList label="Group states">
+                    <NavGroup label="Starts expanded" collapsible=true start_expanded=true>
+                        <NavLink href="/feedback">"Feedback"</NavLink>
+                    </NavGroup>
+                    <NavGroup label="Owned by the page" collapsible=true expanded=remembered>
+                        <NavLink href="/overlay">"Overlay"</NavLink>
+                    </NavGroup>
+                </NavList>
+            </div>
+            <div class="demo-row">
+                <Button family=ButtonFamily::Secondary size=ButtonSize::Sm on_click=move |_| remembered.update(|e| *e = !*e)>
+                    "Toggle from code"
+                </Button>
+                <span>
+                    {move || if remembered.get() { "Owned group: expanded" } else { "Owned group: collapsed" }}
+                </span>
             </div>
         </Section>
     }

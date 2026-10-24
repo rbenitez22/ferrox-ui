@@ -2,9 +2,10 @@
    marked. Part of ferrox-ui `navigation`. Tokens only and class-only. The
    link look is ported from conrad's sidebar items. */
 
-/* ── The list: a column of full-width rows ── */
+/* ── The list, and a group's own list: a column of full-width rows ── */
 
-.nav-list__items {
+.nav-list__items,
+.nav-group__list {
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -69,6 +70,96 @@
 /* Phone: rows a thumb can hit. */
 @media (max-width: 768px) {
   .nav-link {
+    min-height: 2.75rem;
+  }
+}
+
+/* ── A group: a heading, then its own list of links ── */
+
+/* A hairline splits a group from what comes before it. */
+.nav-group:not(:first-child) {
+  margin-top: var(--space-xs);
+  padding-top: var(--space-xs);
+  border-top: 1px solid var(--line);
+}
+
+/* The heading names the group and steps back from the links: small, muted,
+   set as a label (from conrad's sidebar). The toggle shares the look. */
+.nav-group__heading,
+.nav-group__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.6em 1.4em 0.3em;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* A collapsed group's list. The rule above would otherwise beat the
+   browser's own `[hidden]`. */
+.nav-group__list[hidden] {
+  display: none;
+}
+
+/* ── A collapsible group's heading is a button ── */
+
+.nav-group__toggle {
+  padding-bottom: 0.6em;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.nav-group__label {
+  flex: 1 1 auto;
+}
+
+/* Answers the pointer in colour only, as a link does. */
+.nav-group__toggle:hover {
+  color: var(--text);
+  background: var(--primary-tint);
+}
+
+.nav-group__toggle:active {
+  background: var(--primary-tint-strong);
+}
+
+.nav-group__toggle:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: calc(-1 * var(--focus-ring-width));
+}
+
+/* The chevron points at the links: right while they're hidden, down once
+   they show. */
+.nav-group__chevron {
+  flex: 0 0 auto;
+  font-size: 1.4em;
+  transition: transform var(--transition-fast);
+}
+
+.nav-group__toggle[aria-expanded='true'] .nav-group__chevron {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-group__chevron {
+    transition: none;
+  }
+}
+
+/* Phone: a toggle a thumb can hit. */
+@media (max-width: 768px) {
+  .nav-group__toggle {
     min-height: 2.75rem;
   }
 }

@@ -5,8 +5,8 @@ webapp-lib's `SideMenu` / `MenuLink` with a link list that works anywhere and
 a side menu built on `Sheet`. It ports the link styling of conrad's
 `.shell__nav-item` (`ui/src/app/shell.css`) and webapp-lib's `.side-menu a`.
 
-Status: approved (2026-10-23), all open points as recommended. Piece 1 done
-(2026-10-23); piece 2 (NavGroup) next.
+Status: approved (2026-10-23), all open points as recommended. Pieces 1–2
+done (2026-10-23); piece 3 (SideMenu, SideMenuButton) next.
 
 Notes from piece 1:
 - leptos_router 0.8.17's `<A>` already treats `/` as current only on `/`
@@ -21,6 +21,22 @@ Notes from piece 1:
   "the toggle sits inside the field") failed once under the full parallel
   run, then passed 3/3 alone and in two full runs: a load-dependent flake,
   as the fonts one in themes.spec.ts.
+
+Notes from piece 2:
+- The group's heading sits in its own `<li>` with the nested `<ul
+  aria-labelledby>`; the chevron sits at the row's right end and turns 90°
+  (not under reduced motion).
+- `.nav-group__list` shares the list rule with `.nav-list__items`, so it
+  needs `.nav-group__list[hidden] { display: none }`: a class's `display`
+  beats the browser's own `[hidden]`.
+- Expanding on arrival: an `Effect` on the router's `pathname`, then a frame
+  later (once `<A>` has moved `aria-current`) a DOM check of the group's own
+  list. On arrival only, so the user can still collapse the group around the
+  current page.
+- e2e trap: opening a second page in a test (beforeEach, then `openApp`
+  again) aborts the first page's font loads, which Firefox logs as a console
+  error. A test that starts on another route gets its own describe.
+- Release check: 334 e2e tests.
 
 ## Sources
 
