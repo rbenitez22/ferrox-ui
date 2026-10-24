@@ -329,6 +329,53 @@ installed. Recorded:
 tokens used, docs read, compile-fix rounds, and the drift check's findings
 on the result. Run once now (baseline) and once at the end.
 
+## Baseline (piece 1, 2026-10-24)
+
+The reference task, as a developer would say it, to a fresh agent (Sonnet,
+`general-purpose`, no skills, no memory, only the repo's files): a new
+Leptos CSR app with a recipes list page (add in a dialog, row actions:
+edit, delete with confirm; empty, loading and error states; in-memory data
+with a 500 ms load), ferrox-ui by path, done when `trunk build` passes.
+The "after" run (piece 10) uses the same model and wording.
+
+| Measure | Baseline |
+|---|---|
+| Tokens | **68,009** |
+| Tool calls | 13 |
+| Time | 1 min 48 s |
+| Build rounds | 2 (one compile error) |
+| ferrox-ui docs read | the root README; about 650 of the crate README's 1,671 lines, in 7 slices, found by grepping its headings; the demo's `Cargo.toml`, `build.rs`, `Trunk.toml`, `index.html`, `main.rs`; three crates' sources searched for setup functions |
+| App written | 187 lines (`app.rs` 163) |
+
+What it built, against the rules this plan will write down:
+- Components: `Panel` (H1, a `+` in `actions`), `DataView` (List, loading,
+  error, retry, an empty view), `IconButton`s, `Dialog`, `Field`,
+  `Input`, `ConfirmDialog`. Good choices, mostly.
+- **Drift:** each row is a hand-made `<div class="recipe-row">` with **no
+  CSS behind it**: the name and the Edit / Delete buttons sit unstyled side
+  by side. No row component or recipe told it what a row looks like. It
+  used two `IconButton`s, not a row `Menu`, so its rows differ from the
+  demo's.
+- **Unfinished:** the error state is wired, but nothing can trigger it.
+
+Where the docs failed it (its own report, confirmed in its code):
+1. The README says depend on a tag, "never a branch or a local path", and
+   the tag doesn't exist (→ piece 2, front door).
+2. The theme setup is documented only with app themes (`embed_themes`,
+   `register`); whether the minimal setup (`write_css(…, None)`, `init()`)
+   is supported isn't said. The pre-paint script in `index.html` isn't
+   mentioned, so it left it out (a theme flash) (→ piece 2, the starter).
+3. `DataView`'s `key_of` must return `String`; nothing says so. Its tuple
+   key was the one compile error (→ piece 5, signatures in the index).
+4. No row template or list-item pattern; the README only shows `Card`
+   (→ piece 6, recipes; perhaps a row component, to decide then).
+5. Prop types it had to guess: `Dialog`'s `title`, `DataView`'s
+   `empty_view` (→ piece 5).
+6. Timers: it added `gloo-timers` itself for the simulated load (→ the
+   starter or a recipe shows the idiom: Leptos' `set_timeout`).
+7. Finding things cost it a heading grep and seven slices of one big file
+   (→ piece 5, the index and per-component pages).
+
 ## Pieces
 
 Each is small and reviewed on its own.
