@@ -239,7 +239,6 @@ fn Comboboxes() -> impl IntoView {
             <Dialog
                 open=dialog_open
                 title="Move a split"
-                on_close=move || dialog_open.set(false)
                 affirm=DialogAction::new("Save", move || { saves.update(|n| *n += 1); dialog_open.set(false); })
             >
                 <Field label="To account">

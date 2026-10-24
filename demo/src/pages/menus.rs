@@ -76,7 +76,7 @@ pub fn MenusPage() -> impl IntoView {
                 <dt>"book"</dt><dd data-echo="book">{move || book.get()}</dd>
                 <dt>"chosen"</dt><dd data-echo="chosen">{move || chosen.get().join(", ")}</dd>
             </dl>
-            <Dialog open=dialog_open title="Move a recipe" on_close=move || dialog_open.set(false)>
+            <Dialog open=dialog_open title="Move a recipe">
                 <p>"Where to?"</p>
                 <Menu label="Destinations" trigger=MenuTrigger::button("Destination")>
                     <MenuItem on_select=choose("to breakfast")>"Breakfast"</MenuItem>

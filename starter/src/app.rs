@@ -65,13 +65,19 @@ pub fn App() -> impl IntoView {
         dialog_open.set(false);
     };
 
-    // Deleting asks first, naming what goes.
+    // Deleting asks first, naming what goes. Cancel, × and Esc close the
+    // confirmation themselves; confirming closes it when the delete is done.
+    let confirming = RwSignal::new(false);
     let to_delete = RwSignal::new(None::<Item>);
+    let ask_delete = move |item: Item| {
+        to_delete.set(Some(item));
+        confirming.set(true);
+    };
     let delete = move || {
         if let Some(gone) = to_delete.get_untracked() {
             items.update(|all| all.retain(|i| i.id != gone.id));
         }
-        to_delete.set(None);
+        confirming.set(false);
     };
 
     // A card per item, its actions in a menu. The item goes in a
@@ -84,7 +90,7 @@ pub fn App() -> impl IntoView {
             <Card title=title actions=move || view! {
                 <Menu label=format!("{} actions", this.read_value().name) trigger=MenuTrigger::icon(MORE_VERTICAL, "More actions")>
                     <MenuItem icon=EDIT on_select=move || open_rename(this.get_value())>"Rename"</MenuItem>
-                    <MenuItem icon=DELETE danger=true on_select=move || to_delete.set(Some(this.get_value()))>"Delete"</MenuItem>
+                    <MenuItem icon=DELETE danger=true on_select=move || ask_delete(this.get_value())>"Delete"</MenuItem>
                 </Menu>
             }>
                 <p>{format!("Item #{id}")}</p>
@@ -118,7 +124,6 @@ pub fn App() -> impl IntoView {
         <Dialog
             open=dialog_open
             title=Signal::derive(move || if editing.get().is_some() { "Rename item".to_string() } else { "Add item".to_string() })
-            on_close=move || dialog_open.set(false)
             affirm=DialogAction::new("Save", save)
         >
             <Field label="Name">
@@ -126,11 +131,10 @@ pub fn App() -> impl IntoView {
             </Field>
         </Dialog>
         <ConfirmDialog
-            open=Signal::derive(move || to_delete.get().is_some())
+            open=confirming
             title="Delete item?"
             confirm_label="Delete"
             on_confirm=delete
-            on_cancel=move || to_delete.set(None)
         >
             <p>{move || format!("This deletes “{}”.", to_delete.get().map(|i| i.name).unwrap_or_default())}</p>
         </ConfirmDialog>

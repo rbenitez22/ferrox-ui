@@ -13,8 +13,9 @@ use crate::{ButtonFamily, MaybeHelp};
 ///   is read at a glance.
 /// - The body names exactly what is about to be lost.
 /// - `on_confirm` runs the action; set `saving` while the request runs (the
-///   button sweeps and refuses clicks) and close the dialog when it is done.
-///   Cancel, the × and Esc call `on_cancel`.
+///   button sweeps and refuses clicks) and set `open` false when it is done.
+///   Cancel, the × and Esc close it themselves, then call `on_cancel`, if
+///   given.
 ///
 /// ```ignore
 /// <ConfirmDialog
@@ -23,18 +24,18 @@ use crate::{ButtonFamily, MaybeHelp};
 ///     confirm_label="Delete"
 ///     saving=deleting
 ///     on_confirm=move || delete_account()
-///     on_cancel=move || confirming.set(false)
 /// >
 ///     <p>"This deletes “Groceries” and its 214 transactions."</p>
 /// </ConfirmDialog>
 /// ```
 #[component]
 pub fn ConfirmDialog(
-    #[prop(into)] open: Signal<bool>,
+    open: RwSignal<bool>,
     #[prop(into)] title: Signal<String>,
     #[prop(into)] confirm_label: Signal<String>,
     #[prop(into)] on_confirm: UnsyncCallback<()>,
-    #[prop(into)] on_cancel: UnsyncCallback<()>,
+    /// Told after a dismissive close (Cancel, the ×, Esc).
+    #[prop(optional, into)] on_cancel: Option<UnsyncCallback<()>>,
     #[prop(optional, into)] saving: Signal<bool>,
     /// The Cancel button's label.
     #[prop(into, default = "Cancel".into())] cancel_label: Signal<String>,
@@ -51,6 +52,11 @@ pub fn ConfirmDialog(
         saving,
         disabled: Signal::stored(false),
     };
+    let on_cancel = UnsyncCallback::new(move |_| {
+        if let Some(on_cancel) = on_cancel {
+            on_cancel.run(());
+        }
+    });
     view! {
         <Dialog
             open=open

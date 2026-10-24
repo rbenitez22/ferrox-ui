@@ -4,7 +4,7 @@ use leptos::{component, view, IntoView};
 use wasm_bindgen::JsCast;
 use web_sys::{Element, MouseEvent};
 
-use super::modal::Modal;
+use super::modal::{closer, Modal};
 use crate::ids::unique_id;
 use crate::core::component_help;
 use crate::{IconButton, MaybeHelp};
@@ -51,22 +51,23 @@ pub fn sheet_classes(side: SheetSide, extra: &str) -> String {
 /// with `showModal()`: the page behind is inert, focus stays inside and
 /// returns to the opener, the page does not scroll.
 ///
-/// - `open` drives it; a click on the backdrop, the × and Esc call
-///   `on_close`. (A `Dialog` ignores the backdrop, so a stray click cannot
+/// - `open` drives it, both ways: a click on the backdrop, the × and Esc set
+///   it false, then call `on_close`, if given. (A `Dialog` ignores the backdrop, so a stray click cannot
 ///   throw away typed input; a sheet holds navigation or details.)
 /// - It slides in over `--react-time`; under reduced motion it just appears.
 ///   Closing never waits on an animation.
 /// - The body is mounted only while open.
 ///
 /// ```ignore
-/// <Sheet open=menu_open title="Menu" on_close=move || menu_open.set(false)>
+/// <Sheet open=menu_open title="Menu">
 ///     <nav>…</nav>
 /// </Sheet>
 /// ```
 #[component]
 pub fn Sheet(
-    #[prop(into)] open: Signal<bool>,
-    #[prop(into)] on_close: UnsyncCallback<()>,
+    open: RwSignal<bool>,
+    /// Told after a dismissive close (the backdrop, the ×, Esc).
+    #[prop(optional, into)] on_close: Option<UnsyncCallback<()>>,
     #[prop(optional)] side: SheetSide,
     /// Shown in the title bar; also the sheet's accessible name.
     #[prop(into)] title: Signal<String>,
@@ -78,7 +79,8 @@ pub fn Sheet(
     #[prop(optional, into)] class: MaybeProp<String>,
     children: ChildrenFn,
 ) -> impl IntoView {
-    let modal = Modal::new(open, on_close);
+    let on_close = closer(open, on_close);
+    let modal = Modal::new(open.into(), on_close);
     let (on_cancel, on_closed) = (modal.on_cancel(), modal.on_closed());
     let title_id = unique_id("ferrox-sheet-title");
     let labelled_by = title_id.clone();

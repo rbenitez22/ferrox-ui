@@ -74,7 +74,7 @@ fn FormDialog(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
         <Dialog
             open=open
             title="Edit account"
-            on_close=move || { open.set(false); note("form: closed"); }
+            on_close=move || note("form: closed")
             affirm=DialogAction::new("Save", save).saving(saving)
             alternate=DialogAction::new("Save as draft", draft)
         >
@@ -94,7 +94,7 @@ fn WideDialog(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
             open=open
             title="Splits"
             size=DialogSize::Wide
-            on_close=move || { open.set(false); note("wide: closed"); }
+            on_close=move || note("wide: closed")
             affirm=DialogAction::new("Done", move || { open.set(false); note("wide: done"); })
         >
             <table class="demo-table">
@@ -118,7 +118,7 @@ fn NoDismissDialog(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
             open=open
             title="Saved"
             no_cancel=true
-            on_close=move || { open.set(false); note("notice: closed"); }
+            on_close=move || note("notice: closed")
             affirm=DialogAction::new("Got it", move || { open.set(false); note("notice: ok"); })
         >
             <p>"Your changes were saved."</p>
@@ -136,14 +136,14 @@ fn NestedDialogs(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
         <Dialog
             open=outer
             title="Outer"
-            on_close=move || { outer.set(false); note("outer: closed"); }
+            on_close=move || note("outer: closed")
         >
             <Button on_click=move || inner.set(true)>"Open the inner dialog"</Button>
         </Dialog>
         <Dialog
             open=inner
             title="Inner"
-            on_close=move || { inner.set(false); note("inner: closed"); }
+            on_close=move || note("inner: closed")
             affirm=DialogAction::new("Done", move || { inner.set(false); note("inner: done"); })
         >
             <p>"A second modal on top of the first."</p>
@@ -174,7 +174,7 @@ fn DeleteConfirm(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
             confirm_label="Delete"
             saving=deleting
             on_confirm=delete
-            on_cancel=move || { open.set(false); note("confirm: cancelled"); }
+            on_cancel=move || note("confirm: cancelled")
         >
             <p>"This deletes “Groceries” and its 214 transactions."</p>
         </ConfirmDialog>
@@ -190,7 +190,7 @@ fn EdgeSheet(side: SheetSide, label: &'static str, note: impl Fn(&str) + Copy + 
     let chosen = StoredValue::new(format!("{name}: chose"));
     view! {
         <Button family=ButtonFamily::Secondary on_click=move || open.set(true)>{format!("{label}…")}</Button>
-        <Sheet open=open side=side title=label on_close=move || { open.set(false); note(&closed); }>
+        <Sheet open=open side=side title=label on_close=move || note(&closed)>
             <div class="demo-stack">
                 <Button quiet=true on_click=move || { open.set(false); note(&chosen.get_value()); }>"Accounts"</Button>
                 <Button quiet=true>"Budgets"</Button>

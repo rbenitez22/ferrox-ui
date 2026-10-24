@@ -4,7 +4,7 @@ use leptos::{component, view, IntoView};
 use wasm_bindgen::JsCast;
 use web_sys::{Element, KeyboardEvent};
 
-use super::modal::Modal;
+use super::modal::{closer, Modal};
 use crate::ids::unique_id;
 use crate::core::component_help;
 use crate::{Button, ButtonFamily, IconButton, MaybeHelp};
@@ -109,8 +109,10 @@ pub fn dialog_classes(size: DialogSize, extra: &str) -> String {
 /// band. It is the native `<dialog>` opened with `showModal()`, so the page
 /// behind is inert and focus stays inside.
 ///
-/// - `open` drives it. Esc, the × and the Cancel button all call `on_close`,
-///   which should set `open` to false; they are the same act.
+/// - `open` drives it, both ways: set it true to open; Esc, the × and the
+///   Cancel button set it false (they are the same act) and then call
+///   `on_close`, if given. An affirm action closes it when it's done, by
+///   setting `open` false itself, so a save can show its saving state first.
 /// - **The footer is not a slot.** Pass `affirm` (and `alternate`); the order
 ///   is fixed: cancel, alternate, affirm — the heaviest button last.
 /// - Enter fires `affirm` (`submit_on_enter`), except from a textarea, a
@@ -123,7 +125,6 @@ pub fn dialog_classes(size: DialogSize, extra: &str) -> String {
 /// <Dialog
 ///     open=editing
 ///     title="Edit account"
-///     on_close=move || editing.set(false)
 ///     affirm=DialogAction::new("Save", move || save()).saving(saving)
 /// >
 ///     <input autofocus=true … />
@@ -131,9 +132,10 @@ pub fn dialog_classes(size: DialogSize, extra: &str) -> String {
 /// ```
 #[component]
 pub fn Dialog(
-    #[prop(into)] open: Signal<bool>,
+    open: RwSignal<bool>,
     #[prop(into)] title: Signal<String>,
-    #[prop(into)] on_close: UnsyncCallback<()>,
+    /// Told after a dismissive close (Esc, the ×, Cancel).
+    #[prop(optional, into)] on_close: Option<UnsyncCallback<()>>,
     /// The Cancel button's label.
     #[prop(into, default = "Cancel".into())] cancel_label: Signal<String>,
     /// No Cancel button. The × and Esc still close.
@@ -154,7 +156,8 @@ pub fn Dialog(
     #[prop(optional, into)] class: MaybeProp<String>,
     children: ChildrenFn,
 ) -> impl IntoView {
-    let modal = Modal::new(open, on_close);
+    let on_close = closer(open, on_close);
+    let modal = Modal::new(open.into(), on_close);
     let (on_cancel, on_closed) = (modal.on_cancel(), modal.on_closed());
     let title_id = unique_id("ferrox-dialog-title");
     let labelled_by = title_id.clone();

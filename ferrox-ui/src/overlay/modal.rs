@@ -4,9 +4,10 @@
 //!
 //! The signal is the source of truth: `open` turning true shows the dialog
 //! (`showModal`, which makes the rest of the page inert and keeps focus
-//! inside), turning false closes it. When the browser closes it instead (Esc,
-//! or Chrome closing anyway on a repeated Esc), the app hears it through
-//! `on_close`; its state never changes behind its back.
+//! inside), turning false closes it. Every dismissive way out (Esc, the ×,
+//! Cancel, a backdrop click, or Chrome closing anyway on a repeated Esc) goes
+//! through [`closer`]: it sets `open` to false, then tells the app's optional
+//! `on_close`.
 
 use std::cell::Cell;
 
@@ -25,6 +26,16 @@ thread_local! {
     /// How many modals hold the scroll lock (a confirm opened from a dialog
     /// makes two).
     static LOCKS: Cell<usize> = const { Cell::new(0) };
+}
+
+/// The overlays' one way to close: `open` to false, then the app's notice.
+pub(crate) fn closer(open: RwSignal<bool>, notify: Option<UnsyncCallback<()>>) -> UnsyncCallback<()> {
+    UnsyncCallback::new(move |_| {
+        open.set(false);
+        if let Some(notify) = notify {
+            notify.run(());
+        }
+    })
 }
 
 /// One modal's wiring. Put `node_ref` on the `<dialog>`, `on_cancel` on its

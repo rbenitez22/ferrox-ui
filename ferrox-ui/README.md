@@ -227,10 +227,12 @@ browser makes the page behind inert, keeps focus inside, and puts the modal in
 the top layer, above everything including `LoadingOverlay`. All three share
 the same behaviour:
 
-- **`open` drives it.** Every way out (Esc, the ×, the Cancel button, a
-  sheet's backdrop) calls `on_close` / `on_cancel`, and the app sets `open`
-  to false. If the browser closes the element itself, the callback runs too,
-  so the app's state and the element never disagree.
+- **`open` is an `RwSignal<bool>`, and the modal closes itself.** Set it
+  true to open. Every dismissive way out (Esc, the ×, the Cancel button, a
+  sheet's backdrop, the browser closing the element itself) sets it false,
+  then calls `on_close` / `on_cancel` if you gave one, so the app's state
+  and the element never disagree. An affirm action closes it by setting
+  `open` false when its work is done (after any saving state).
 - **Focus** goes to an element marked `autofocus`, otherwise the first
   control (the ×). On close it returns to whatever opened the modal.
 - **The page doesn't scroll** while a modal is open (`<body>` gets
@@ -266,7 +268,6 @@ view! {
     <Dialog
         open=editing
         title="Edit account"
-        on_close=move || editing.set(false)
         affirm=DialogAction::new("Save", move || save()).saving(saving)
         alternate=DialogAction::new("Save as draft", move || save_draft())
     >
@@ -277,7 +278,8 @@ view! {
 
 | Prop | Default | |
 |---|---|---|
-| `open`, `title`, `on_close` | required | `on_close` is called by Esc, the × and the Cancel button: the same act |
+| `open`, `title` | required | `open`: `RwSignal<bool>`; Esc, the × and Cancel set it false (the same act) |
+| `on_close` | none | told after that dismissive close |
 | `affirm` | none | the last button; `DialogAction::new(label, fn)`, plus `.danger()` for a destructive commit, `.saving(signal)`, `.disabled(signal)` |
 | `alternate` | none | a lighter way to finish, before `affirm`, always secondary; Enter never reaches it |
 | `cancel_label` | `"Cancel"` | |
@@ -311,15 +313,15 @@ view! {
         confirm_label="Delete"
         saving=deleting
         on_confirm=move || delete_account()     // set `deleting`, close when done
-        on_cancel=move || confirming.set(false)
     >
         <p>"This deletes “Groceries” and its 214 transactions."</p>
     </ConfirmDialog>
 }
 ```
 
-Props: `open`, `title`, `confirm_label`, `on_confirm`, `on_cancel` (Cancel,
-the × and Esc), `saving` (the confirm button sweeps and refuses clicks),
+Props: `open` (`RwSignal<bool>`; Cancel, the × and Esc close it), `title`,
+`confirm_label`, `on_confirm` (set `open` false when the action is done),
+`on_cancel` (optional: told after Cancel, the × or Esc), `saving` (the confirm button sweeps and refuses clicks),
 `cancel_label` (`"Cancel"`), `close_label` (`"Close"`), `help` (a `?` before
 the ×).
 
@@ -336,7 +338,7 @@ use ferrox_ui::{Sheet, SheetSide};
 
 view! {
     <IconButton label="Menu" on_click=move || menu.set(true)><Icon icon=MENU/></IconButton>
-    <Sheet open=menu title="Menu" on_close=move || menu.set(false)>
+    <Sheet open=menu title="Menu">
         <nav>…</nav>
     </Sheet>
 }
@@ -344,7 +346,8 @@ view! {
 
 | Prop | Default | |
 |---|---|---|
-| `open`, `title`, `on_close` | required | `title` is shown and is the sheet's accessible name |
+| `open`, `title` | required | `open`: `RwSignal<bool>`, closed by the backdrop, the × and Esc; `title` is shown and is the sheet's accessible name |
+| `on_close` | none | told after that dismissive close |
 | `side` | `Left` | `Left` / `Right`: full height, `min(20rem, 85vw)` wide. `Bottom`: full width, at most 85vh tall |
 | `close_label` | `"Close"` | |
 | `help` | none | a `?` in the title bar, before the × |
@@ -835,8 +838,7 @@ view! {
 }
 ```
 
-**It closes itself.** `open` is an `RwSignal`, not `Sheet`'s `open` plus
-`on_close`, because the menu sets it back to false on its own:
+**It closes itself**, like every modal, and also on its own:
 
 - when the user follows a link inside it: a plain left click on any
   `<a href>` without a `target`, so a plain `<A>` closes it too. A ctrl- or

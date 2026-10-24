@@ -156,7 +156,7 @@ fn Asking() -> impl IntoView {
 #[component]
 fn FakeAssistant(asked: RwSignal<Option<HelpRequest>>, open: RwSignal<bool>) -> impl IntoView {
     view! {
-        <Sheet open=open side=SheetSide::Right title="Assistant" on_close=move || open.set(false)>
+        <Sheet open=open side=SheetSide::Right title="Assistant">
             {move || asked.get().map(|request| view! {
                 <dl class="demo-echo">
                     <dt>"topic"</dt><dd data-request="topic">{request.topic_id.clone()}</dd>
@@ -215,7 +215,7 @@ fn OnComponents() -> impl IntoView {
                         <Button family=ButtonFamily::Danger on_click=move || deleting.set(true)>"Confirm with help…"</Button>
                         <Button family=ButtonFamily::Secondary on_click=move || menu.set(true)>"Sheet with help…"</Button>
                     </div>
-                    <Dialog open=editing title="Edit split" help=about("edit-split", "Editing a split") on_close=move || editing.set(false)>
+                    <Dialog open=editing title="Edit split" help=about("edit-split", "Editing a split")>
                         <p>"A dialog's ? sits in its title bar, before the ×."</p>
                     </Dialog>
                     <ConfirmDialog
@@ -224,11 +224,10 @@ fn OnComponents() -> impl IntoView {
                         confirm_label="Delete"
                         help=about("delete-split", "Deleting a split")
                         on_confirm=move || deleting.set(false)
-                        on_cancel=move || deleting.set(false)
                     >
                         <p>"This deletes the split."</p>
                     </ConfirmDialog>
-                    <Sheet open=menu title="Menu" help=about("menu", "The menu") on_close=move || menu.set(false)>
+                    <Sheet open=menu title="Menu" help=about("menu", "The menu")>
                         <p>"A sheet's ? sits in its title bar too."</p>
                     </Sheet>
                 </HelpScope>

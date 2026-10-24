@@ -28,6 +28,10 @@ From the names audit in `plans/agent-first.md` (piece 3).
 - No callback passes a DOM event: `Button`, `IconButton` and `SplitButton`
   `on_click` are `UnsyncCallback<()>` (as `Card`'s already was). Write
   every callback as `move || …`.
+- `Dialog`, `Sheet` and `ConfirmDialog` own their state, as `SideMenu`
+  did: `open` is an `RwSignal<bool>`, and every dismissive way out (Esc,
+  the ×, Cancel, a sheet's backdrop) sets it false itself. `on_close` /
+  `on_cancel` are optional notices; drop `on_close=move || open.set(false)`.
 
 ### Added
 

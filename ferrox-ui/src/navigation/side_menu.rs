@@ -66,7 +66,6 @@ pub fn SideMenu(
     view! {
         <Sheet
             open=open
-            on_close=move || open.set(false)
             side=side
             title=title
             close_label=close_label
