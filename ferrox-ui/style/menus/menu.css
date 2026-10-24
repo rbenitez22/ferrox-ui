@@ -3,7 +3,11 @@
 
    The panel is a popover in the top layer, placed from script (`left`,
    `top`, `data-side`) under or over its trigger, so no `overflow` parent
-   clips it. */
+   clips it.
+
+   `--menu-max-width` (default 22rem) caps a panel's width; past it, labels
+   end in an ellipsis. Set it on `:root`, or on one menu's `class` (the
+   panel inherits it through the DOM, top layer or not). */
 
 .menu {
   display: inline-flex;
@@ -55,7 +59,11 @@
   box-sizing: border-box;
   margin: 0;
   min-width: 12rem;
-  max-width: calc(100vw - 16px);
+  max-width: min(var(--menu-max-width, 22rem), calc(100vw - 16px));
+  max-height: calc(100vh - 16px);
+  /* Never sideways: a long label ends in an ellipsis instead. A very long
+     menu scrolls down. */
+  overflow: hidden auto;
   padding: var(--space-xs) 0;
   background: var(--surface-0);
   color: var(--text);
@@ -73,6 +81,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+  box-sizing: border-box;
   width: 100%;
   padding: var(--space-xs) var(--space-md);
   border: none;
@@ -109,6 +118,9 @@
 .menu__label {
   flex: 1 1 auto;
   min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* The one already in force: a check at the end, in the primary's text colour.
@@ -166,4 +178,12 @@
   .menu__item {
     min-height: 44px;
   }
+}
+
+/* ── Context menus: the area adds no box of its own ── */
+
+.context-menu {
+  display: contents;
+  /* A long press opens the menu, not the browser's link preview. */
+  -webkit-touch-callout: none;
 }

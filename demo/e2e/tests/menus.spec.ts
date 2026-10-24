@@ -15,6 +15,8 @@ const focusedText = (page: Page) => page.evaluate(() => document.activeElement?.
 test.beforeEach(async ({ page }) => {
   await page.setViewportSize({ width: 1200, height: 900 });
   await openApp(page, '/menus');
+  // A font landing mid-test moves buttons by a pixel or two.
+  await page.evaluate(() => document.fonts.ready);
 });
 
 test.describe('Menu', () => {
@@ -279,6 +281,26 @@ test.describe('Menu items', () => {
     }
   });
 
+  test('never scrolls sideways: a long label ends in an ellipsis', async ({ page }) => {
+    await trigger(page, 'Go to').click();
+    await expect(items(page, 'Go to').first()).toBeFocused();
+    const panel = menu(page, 'Go to').locator('..');
+    expect(await panel.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+    const long = items(page, 'Go to').nth(2).locator('.menu__label');
+    expect(await long.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+    expect(await long.evaluate((el) => getComputedStyle(el).textOverflow)).toBe('ellipsis');
+    const p = (await panel.boundingBox())!;
+    expect(p.width).toBeLessThanOrEqual(22 * 16 + 1);
+  });
+
+  test('--menu-max-width on a menu\'s class lets it grow wider', async ({ page }) => {
+    await trigger(page, 'Go to, wider').click();
+    await expect(items(page, 'Go to, wider').first()).toBeFocused();
+    const p = (await menu(page, 'Go to, wider').locator('..').boundingBox())!;
+    expect(p.width).toBeGreaterThan(22 * 16 + 1);
+    expect(p.width).toBeLessThanOrEqual(34 * 16 + 1);
+  });
+
   test('a header above the items, outside the menu', async ({ page }) => {
     await trigger(page, 'Account').click();
     const header = page.locator('.menu__panel:popover-open .menu__header');
@@ -375,5 +397,133 @@ test.describe('SplitButton', () => {
     const save = group(page, 'Save');
     await expect(save.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
     await expect(save.getByRole('button', { name: 'More save options' })).toBeDisabled();
+  });
+});
+
+test.describe('ContextMenu', () => {
+  const row = (page: Page, name: string) => page.locator(`[data-row="${name}"]`);
+  const actions = (page: Page, name: string) => menu(page, `${name} actions`);
+  const panelOf = (page: Page, name: string) => actions(page, name).locator('..');
+  /** Dispatches a contextmenu event; true when something prevented the browser's menu. */
+  const prevented = (page: Page, selector: string) =>
+    page.locator(selector).evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      const ev = new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: r.x + 5, clientY: r.y + 5 });
+      return !el.dispatchEvent(ev);
+    });
+
+  test('a right-click in the area opens it at the pointer, the first item focused', async ({ page }) => {
+    const b = (await row(page, 'Shakshuka').boundingBox())!;
+    const [x, y] = [b.x + 40, b.y + b.height / 2];
+    await page.mouse.click(x, y, { button: 'right' });
+    await expect(actions(page, 'Shakshuka')).toBeVisible();
+    await expect(actions(page, 'Shakshuka').getByRole('menuitem')).toHaveText(['Edit', 'Duplicate', 'Delete']);
+    await expect(actions(page, 'Shakshuka').getByRole('menuitem').first()).toBeFocused();
+    const p = (await panelOf(page, 'Shakshuka').boundingBox())!;
+    expect(Math.abs(p.x - x)).toBeLessThan(2);
+    expect(Math.abs(p.y - y)).toBeLessThan(2);
+  });
+
+  test('a press outside closes it without taking focus back; a right-click elsewhere moves it', async ({ page }) => {
+    const b = (await row(page, 'Shakshuka').boundingBox())!;
+    await page.mouse.click(b.x + 40, b.y + b.height / 2, { button: 'right' });
+    await expect(actions(page, 'Shakshuka').getByRole('menuitem').first()).toBeFocused();
+    const r = (await row(page, 'Ribollita').boundingBox())!;
+    // The row's far end: Shakshuka's open panel covers its start.
+    await page.mouse.click(r.x + r.width - 30, r.y + r.height / 2, { button: 'right' });
+    await expect(actions(page, 'Shakshuka')).toBeHidden();
+    await expect(actions(page, 'Ribollita').getByRole('menuitem').first()).toBeFocused();
+    await page.getByRole('heading', { name: 'Context menu' }).click();
+    await expect(actions(page, 'Ribollita')).toBeHidden();
+    await expect(chosen(page)).toHaveText('');
+  });
+
+  test("it suppresses the browser's menu in the area only", async ({ page }) => {
+    expect(await prevented(page, '[data-row="Ribollita"]')).toBe(true);
+    await page.keyboard.press('Escape');
+    expect(await prevented(page, '[data-outside="true"]')).toBe(false);
+  });
+
+  test('Shift+F10 and the Menu key open it under the focused element', async ({ page }) => {
+    for (const key of ['Shift+F10', 'ContextMenu']) {
+      const open = page.getByRole('button', { name: 'Open Shakshuka' });
+      await open.focus();
+      await page.keyboard.press(key);
+      await expect(actions(page, 'Shakshuka').getByRole('menuitem').first()).toBeFocused();
+      const o = (await open.boundingBox())!;
+      const p = (await panelOf(page, 'Shakshuka').boundingBox())!;
+      expect(p.y).toBeGreaterThanOrEqual(o.y + o.height);
+      expect(Math.abs(p.x - o.x)).toBeLessThan(2);
+      await page.keyboard.press('Escape');
+      await expect(actions(page, 'Shakshuka')).toBeHidden();
+      await expect(open).toBeFocused();
+    }
+  });
+
+  test('the items behave as in Menu; choosing returns focus to what had it', async ({ page }) => {
+    const open = page.getByRole('button', { name: 'Open Ribollita' });
+    await open.focus();
+    await page.keyboard.press('Shift+F10');
+    await expect(actions(page, 'Ribollita').getByRole('menuitem').first()).toBeFocused();
+    await page.keyboard.press('ArrowUp');
+    expect(await focusedText(page)).toBe('Delete');
+    await page.keyboard.press('ArrowDown');
+    await page.keyboard.press('d');
+    await page.keyboard.press('Enter');
+    await expect(chosen(page)).toHaveText('duplicate Ribollita');
+    await expect(actions(page, 'Ribollita')).toBeHidden();
+    await expect(open).toBeFocused();
+    await expect(page.locator('[data-echo="opened"]')).toHaveText('');
+  });
+
+  test('near the window’s edge it opens leftwards and upwards, inside the viewport', async ({ page }) => {
+    const b = (await row(page, 'Ribollita').boundingBox())!;
+    await page.setViewportSize({ width: 1200, height: Math.ceil(b.y + b.height + 10) });
+    const vw = 1200;
+    const vh = Math.ceil(b.y + b.height + 10);
+    const [x, y] = [b.x + b.width - 10, b.y + b.height - 5];
+    await page.mouse.click(x, y, { button: 'right' });
+    await expect(actions(page, 'Ribollita').getByRole('menuitem').first()).toBeFocused();
+    const p = (await panelOf(page, 'Ribollita').boundingBox())!;
+    expect(p.x + p.width).toBeLessThanOrEqual(vw);
+    expect(p.x + p.width).toBeLessThanOrEqual(x + 1);
+    expect(p.y + p.height).toBeLessThanOrEqual(vh);
+    expect(p.y + p.height).toBeLessThanOrEqual(y + 1);
+  });
+
+  test('a disabled one leaves the browser’s menu alone', async ({ page }) => {
+    expect(await prevented(page, '[data-row="Pierogi"]')).toBe(false);
+    await expect(actions(page, 'Pierogi')).toBeHidden();
+    await page.getByRole('button', { name: 'Open Pierogi' }).focus();
+    await page.keyboard.press('Shift+F10');
+    await expect(actions(page, 'Pierogi')).toBeHidden();
+  });
+
+  test.describe('touch', () => {
+    test.skip(({ browserName }) => browserName !== 'chromium', 'synthetic Touch events need Chromium');
+
+    /** Starts a touch on the row, moves it by `dy`, holds it `ms`, lifts it. */
+    const press = (page: Page, name: string, dy: number, ms: number) =>
+      row(page, name).evaluate(async (el, [dy, ms]) => {
+        const r = el.getBoundingClientRect();
+        const at = (y: number) => new Touch({ identifier: 1, target: el, clientX: r.x + 30, clientY: y });
+        const fire = (type: string, y: number) =>
+          el.dispatchEvent(new TouchEvent(type, { bubbles: true, cancelable: true, touches: type === 'touchend' ? [] : [at(y)], changedTouches: [at(y)] }));
+        const y0 = r.y + r.height / 2;
+        fire('touchstart', y0);
+        if (dy) fire('touchmove', y0 + dy);
+        await new Promise((done) => setTimeout(done, ms));
+        fire('touchend', y0 + dy);
+      }, [dy, ms]);
+
+    test('a long press opens it; a short or moving one doesn’t', async ({ page }) => {
+      await press(page, 'Shakshuka', 0, 200);
+      await expect(actions(page, 'Shakshuka')).toBeHidden();
+      await press(page, 'Shakshuka', 40, 700);
+      await expect(actions(page, 'Shakshuka')).toBeHidden();
+      await press(page, 'Shakshuka', 0, 700);
+      await expect(actions(page, 'Shakshuka')).toBeVisible();
+      await expect(actions(page, 'Shakshuka').getByRole('menuitem').first()).toBeFocused();
+    });
   });
 });

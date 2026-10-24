@@ -1,13 +1,13 @@
 //! Menus: each kind of trigger (an icon at a row's end, a button, a custom
 //! view with a header), item icons, a danger item, a disabled one, a
-//! current one, links, a split button (saving, locked), a log of what was
-//! chosen, a disabled menu,
+//! current one, links, a split button (saving, locked), context menus on
+//! rows (one disabled), a log of what was chosen, a disabled menu,
 //! a menu inside a dialog, and one low on the page to watch it flip above.
 
 use ferrox_icons::{DELETE, EDIT, MORE_VERTICAL};
 use std::time::Duration;
 
-use ferrox_ui::{Button, ButtonFamily, Dialog, Menu, MenuAlign, MenuDivider, MenuItem, MenuLink, MenuTrigger, SplitButton, Switch};
+use ferrox_ui::{Button, ButtonFamily, ContextMenu, Dialog, Menu, MenuAlign, MenuDivider, MenuItem, MenuLink, MenuTrigger, SplitButton, Switch};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -59,6 +59,12 @@ pub fn MenusPage() -> impl IntoView {
                 <Menu label="Go to" trigger=MenuTrigger::button("Go to") align=MenuAlign::Start>
                     <MenuLink href="/layout">"Layout"</MenuLink>
                     <MenuLink href="/data" icon=EDIT>"Data"</MenuLink>
+                    <MenuLink href="/navigation">"Navigation, a page whose name is far too long for any menu"</MenuLink>
+                </Menu>
+                <Menu label="Go to, wider" trigger=MenuTrigger::button("Go to, wider") align=MenuAlign::Start class="demo-wide-menu">
+                    <MenuLink href="/layout">"Layout"</MenuLink>
+                    <MenuLink href="/data" icon=EDIT>"Data"</MenuLink>
+                    <MenuLink href="/navigation">"Navigation, a page whose name is far too long for any menu"</MenuLink>
                 </Menu>
                 <Menu label="Locked actions" trigger=MenuTrigger::button("Locked") disabled=true>
                     <MenuItem on_select=choose("never")>"Never"</MenuItem>
@@ -79,6 +85,7 @@ pub fn MenusPage() -> impl IntoView {
             </Dialog>
         </Section>
         <SplitButtons chosen=chosen />
+        <ContextRows chosen=chosen />
         <Section title="Low on the page">
             <p>"Make the window short enough and this menu opens above its button."</p>
             <div>
@@ -121,6 +128,48 @@ fn SplitButtons(chosen: RwSignal<Vec<String>>) -> impl IntoView {
             </div>
             <dl class="demo-echo">
                 <dt>"saves"</dt><dd data-echo="saves">{move || saves.get().to_string()}</dd>
+            </dl>
+        </Section>
+    }
+}
+
+/// Rows with a context menu each (right-click, Shift+F10, the Menu key, a
+/// long press), the same actions as a visible ⋮ would offer; the last row's
+/// is disabled, so the browser's own menu stays.
+#[component]
+fn ContextRows(chosen: RwSignal<Vec<String>>) -> impl IntoView {
+    let opened = RwSignal::new(Vec::<String>::new());
+    let row = move |name: &'static str, disabled: bool| {
+        let log = move |what: &'static str| move || chosen.update(|c| c.push(format!("{what} {name}")));
+        view! {
+            <ContextMenu
+                label=format!("{name} actions")
+                disabled=disabled
+                items=move || view! {
+                    <MenuItem icon=EDIT on_select=log("edit")>"Edit"</MenuItem>
+                    <MenuItem on_select=log("duplicate")>"Duplicate"</MenuItem>
+                    <MenuDivider />
+                    <MenuItem icon=DELETE danger=true on_select=log("delete")>"Delete"</MenuItem>
+                }
+            >
+                <div class="demo-context-row" data-row=name>
+                    <span>{name}</span>
+                    <Button family=ButtonFamily::Secondary on_click=move |_| opened.update(|o| o.push(name.to_string()))>
+                        {format!("Open {name}")}
+                    </Button>
+                </div>
+            </ContextMenu>
+        }
+    };
+    view! {
+        <Section title="Context menu">
+            <p>"Right-click a row, press Shift+F10 or the Menu key on its button, or press and hold on a touch screen."</p>
+            {row("Shakshuka", false)}
+            {row("Ribollita", false)}
+            {row("Pierogi", true)}
+            <p class="demo-outside" data-outside="true">"Outside every row: the browser's own menu."</p>
+            <dl class="demo-echo">
+                <dt>"opened"</dt><dd data-echo="opened">{move || opened.get().join(", ")}</dd>
             </dl>
         </Section>
     }

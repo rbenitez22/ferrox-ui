@@ -1,12 +1,11 @@
 use ferrox_icons::{Icon, IconData, CHEVRON_DOWN};
-use leptos::context::Provider;
 use leptos::html;
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 use wasm_bindgen::JsCast;
-use web_sys::{Element, Event, FocusEvent, HtmlElement, KeyboardEvent};
+use web_sys::{Element, Event, KeyboardEvent};
 
-use super::keys::{move_to, type_ahead};
+use super::panel::{focus_end, is_open, panel_element, MenuContext, MenuPanel};
 use crate::core::anchor::{follow, place, Align};
 use crate::ids::unique_id;
 use crate::{button_classes, icon_button_classes, ButtonFamily, ButtonSize};
@@ -63,24 +62,6 @@ impl From<MenuAlign> for Align {
     }
 }
 
-/// What a menu's items need from it: closing it, focus back on the trigger.
-#[derive(Clone, Copy)]
-pub(crate) struct MenuContext {
-    close: Callback<()>,
-}
-
-impl MenuContext {
-    pub(crate) fn close(&self) {
-        self.close.run(());
-    }
-}
-
-/// The menu's items, in order.
-fn items_of(menu: &Element) -> Vec<HtmlElement> {
-    let Ok(found) = menu.query_selector_all("[role=menuitem]") else { return Vec::new() };
-    (0..found.length()).filter_map(|i| found.item(i)).filter_map(|n| n.dyn_into::<HtmlElement>().ok()).collect()
-}
-
 /// A list of actions behind a trigger, as ARIA's menu button has it.
 ///
 /// - **Opening:** a click, Enter or Space on the trigger opens it with the
@@ -128,30 +109,19 @@ pub fn Menu(
     // Which item opening focuses: the first, or the last (↑ on the trigger).
     let focus_last = StoredValue::new(false);
 
-    let panel = move || panel_ref.get_untracked().map(|p| -> HtmlElement { p.unchecked_into() });
-    let focus_item = move |last: bool| {
-        let Some(menu) = menu_ref.get_untracked() else { return };
-        let items = items_of(&menu);
-        let target = if last { items.last() } else { items.first() };
-        if let Some(item) = target {
-            let _ = item.focus();
-        }
-    };
+    let focus_item = move |last: bool| focus_end(menu_ref, last);
     let close_to_trigger = move || {
-        if let Some(panel) = panel() {
+        if let Some(panel) = panel_element(panel_ref) {
             let _ = panel.hide_popover();
         }
         if let Some(trigger) = trigger_ref.get_untracked() {
             let _ = trigger.focus();
         }
     };
-    // Given to the items through a `Provider`, not `provide_context`: a
-    // component has no owner of its own, so sibling menus would overwrite
-    // each other's.
     let context = MenuContext { close: Callback::new(move |_| close_to_trigger()) };
 
     let on_toggle = move |_: Event| {
-        let (Some(trigger), Some(panel)) = (trigger_ref.get_untracked(), panel()) else { return };
+        let (Some(trigger), Some(panel)) = (trigger_ref.get_untracked(), panel_element(panel_ref)) else { return };
         let is_open = panel.matches(":popover-open").unwrap_or(false);
         open.set(is_open);
         if is_open {
@@ -176,53 +146,11 @@ pub fn Menu(
             return;
         }
         ev.prevent_default();
-        let Some(panel) = panel() else { return };
-        if panel.matches(":popover-open").unwrap_or(false) {
+        if is_open(panel_ref) {
             focus_item(key == "ArrowUp");
-        } else {
+        } else if let Some(panel) = panel_element(panel_ref) {
             focus_last.set_value(key == "ArrowUp");
             let _ = panel.show_popover();
-        }
-    };
-
-    let on_menu_key = move |ev: KeyboardEvent| {
-        let Some(menu) = menu_ref.get_untracked() else { return };
-        let key = ev.key();
-        if key == "Escape" {
-            // Handled here, so an enclosing dialog does not close too.
-            ev.prevent_default();
-            ev.stop_propagation();
-            close_to_trigger();
-            return;
-        }
-        let items = items_of(&menu);
-        let active = document().active_element();
-        let at = items.iter().position(|item| Some(item.unchecked_ref::<Element>()) == active.as_ref());
-        let to = match move_to(at, items.len(), &key) {
-            Some(to) => Some(to),
-            None => {
-                let mut chars = key.chars();
-                match (chars.next(), chars.next()) {
-                    (Some(ch), None) if !ch.is_whitespace() && !ev.ctrl_key() && !ev.meta_key() && !ev.alt_key() => {
-                        let labels: Vec<String> = items.iter().map(|i| i.text_content().unwrap_or_default()).collect();
-                        type_ahead(&labels, at, ch)
-                    }
-                    _ => return,
-                }
-            }
-        };
-        ev.prevent_default();
-        if let Some(item) = to.and_then(|to| items.get(to)) {
-            let _ = item.focus();
-        }
-    };
-
-    // Tab, or any other way focus leaves the panel, closes it.
-    let on_focus_out = move |ev: FocusEvent| {
-        let Some(panel) = panel() else { return };
-        let inside = ev.related_target().and_then(|t| t.dyn_into::<web_sys::Node>().ok()).is_some_and(|n| panel.contains(Some(&n)));
-        if !inside {
-            let _ = panel.hide_popover();
         }
     };
 
@@ -303,22 +231,19 @@ pub fn Menu(
             _ => "menu".to_string(),
         }>
             {trigger_view}
-            <div
-                popover="auto"
+            <MenuPanel
                 id=panel_id
-                class="menu__panel"
-                node_ref=panel_ref
-                on:toggle=on_toggle
-                on:keydown=on_menu_key
-                on:focusout=on_focus_out
-            >
-                {header.map(|header| view! { <div class="menu__header">{header.run()}</div> })}
-                <div role="menu" id=menu_id class="menu__items" aria-label=move || label.get() node_ref=menu_ref>
-                    <Show when=move || opened_once.get()>
-                        {let children = children.clone(); view! { <Provider value=context>{children()}</Provider> }}
-                    </Show>
-                </div>
-            </div>
+                menu_id=menu_id
+                popover="auto"
+                label=label
+                panel_ref=panel_ref
+                menu_ref=menu_ref
+                header=header
+                built=opened_once.into()
+                context=context
+                on_toggle=on_toggle
+                items=ViewFn::from(move || children())
+            />
         </div>
     }
 }

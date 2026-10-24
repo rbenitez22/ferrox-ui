@@ -296,3 +296,19 @@
     border-radius: var(--radius-md);
     margin-bottom: var(--space-sm);
 }
+
+/* A row with a context menu: full width, so its right edge is the page's. */
+.demo-context-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-sm);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-xs);
+}
+
+/* One menu allowed wider than the default 22rem. */
+.demo-wide-menu {
+    --menu-max-width: 34rem;
+}

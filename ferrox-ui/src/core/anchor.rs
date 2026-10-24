@@ -82,6 +82,25 @@ pub(crate) fn place(anchor: &Element, floating: &HtmlElement, match_width: bool,
     let _ = floating.set_attribute("data-side", match side { Side::Below => "below", Side::Above => "above" });
 }
 
+/// Places `floating` at a point (a context menu at the pointer): below and
+/// to the right of it when there is room, flipped and kept inside the
+/// viewport when not.
+#[cfg_attr(not(feature = "menus"), allow(dead_code))]
+pub(crate) fn place_at(x: f64, y: f64, floating: &HtmlElement) {
+    let Some(window) = web_sys::window() else { return };
+    let viewport_width = window.inner_width().ok().and_then(|w| w.as_f64()).unwrap_or(0.0);
+    let viewport_height = window.inner_height().ok().and_then(|h| h.as_f64()).unwrap_or(0.0);
+    let f = floating.get_bounding_client_rect();
+    let point = Rect { left: x, top: y - GAP, width: 0.0, height: 0.0 };
+    let (left, top, side) = position(point, f.width(), f.height(), viewport_width, viewport_height, Align::Start);
+    // Out of room on the right: open leftwards from the point instead.
+    let left = if x + f.width() > viewport_width - MARGIN { (x - f.width()).max(MARGIN) } else { left };
+    let style = floating.style();
+    let _ = style.set_property("left", &format!("{left}px"));
+    let _ = style.set_property("top", &format!("{top}px"));
+    let _ = floating.set_attribute("data-side", match side { Side::Below => "below", Side::Above => "above" });
+}
+
 /// Keeps `floating` placed next to `anchor`, once per frame, for as long as
 /// it is an open popover. Per frame rather than on scroll events, so it
 /// follows every way the anchor can move: page scroll, a scrolling parent,

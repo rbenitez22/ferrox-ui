@@ -37,6 +37,27 @@ Notes from piece 3 (done 2026-10-24):
 - Joined halves drop the `.btn` hover grow (one would ride over the other).
 - e2e: 54 menu tests.
 
+Notes from piece 4 (done 2026-10-24):
+- The area is a `display: contents` wrapper; the items are a prop
+  (`items: ViewFn`), the area its children (no slot).
+- `Menu` and `ContextMenu` share a crate-private `MenuPanel` (keys,
+  focus-out, Esc, the items' `Provider`).
+- The context menu is a **manual** popover with its own outside-press
+  listener: as an auto popover, Firefox on Linux (which fires `contextmenu`
+  on mousedown) took the release of the opening right-click for a press
+  outside and closed it at once — the user hit this live: the menu only
+  stayed while the button was held.
+- `core::anchor` gained `place_at` (a point, flipping left and up).
+- Long press: 500ms, 10px slop, the lift's click suppressed; e2e in
+  Chromium only (synthetic `Touch`).
+- Also from the user, live: a `MenuLink` (`<a>`, content-box) overflowed the
+  panel, which scrolled sideways. Items are `border-box`, the panel never
+  scrolls sideways, labels end in an ellipsis, and `--menu-max-width`
+  (22rem) is the app's to set.
+- Menu e2e wait for `document.fonts.ready`: a font landing mid-test moved
+  buttons 2px in Firefox.
+- e2e: 73 menu tests (Chromium) / 72 (Firefox).
+
 ## Where it comes from
 
 - **conrad's `Menu`** (`ui/src/components/Menu.tsx`, 166 lines;

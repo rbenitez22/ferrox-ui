@@ -3,7 +3,7 @@ use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 use web_sys::KeyboardEvent;
 
-use super::menu::MenuContext;
+use super::panel::MenuContext;
 
 /// The class list for a `.menu__item`.
 pub fn menu_item_classes(danger: bool, current: bool) -> String {

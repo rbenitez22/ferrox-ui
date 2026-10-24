@@ -32,4 +32,4 @@ leptos  = { workspace = true }
 leptos_router = { workspace = true, optional = true }
 wasm-bindgen = { workspace = true }
 js-sys = { workspace = true }
-web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent", "DomTokenList", "Event", "EventTarget", "HtmlDialogElement", "HtmlElement", "KeyboardEvent", "DomRect", "ScrollIntoViewOptions", "ScrollLogicalPosition", "IntersectionObserver", "IntersectionObserverEntry", "IntersectionObserverInit", "FocusEvent", "NodeList"] }
+web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent", "DomTokenList", "Event", "EventTarget", "HtmlDialogElement", "HtmlElement", "KeyboardEvent", "DomRect", "ScrollIntoViewOptions", "ScrollLogicalPosition", "IntersectionObserver", "IntersectionObserverEntry", "IntersectionObserverInit", "FocusEvent", "NodeList", "TouchEvent", "TouchList", "Touch"] }

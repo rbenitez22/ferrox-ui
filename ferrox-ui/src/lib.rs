@@ -10,7 +10,7 @@
 //! `NavGroup`, `SideMenu`, `SideMenuButton`. Feature `layout`: `Panel` (also collapsible),
 //! `Card`. Feature `data`: `DataView`,
 //! `DataLayoutSwitch`, `Pagination`. Feature `menus`: `Menu`, `MenuItem`,
-//! `MenuLink`, `MenuDivider`, `SplitButton`.
+//! `MenuLink`, `MenuDivider`, `SplitButton`, `ContextMenu`.
 //!
 //! Call [`init`] once at startup, before mounting, to add the components'
 //! CSS. The theme itself (tokens, themes, fonts) comes from ferrox-theme.
