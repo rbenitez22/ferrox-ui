@@ -4,7 +4,8 @@
 #   1. every crate builds with every combination of its features (and none)
 #   2. clippy, warnings are errors
 #   3. cargo test --workspace
-#   4. the demo builds with Trunk (from scratch: generated CSS removed first)
+#   4. the demo and the starter build with Trunk (from scratch: generated CSS
+#      removed first; the starter against this working tree)
 #   5. Playwright e2e tests, Chromium + Firefox, against a fresh build of the
 #      working tree on its own port (never a running `trunk serve`)
 #
@@ -37,11 +38,13 @@ cargo clippy -q --workspace --all-targets --all-features -- -D warnings
 step "3/5 cargo test"
 cargo test -q --workspace --all-features
 
-step "4/5 demo build"
+step "4/5 demo and starter build"
 # From scratch: the generated stylesheet must appear on a clean checkout.
 # Own dist folder: demo/dist belongs to a running `trunk serve`.
 rm -rf demo/style/ferrox
 (cd demo && trunk build --dist ../target/release-check-dist)
+rm -rf target/starter-local/style/ferrox
+scripts/starter-local.sh build
 
 step "5/5 e2e tests"
 (

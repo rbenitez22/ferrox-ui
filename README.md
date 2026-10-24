@@ -22,49 +22,58 @@ plan, with the decisions and the full component inventory, is
 | `ferrox-theme` | Runtime theme switching (families, `system`/`light`/`dark`, stored choice), Leptos signals (feature `leptos`). *Moved in.* |
 | `ferrox-theme-build` | Build-script helper: the tokens, built-in themes and fonts; validates an app's theme files; writes the CSS file, fonts and pre-paint script the app links in `index.html`. *Moved in.* |
 | `ferrox-ui` | Primitives in feature groups: `core` (always on: `Button`, `IconButton`, `Toolbar`, `Spinner`, `LoadingOverlay`, `Alert`, help on any component (`HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`: a `?` with an offline topic, and context for an app's assistant); call `ferrox_ui::init()` before mounting to add their CSS), feature `overlay` (`Dialog`, `ConfirmDialog`, `Sheet`), feature `forms` (`Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox`), feature `navigation` (`NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton`), feature `layout` (`Panel`, also collapsible, and `Card`), feature `data` (`DataView` with infinite scroll, `DataLayoutSwitch`, `Pagination`), feature `menus` (`Menu`, `SplitButton`, `ContextMenu`). *Every group done: core, overlay, forms, navigation, layout, data and menus.* [README](ferrox-ui/README.md) |
-| `ferrox-icons` | SVG icons (Lucide), checked at build time: each icon a const (`CLOSE`), drawn by one `Icon` component. 20 icons so far, added as components need them. [README](ferrox-icons/README.md) |
+| `ferrox-icons` | SVG icons (Lucide), checked at build time: each icon a const (`CLOSE`), drawn by one `Icon` component. 27 icons so far, added as components need them. [README](ferrox-icons/README.md) |
 | `ferrox-charts` | Charts on the theme's chart tokens (later) |
-| `demo/` | Showcase of every theme and component, with Playwright end-to-end tests (not published). Pages: themes, buttons, icons, feedback, overlay, forms, help, navigation, layout. [README](demo/README.md) |
+| `starter/` | The smallest app with everything wired: copy it to start (not published; not a workspace member, it depends on ferrox-ui by git). `scripts/starter-local.sh` builds it against the working tree for the tests. |
+| `demo/` | Showcase of every theme and component, with Playwright end-to-end tests (not published). Pages: themes, buttons, icons, feedback, overlay, forms, help, navigation, layout, data, menus. [README](demo/README.md) |
 
 All crates share one version and are released together under one git tag.
 
-## Using it
+## Start here
 
-Not yet: there is no release. Once there is, depend on a tag, never a branch
-or a local path:
+**A new app:** copy [`starter/`](starter/), rename it (`name` in its
+`Cargo.toml`, the `<title>` in its `index.html`), and run `trunk serve` in
+it (http://127.0.0.1:3300). It's the smallest app with everything wired,
+and one page built from ferrox-ui: a list of items with add, rename,
+delete-with-confirm, loading and empty states. You need
+[Trunk](https://trunkrs.dev) and the `wasm32-unknown-unknown` target
+(`rustup target add wasm32-unknown-unknown`).
 
-```toml
-ferrox-ui = { git = "https://github.com/rbenitez22/ferrox-ui", tag = "v0.1.0", features = ["overlay"] }
-```
+**An existing Leptos CSR app:** the whole setup is in five of the
+starter's files. Copy each part into yours:
 
-Apps that use [webapp-lib](https://github.com/rbenitez22/webapp-lib) get
-ferrox-ui through its re-exports (`webapp_lib::ui`, `webapp_lib::theme`) and
-must **not** list ferrox-ui or ferrox-theme themselves. Two references that
-differ (tag, or `ssh://` vs `https://`) make Cargo build two copies of every
-type. The only direct dependency such an app adds is `ferrox-theme-build`, in
-`[build-dependencies]`, from the same tag webapp-lib uses; a mismatch fails
-the build with a message saying so.
+| Starter file | What to take |
+|---|---|
+| [`Cargo.toml`](starter/Cargo.toml) | the ferrox dependencies (pinned to one commit until `v0.1.0`), the feature groups you need |
+| [`build.rs`](starter/build.rs) | the `write_css` call: it writes `style/ferrox/` (stylesheet, fonts, pre-paint script) |
+| [`index.html`](starter/index.html) | the `<link data-trunk>` lines in `<head>`, in that order; `class="ferrox-app"` on `<body>` (the page in the theme's background, text colour and font); the loading screen in `<body>` |
+| [`Trunk.toml`](starter/Trunk.toml) | the `pre_build` hook and the `[watch]` ignore |
+| [`src/main.rs`](starter/src/main.rs) | `ferrox_theme::init()` and `ferrox_ui::init()` before mounting |
 
-### Theme setup (`demo/` is a working example)
+…and `style/ferrox/` in `.gitignore` ([`starter/.gitignore`](starter/.gitignore)): it's generated.
 
-```toml
-[build-dependencies]
-ferrox-theme-build = { git = "https://github.com/rbenitez22/ferrox-ui", tag = "v0.1.0" }
-```
+**With an agent:** tell it "use ferrox-ui from `<this clone>`: take the
+setup from `starter/`, the components from `ferrox-ui/README.md`". A kit
+made for agents (an entry point, task instructions, a drift check, an
+installer, for any agent) is being built: [`plans/agent-first.md`](plans/agent-first.md).
+
+**Versions.** Every crate here shares one version and one git reference.
+Use the same reference (the starter's `rev`, later a release tag) for all
+of them: two references, even to the same commit (`ssh://` and
+`https://`), make Cargo build two copies of every type.
+
+### Your own themes
+
+The built-in themes need nothing more. To add your own (or replace a
+built-in with your own file of the same id), put theme files in a folder,
+embed and write them from `build.rs`, and register them before `init()`:
 
 ```rust
 // build.rs
 fn main() {
-    ferrox_theme_build::embed_themes("style/themes");                 // the app's own themes (optional)
-    ferrox_theme_build::write_css("style/ferrox", Some("style/themes")); // CSS, fonts, pre-paint script
+    ferrox_theme_build::embed_themes("style/themes");
+    ferrox_theme_build::write_css("style/ferrox", Some("style/themes"));
 }
-```
-
-```html
-<!-- index.html <head>: the pre-paint script first (inlined), then the stylesheet -->
-<link data-trunk rel="inline" href="style/ferrox/prepaint.js" />
-<link data-trunk rel="css" href="style/ferrox/ferrox.css" />
-<link data-trunk rel="copy-dir" href="style/ferrox/fonts" />
 ```
 
 ```rust
@@ -73,34 +82,14 @@ ferrox_theme::register(include!(concat!(env!("OUT_DIR"), "/ferrox_themes.rs")));
 ferrox_theme::init();
 ```
 
-```toml
-# Trunk.toml — Trunk resolves index.html's links before it runs cargo, so the
-# build script must run first, or a clean checkout fails to build.
-[[hooks]]
-stage = "pre_build"
-command = "cargo"
-command_arguments = ["check", "--quiet", "--target", "wasm32-unknown-unknown"]
-
-[watch]
-ignore = ["style/ferrox"]   # written by every build, never a reason for one
-```
-
-Optional loading screen, shown until the app mounts (in `<body>`):
-
-```html
-<div class="ferrox-loading">
-  <div class="ferrox-loading__spinner"></div>
-  <div class="ferrox-loading__text">Loading…</div>
-</div>
-```
-
-Add `style/ferrox/` to `.gitignore`: it is generated.
+[`demo/`](demo/) does this with its own themes.
 
 ## Developing
 
 ```sh
 cd demo && trunk serve          # http://127.0.0.1:3200
-cd demo/e2e && npm ci && npm test
+scripts/starter-local.sh serve  # the starter, built against this tree (http://127.0.0.1:3300)
+cd demo/e2e && npm ci && npm test  # also serves and tests the starter
 scripts/release-check.sh        # the gate before any tag
 ```
 

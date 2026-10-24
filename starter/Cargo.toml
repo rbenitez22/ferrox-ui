@@ -1,0 +1,22 @@
+# A ferrox-ui app, ready to rename: change `name` here and the title in
+# index.html. Build and serve with `trunk serve` (http://127.0.0.1:3300).
+
+[package]
+name    = "starter"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+leptos = { version = "0.8.14", features = ["csr"] }
+# ferrox-ui, pinned to one commit (a release tag once v0.1.0 is out).
+# Add the features (groups) you use: overlay, forms, navigation, layout,
+# data, menus. Working from a local clone instead? Swap `git` and `rev`
+# for `path = "/path/to/ferrox-ui/ferrox-ui"` (and the same for the others).
+ferrox-ui    = { git = "https://github.com/rbenitez22/ferrox-ui", rev = "e05d7d183034918a08761ece3a28bc26b63ea4ae", features = ["overlay", "forms", "layout", "data", "menus"] }
+ferrox-theme = { git = "https://github.com/rbenitez22/ferrox-ui", rev = "e05d7d183034918a08761ece3a28bc26b63ea4ae", features = ["leptos"] }
+ferrox-icons = { git = "https://github.com/rbenitez22/ferrox-ui", rev = "e05d7d183034918a08761ece3a28bc26b63ea4ae" }
+web-sys      = { version = "0.3.83", features = ["Document", "Element", "HtmlElement", "Window"] }
+
+[build-dependencies]
+ferrox-theme-build = { git = "https://github.com/rbenitez22/ferrox-ui", rev = "e05d7d183034918a08761ece3a28bc26b63ea4ae" }

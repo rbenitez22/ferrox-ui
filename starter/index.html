@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Starter</title>
+    <!-- Written by build.rs into style/ferrox/. The pre-paint script comes
+         first: it sets the saved theme before anything is drawn. -->
+    <link data-trunk rel="inline" href="style/ferrox/prepaint.js" />
+    <link data-trunk rel="css" href="style/ferrox/ferrox.css" />
+    <link data-trunk rel="copy-dir" href="style/ferrox/fonts" />
+    <link data-trunk rel="rust" data-wasm-opt="z" />
+  </head>
+  <!-- ferrox-app: the page in the theme's background, text colour and font. -->
+  <body class="ferrox-app">
+    <!-- Shown until the app mounts; ferrox.css styles it. -->
+    <div class="ferrox-loading">
+      <div class="ferrox-loading__spinner"></div>
+      <div class="ferrox-loading__text">Loading…</div>
+    </div>
+  </body>
+</html>

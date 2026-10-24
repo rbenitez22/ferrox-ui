@@ -8,6 +8,8 @@ import { defineConfig, devices } from '@playwright/test';
 //   fresh build of the working tree and never touches a running dev server.
 const FRESH = !!process.env.E2E_FRESH;
 const PORT = FRESH ? 3299 : 3200;
+/** The starter app's port (tests/starter.spec.ts). */
+export const STARTER_PORT = 3399;
 const SERVE = FRESH
   ? `trunk serve --port ${PORT} --dist ../target/e2e-dist --no-autoreload`
   : 'trunk serve';
@@ -26,12 +28,23 @@ export default defineConfig({
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
   ],
-  webServer: {
-    command: SERVE,
-    cwd: '..',
-    url: `http://127.0.0.1:${PORT}`,
-    reuseExistingServer: !FRESH,
-    // The first Trunk build compiles the whole workspace to WASM.
-    timeout: 300_000,
-  },
+  webServer: [
+    {
+      command: SERVE,
+      cwd: '..',
+      url: `http://127.0.0.1:${PORT}`,
+      reuseExistingServer: !FRESH,
+      // The first Trunk build compiles the whole workspace to WASM.
+      timeout: 300_000,
+    },
+    {
+      // The starter app (tests/starter.spec.ts), built against this working
+      // tree by scripts/starter-local.sh.
+      command: `bash ../scripts/starter-local.sh serve --port ${STARTER_PORT}`,
+      cwd: '..',
+      url: `http://127.0.0.1:${STARTER_PORT}`,
+      reuseExistingServer: !FRESH,
+      timeout: 300_000,
+    },
+  ],
 });

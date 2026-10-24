@@ -1,0 +1,16 @@
+[serve]
+address = "127.0.0.1"
+port    = 3300
+open    = false
+
+[watch]
+# style/ferrox/ is written by build.rs on every build: never a reason for one.
+ignore = ["style/ferrox"]
+
+# build.rs writes style/ferrox/, but Trunk resolves index.html's links before
+# it runs cargo. Running the build script first, via `cargo check`, makes the
+# files exist on a clean build.
+[[hooks]]
+stage = "pre_build"
+command = "cargo"
+command_arguments = ["check", "--quiet", "--target", "wasm32-unknown-unknown"]

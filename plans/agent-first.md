@@ -376,6 +376,49 @@ Where the docs failed it (its own report, confirmed in its code):
 7. Finding things cost it a heading grep and seven slices of one big file
    (→ piece 5, the index and per-component pages).
 
+## Notes from piece 2 (front door, 2026-10-24)
+
+- **The pre-paint script has one home now:** `ferrox-theme-build`'s
+  `assets/prepaint.js`, written by `write_css` beside the stylesheet and
+  inlined by `index.html` (`<link data-trunk rel="inline">`). No app
+  pastes it; `ferrox_theme::PREPAINT_SCRIPT` and the demo's copy-check
+  test are gone (`88425d0`).
+- **`starter/`** pins ferrox-ui to `e05d7d1` (the `.ferrox-app` commit) by git (works once that
+  commit is pushed). It isn't a workspace member. `scripts/starter-local.sh`
+  copies it to `target/starter-local`, rewrites the git dependencies to
+  paths into this tree, and builds or serves it; a `[patch]` was tried
+  first, but Cargo still fetches the original git source, which needs the
+  network and a pushed commit. The release check builds it; Playwright
+  serves it on 3399 (`tests/starter.spec.ts`: mount, add, rename, delete
+  with confirm, empty view, pre-paint with the WASM blocked).
+- **`.ferrox-app`** (`e05d7d1`): the screenshot of the first starter build
+  showed the theme reaching every component but not the page (a white
+  background, the browser's serif). The page's ground (background, text
+  colour, body font) is now an opt-in class in the theme stylesheet, on
+  `<body>`; the demo uses it too. Page width and padding stay piece 4's.
+- The README's top is "Start here": a new app (copy the starter), an
+  existing app (a table of the starter's files and what to take from
+  each), an agent (interim wording until the kit, pieces 8–9). The setup
+  snippets it used to repeat are gone; "Your own themes" stays (not in the
+  starter).
+- **For piece 3 (names and ergonomics), found building the starter:**
+  - Closures in `Menu`'s (re-buildable) children must be able to run again:
+    moving a record into `on_select` fails with an `FnOnce` error. The
+    starter uses a `StoredValue` (`Copy`). An agent will hit this; either
+    the docs and recipes teach the idiom, or the API avoids it.
+  - `DataView` doesn't redraw an item whose key is unchanged, so a rename
+    keyed by `id` alone shows the old name. The starter keys by id and
+    name. A `version_of`, or redrawing on equality, may be the better API.
+- **Moved out of the README, for webapp-lib's docs** (its piece 2), verbatim:
+
+  > Apps that use [webapp-lib](https://github.com/rbenitez22/webapp-lib) get
+  > ferrox-ui through its re-exports (`webapp_lib::ui`, `webapp_lib::theme`) and
+  > must **not** list ferrox-ui or ferrox-theme themselves. Two references that
+  > differ (tag, or `ssh://` vs `https://`) make Cargo build two copies of every
+  > type. The only direct dependency such an app adds is `ferrox-theme-build`, in
+  > `[build-dependencies]`, from the same tag webapp-lib uses; a mismatch fails
+  > the build with a message saying so.
+
 ## Pieces
 
 Each is small and reviewed on its own.
