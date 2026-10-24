@@ -1,48 +1,407 @@
 # Agent first: ferrox-ui for a developer working through an agent
 
-Status: noted (2026-10-24), to plan and discuss after the menus group. Not
-approved; nothing here is decided.
+Status: approved (2026-10-24), open points as recommended (point 11, `pwsh` on this machine, still to ask). Revised the same day before approval: the kit as the deliverable (the user's `ai-toolkit` untouched); every script in bash and PowerShell with a spec for other languages; an agent-agnostic core with generated adapters and a path for unknown agents; one source per fact; the kit inside the crate; a front door.
 
-## The user's direction (2026-10-24)
+## The direction (the user, 2026-10-24)
 
 The audience is not a human developer reading docs: it's a developer
 working through an agent. The library must let an agent build a consistent
-app with minimal token use. With ferrox-ui in place from the start, the
-directive would have been just "use ferrox-ui", instead of repeating
-instructions to keep this or that convention, look and feel.
+app with minimal token use. With ferrox-ui in place, an app's whole UI
+directive should be one line, "use ferrox-ui", instead of conventions,
+look and feel restated in every prompt and every `CLAUDE.md`.
 
-So the question for the plan: what lets an agent understand the intent of
-the library quickly, and arrive at consistent UIs, while spending as few
-tokens as possible?
+Two measures, then: **consistency** (an agent's screens look and behave
+like every other app's without being told how) and **tokens** (what it has
+to read, write and fix to get there).
 
-## First ideas, to discuss
+**The deliverable is an agent kit** (the user, 2026-10-24): ferrox-ui ships
+its own toolkit (entry point, skills, a subagent, commands, the drift
+check, an installer) that any developer attaches to, or adapts for, their
+own environment and agent. The user's `ai-toolkit` is not changed: it's an
+example of the shape, and its owner adopts the kit like anyone else. The
+library stays usable by a human; the kit is what makes it cheap for an
+agent.
 
-- **A short entry point for agents** (an `AGENTS.md`, or a Claude Code
-  skill, `ferrox-ui`): what the library is for, a "which component for
-  which need" table, and the few rules that make an app consistent (no raw
-  `<button>`, no colours or spacing outside the tokens, actions in a
-  Panel's `actions`, …). Read first; small enough to read every time.
-- **Split the reference so it loads on demand.** `ferrox-ui/README.md` is
-  over 1,300 lines: too much to load to use one component. An index (one
-  line per component: what it's for, its signature) plus a page per
-  component the agent opens only when it needs it.
-- **Recipes for whole screens**, the shapes apps repeat: a list page
-  (Panel + DataView + Menu row actions + DataLayoutSwitch), a form in a
-  Dialog, a detail page, a settings page. An agent copies a recipe instead
-  of composing ten components from scratch. Perhaps some become
-  components or webapp-lib adapters (`ListPage`).
-- **Docs that can't rot:** examples compiled as doctests, and the index
-  generated from (or checked against) the source, so the agent never
-  trusts a stale signature.
-- **Make the obvious call the right one:** defaults that are correct,
-  types that refuse wrong combinations, compile errors that point to the
-  fix. Every guess an agent doesn't have to make is tokens saved.
-- **A consistency check an agent can run:** a script or lint over an app
-  that flags drift (raw elements where a component exists, inline styles,
-  hex colours, hand-made menus), so "is this consistent?" is one command,
-  not a review.
-- **Point the existing skills here:** `leptos-list-view`, `leptos-page`,
-  `leptos-ui-setup` and `webapp-lib-ref` should produce ferrox-ui code and
-  say so, once webapp-lib is on it.
-- Measure: the tokens an agent spends building a reference screen (say, a
-  list page) before and after, so changes are judged by the number.
+## Where an agent stands today
+
+- **The reference is one 1,671-line file** (`ferrox-ui/README.md`, 73 KB,
+  roughly 18,000 tokens). Using one component means loading all of it, or
+  searching it blind.
+- **Nothing says which component fits a need**, except the new menus table.
+  An agent picks by name, or writes its own.
+- **Page layout is the app's CSS.** Components look right; the space
+  between and around them is whatever the agent writes, so screens drift
+  even when every component is ferrox-ui's.
+- **Examples aren't compiled.** A renamed prop leaves the README wrong,
+  and the agent pays for that in a compile-fix loop.
+- **Nothing ships for agents.** The only agent guidance that exists is in
+  the user's private `ai-toolkit` (`leptos-list-view`, `leptos-page`,
+  `leptos-ui-setup`, `webapp-lib-ref`: about 580 lines, about webapp-lib
+  0.x). Another developer gets nothing.
+- **Nothing checks drift.** "Is this consistent?" is a review, not a
+  command.
+
+## Design
+
+### 0. One source per fact
+
+The user (2026-10-24): no duplicated content. Every agent, and every
+human, taps into the same core, as the user's `ai-toolkit` was meant to.
+The rule for every piece below:
+
+- **Each fact has exactly one home.** Everything else links to it.
+- **Where an agent needs a fact inline** (to save a file read), it is
+  *rendered* from its home by a tool, between markers, and a test fails
+  when the render is stale. Never copied by hand.
+- **Adapters hold no content**, not even a description: they are
+  generated from `kit.tsv` at install time.
+
+| Fact | Its one home | Reached from |
+|---|---|---|
+| A component's props, example, behaviour | `ferrox-ui/docs/<component>.md` | rustdoc (`include_str!`), the README (link), agents (via the index) |
+| Every public item, one line | the source's doc comments → `docs/index.md` (generated) | `AGENTS.md` (link), the `component` task |
+| Which component for which need | `docs/choosing.md` | `AGENTS.md` (rendered in, it's the most-used fact), the README (link) |
+| The consistency rules | `ferrox-ui/agent-kit/check/rules.tsv` (id, rule, pattern, fix) | the drift check (reads it), `AGENTS.md` (rules rendered in), the reviewer role (link) |
+| A recipe | the demo page's source (`demo/src/recipes/*.rs`, e2e-tested) | `docs/recipes.md`: one line each, what it shows, its path |
+| A task's procedure | `ferrox-ui/agent-kit/core/tasks/<task>.md` | adapters (generated from `kit.tsv`), `BOOTSTRAP.md` |
+| A task's name and purpose | `ferrox-ui/agent-kit/kit.tsv` | every generated adapter, `ADAPTING.md`, the kit README's table (rendered) |
+| A script's behaviour | its `.spec.md` (the master) | the bash and PowerShell implementations, which follow it; the shared test suite holds them to it |
+| Where an adapter's files go | `ferrox-ui/agent-kit/install/targets.tsv` | both installers |
+
+### 1. One entry point: `ferrox-ui/agent-kit/core/AGENTS.md`
+
+Small enough to read every time (target under 2,000 tokens), and complete
+enough that most screens need nothing else:
+
+- What ferrox-ui is, in three lines; setup in five lines that point to the
+  `setup` task for the details.
+- **The "need → component" table for the whole library**, rendered from
+  `docs/choosing.md` (its one home), the menus table's shape: "a list of records → `DataView`", "a destructive confirm
+  → `ConfirmDialog`", "pick from many → `Combobox`", "row actions → `Menu`
+  with `MORE_VERTICAL`", …
+- **The rules that make an app consistent**, rendered from
+  `check/rules.tsv` (the same rules the drift check enforces), each one
+  line: no raw
+  `<button>` / `<select>` / `<dialog>` / `<input>` where a component
+  exists; no colours, sizes or spacing outside the tokens; page structure
+  from the layout primitives (below), not app CSS; a screen's actions in
+  its `Panel`'s `actions`; every icon from ferrox-icons; …
+- **Where to look next**: the recipe for the screen at hand, then the one
+  component page it needs.
+
+It lives in the ferrox-ui repo, in the kit's agent-neutral core, so it
+versions with the code. Each adapter, or `BOOTSTRAP.md`, points the
+developer's agent at it (sections 8 and 8a).
+
+### 2. A reference that loads on demand
+
+- `ferrox-ui/docs/<component>.md`, one page per component (or per small
+  family: `menu-items.md`): props, one example, the behaviour that matters.
+  Most are 50–150 lines.
+- `ferrox-ui/docs/index.md`: every public item, one line each, its
+  signature and what it's for. **Generated from the source** (the
+  `#[component]` signatures and their first doc line) by a small tool in
+  the repo, with a test that fails when the committed index is stale.
+- `ferrox-ui/docs/choosing.md`: which component for which need, the one
+  home of that table (the menus table in today's README moves there).
+- The README shrinks to a human overview with links. The content moves; it
+  isn't written twice. The same render tool and staleness test serve
+  every rendered block in the repo (sections 0, 1, 8).
+
+### 3. Docs that can't rot
+
+The component pages are pulled into rustdoc with `#[doc =
+include_str!(…)]`, so their examples compile as doctests on every `cargo
+test`. A renamed prop breaks the build, not the agent.
+
+### 4. Recipes: whole screens, tested
+
+The shapes apps repeat, each a complete, working screen:
+
+| Recipe | Built from |
+|---|---|
+| List page | `Panel` (title, `+`, `DataLayoutSwitch`) + `DataView` of `Card`s + a row `Menu` + empty / loading / error |
+| Form in a dialog | `Dialog` + `Field`s + validation + saving |
+| Detail page | `Panel`s, a `SplitButton`, a `ConfirmDialog` for delete |
+| Settings page | collapsible `Panel`s, `Switch`es, `Select`s |
+| App shell | header, `SideMenu`, a user `Menu` with a header |
+
+Each recipe is a demo page (`demo/src/recipes/<name>.rs`, so it runs and
+the e2e suite covers it), commented where a choice needs explaining. The
+page *is* the recipe: `docs/recipes.md` only lists them, one line each
+with its path. An agent reads the one file and changes the nouns: few
+tokens, and the same screen shape in every app.
+
+### 5. Page layout primitives (`layout`)
+
+So apps need next to no CSS of their own. Three small components on the
+spacing tokens:
+
+- `Stack` — children in a column with a token gap (`Gap::Sm/Md/Lg`).
+- `Cluster` — children in a wrapping row with a gap and alignment (a row
+  of buttons, a label and its value).
+- `PageGrid` — a page's main column plus an optional side column that
+  stacks under it on a phone.
+
+With these, a recipe has no `<style>`, and neither does the app that
+copies it.
+
+### 6. Names an agent can predict
+
+An agent generalises from one component to the next, so the same idea must
+have the same name everywhere. An audit, then renames while it's cheap
+(nothing is released): `label` vs `title` vs `text` for the visible words;
+`on_select` / `on_click` / `on_change`; `disabled` as `Signal<bool>`
+everywhere; `*_label` for every word that can be translated; the same
+`class` behaviour. Each rename is noted in a CHANGELOG entry.
+
+### 7. A drift check: `ferrox-ui/agent-kit/check/ferrox-check`
+
+Run in an app, it lists where the app drifted, with the fix: a raw
+`<button>` (→ `Button`), `style=` (→ tokens or a layout primitive), a hex
+colour or `px` in app CSS (→ a token), a hand-made menu or dialog, a
+missing `init()`. File:line, one per line, short. AGENTS.md says to run it
+before calling a screen done.
+
+### 8. The agent kit (`ferrox-ui/agent-kit/`, the deliverable)
+
+It lives **inside the `ferrox-ui` crate's folder**, with `docs/`, so the
+same files serve both ways a developer can get ferrox-ui:
+
+- **From GitHub** (the plan of record): one clone gives the kit, the docs,
+  the recipes and the starter at one version. The developer points their
+  agent at the clone; the installer writes the app's git dependency pinned
+  to the clone's own tag or commit, so what the agent reads matches what
+  the app compiles. No separate kit repo: that would version apart from
+  the library.
+- **From crates.io**, if it's ever published: Cargo packages only what's
+  inside a crate's folder, so `cargo add ferrox-ui` would deliver the kit
+  and docs with the crate, version-matched, found through `cargo
+  metadata`. Publishing would also mean publishing `ferrox-icons`,
+  `ferrox-theme` and `ferrox-theme-build` (crates.io refuses git
+  dependencies). A `cargo install ferrox-kit` CLI with the kit built in is
+  an option then, beside the scripts. Not planned now.
+
+The shape of a good toolkit: agent-neutral masters, thin per-agent shells,
+an installer. Everything an agent needs to build with ferrox-ui, and
+nothing about the user's own stack ([[general-not-stack]]).
+
+```
+ferrox-ui/agent-kit/
+├── README.md              what the kit is; attaching it to Claude Code,
+│                          Copilot, any AGENTS.md agent, or any other
+├── BOOTSTRAP.md           one paragraph to paste into ANY agent: where the
+│                          kit is and what to read first
+├── ADAPTING.md            the kit's contract, for writing an adapter for an
+│                          agent the kit doesn't know (section 8a)
+├── core/                  agent-neutral: plain Markdown, no frontmatter, no
+│   │                      agent's tool or feature names
+│   ├── AGENTS.md          the entry point (section 1)
+│   ├── tasks/             one procedure per task:
+│   │   ├── setup.md       add ferrox-ui to a Leptos CSR app
+│   │   ├── screen.md      build a screen from a recipe
+│   │   ├── component.md   find and use the right component
+│   │   └── check.md       run the drift check, fix what it finds
+│   └── roles/
+│       └── reviewer.md    a reviewer's brief: the rules, the check,
+│                          a file:line report
+├── adapters/              templates only, rendered per kit.tsv row on
+│   │                      install; they hold no content
+│   ├── claude/            skill, subagent and command templates
+│   ├── copilot/           prompt and instructions templates
+│   └── agents-md/         an AGENTS.md section template, for agents that
+│                          read one (Codex, Cursor, Copilot and others)
+├── kit.tsv                every core piece: id, kind (entry, task, role,
+│                          command), path, one-line purpose; the installer
+│                          and ADAPTING.md both read it
+├── install/               install.sh, install.ps1, install.spec.md,
+│                          targets.tsv (adapter → where its files go)
+└── check/                 ferrox-check and ferrox-docs (.sh, .ps1,
+                           .spec.md), rules.tsv
+```
+
+- **Docs that match the version in use.** The reference pages and recipes
+  stay in the crate (`ferrox-ui/docs/`). The kit finds them through the
+  app's own `Cargo.lock`: `check/ferrox-docs.sh` asks `cargo metadata`
+  where the ferrox-ui being built lives, and prints its `docs/` path. An
+  agent never reads docs for a different version than it compiles.
+- **Installed by copying**, stamped with the ferrox-ui version, so an
+  app's repo carries its kit to every machine and teammate; `install.sh
+  --update` refreshes it and shows what changed.
+- The kit has its own tests: the installer into a scratch app (each mode,
+  dry-run, backup), every skill's paths resolving, the drift check against
+  fixtures.
+
+### 8a. Any agent, including ones nobody knows yet
+
+The user (2026-10-24): a developer may use any agent, so the kit is
+agent-agnostic first, with known agents as conveniences.
+
+- **The core is the product; adapters are wrappers.** Everything an agent
+  needs to do well is in `core/`, as plain Markdown that names actions
+  generically ("read the file", "run the command", "ask the user"), never
+  an agent's tools, slash syntax or frontmatter. A test fails if a core
+  file mentions one (a deny-list: `Skill tool`, `Bash tool`,
+  `subagent_type`, `$ARGUMENTS`, `#file:`, …).
+- **Adapters are generated, not written.** An adapter is a template (how
+  that agent wraps one task, one role, the entry point) plus its line in
+  `install/targets.tsv` (where the files go). The installer renders one
+  shell per `kit.tsv` row: a Claude skill is frontmatter from the row plus
+  "follow `core/tasks/screen.md`". Adding a task is a core file and a
+  `kit.tsv` row; every adapter gets it. Nothing in `adapters/` repeats
+  guidance or descriptions.
+- **`BOOTSTRAP.md`, for any agent at all.** A short paragraph a developer
+  pastes into an agent's instructions or first message: the kit's path,
+  "read `core/AGENTS.md` first", "for a task, read its file in
+  `core/tasks/`", "before saying a screen is done, run the check". Any
+  agent that can read files and run commands can use the kit with nothing
+  else.
+- **`ADAPTING.md`, to make a native adapter for a new agent.** The
+  contract, and how to map it: the entry point → the agent's
+  project-instructions file; each task → its reusable prompt / skill /
+  rule; the reviewer role → its subagent or a second session; commands →
+  its command mechanism or a documented phrase. It lists `kit.tsv` as the
+  source of what to wrap and ends with a checklist. A developer can hand
+  `ADAPTING.md` to their own agent and have it write the adapter.
+- **`install --generic <dir>`** copies just `core/`, `BOOTSTRAP.md`,
+  `kit.tsv` and the scripts, for agents with no adapter.
+
+### 8b. Scripts: bash, PowerShell, and a spec for anything else
+
+Every script the kit ships (`install`, `ferrox-check`, `ferrox-docs`) comes
+in three forms (the user, 2026-10-24):
+
+- **bash** (`*.sh`), for Linux and macOS;
+- **PowerShell 7** (`*.ps1`, `pwsh`), for Windows (and anywhere else
+  `pwsh` runs);
+- **a spec** (`*.spec.md`), agent-neutral: inputs, outputs, exit codes,
+  what it reads and writes, each step, and the edge cases, written so a
+  developer's agent can translate the script into any other language (a
+  Makefile, Python, Nushell, …). The kit README says how: "give your agent
+  `<script>.spec.md` and the language".
+
+To keep the three from drifting apart:
+
+- **The rules are data, not code.** The drift check's patterns, messages
+  and fixes live in one file (`check/rules.tsv`); the installer's what-goes-
+  where in another (`install/targets.tsv`). Both scripts read them, and
+  the specs describe the format. A new rule is one line, in one place.
+- **No tools beyond the shell.** bash uses `grep -E`, `find`, `sed`;
+  PowerShell uses `Select-String` and `Get-ChildItem`. Nothing to install
+  (no `rg`, no `jq`); `cargo` only where it's needed anyway
+  (`ferrox-docs`).
+- **The spec is the master; the scripts implement it.** Two
+  implementations are the one unavoidable repeat (a script can't link to
+  a spec); the shared test suite is what keeps them the same.
+- **One test suite for both.** The same fixtures and expected output run
+  against the bash and the PowerShell version, so they must agree line for
+  line. PowerShell runs in CI and locally through `pwsh` on Linux (not
+  installed on this machine yet: the test skips it with a clear message
+  until it is).
+
+### 8c. The front door
+
+What a developer who found the repo does first:
+
+- **A starter app** (`starter/`): the smallest app with everything wired
+  (dependencies, the theme's build script, the Trunk hook, the stylesheet
+  links, the two `init()` calls), one page built from the list-page
+  recipe, and an e2e smoke test. "Copy `starter/`, `trunk serve`." It is
+  the one home of the setup facts: the `setup` task and the README point
+  at its files.
+- **"Start here" at the top of the README**, three paths: with an agent
+  (install the kit into your app, or paste `BOOTSTRAP.md`, then "use
+  ferrox-ui"); a new app by hand (copy the starter); an existing app (the
+  setup steps, pointing at the starter's files).
+- **A dependency line that works today:** pinned to a git `rev` until
+  `v0.1.0` is tagged (the README's `tag = "v0.1.0"` points at a tag that
+  doesn't exist yet), rendered from one place.
+- The README's "Apps that use webapp-lib…" moves to webapp-lib's docs
+  ([[general-not-stack]]).
+
+### 9. Measure it
+
+A reference task, the same before and after: "in a fresh Leptos app with
+ferrox-ui, add a recipes list page with add, row actions (edit, delete
+with confirm), and empty, loading and error states". A fresh agent (a
+subagent, no other context, none of the user's own skills) gets only the
+one-line directive: before, with today's README; after, with the kit
+installed. Recorded:
+tokens used, docs read, compile-fix rounds, and the drift check's findings
+on the result. Run once now (baseline) and once at the end.
+
+## Pieces
+
+Each is small and reviewed on its own.
+
+1. **Baseline.** The reference task, run against today's docs; numbers in
+   this plan.
+2. **Front door.** The starter app (with its e2e smoke test), "Start here"
+   in the README, the dependency line that works today.
+3. **Names.** The audit (a table: today → proposed), approved, then the
+   renames, demo, tests, CHANGELOG.
+4. **Layout primitives.** `Stack`, `Cluster`, `PageGrid`, `Gap`; demo,
+   e2e.
+5. **Reference split.** `docs/` pages from the README, `docs/choosing.md`,
+   the render tool (index from source, rendered blocks between markers)
+   and its staleness test, doctests through `include_str!`; the README
+   becomes the overview, linking.
+6. **Recipes.** The five screens as demo pages (e2e), and
+   `docs/recipes.md` listing them; the starter's page becomes the list
+   recipe's copy.
+7. **Drift check.** `check/rules.tsv`; `ferrox-check` and `ferrox-docs`
+   in bash and PowerShell, with their specs; one test suite for both, run
+   against the demo (which must pass) and fixtures (which must fail the
+   right way).
+8. **The kit, part 1 (agent-neutral):** `core/` (AGENTS.md, the four
+   tasks, the reviewer role), `kit.tsv`, `BOOTSTRAP.md`, `ADAPTING.md`,
+   the installer's `--generic` in bash and PowerShell with its spec, the
+   kit README, the core deny-list test.
+9. **The kit, part 2 (adapters):** the templates in `adapters/claude`
+   (skill, subagent, command), `adapters/copilot`, `adapters/agents-md`;
+   the installer's `--claude`, `--copilot`, `--agents-md` and `--update`
+   rendering them (both shells, `install/targets.tsv`); a test that
+   renders every adapter for every `kit.tsv` row and checks no rendered
+   shell carries text that isn't from `kit.tsv`.
+10. **Measure again** with the kit installed; adjust where the agent
+    stumbled.
+
+## Open points
+
+1. **Agent-neutral masters plus thin per-agent shells** (the toolkit
+   shape), recommended: one copy of the guidance, any agent. The
+   alternative is writing each agent's format separately.
+2. **Split the README into `docs/` pages, the README an overview**,
+   recommended. The alternative keeps one README and adds only the index,
+   still 18,000 tokens when an agent opens it.
+3. **Layout primitives** (`Stack`, `Cluster`, `PageGrid`), recommended:
+   page spacing is where screens drift once components are shared. The
+   alternative is a page of CSS rules in AGENTS.md, which costs tokens
+   every time and is followed loosely.
+4. **Renames now**, before 0.1.0 and before any app depends on ferrox-ui,
+   recommended. The alternative is living with the inconsistencies, which
+   agents will copy.
+5. **Measuring with a subagent**, twice, recommended: it costs one agent
+   run each time, and it's the only number that says whether this worked.
+6. **The drift check as scripts over a rules file** (`grep -E` /
+   `Select-String` patterns in `check/rules.tsv`) first, recommended; a
+   Rust tool only if patterns aren't enough.
+7. **Install by copying, version-stamped** (`--update` to refresh),
+   recommended: the app's repo carries the kit to every machine. The
+   alternative, symlinks into a ferrox-ui checkout, breaks anywhere that
+   checkout isn't.
+8. **Adapters shipped:** Claude Code (skills, subagent, commands),
+   `AGENTS.md` (read by Codex, Cursor, Copilot and others), Copilot
+   prompts, recommended; every other agent through `BOOTSTRAP.md` and
+   `ADAPTING.md`. More native adapters only when someone asks.
+9. **Docs found through `cargo metadata`** (version-matched, nothing
+   copied), recommended. The alternative copies `docs/` into the app on
+   install, which goes stale when ferrox-ui is upgraded.
+10. **PowerShell 7 (`pwsh`)** for the Windows scripts, recommended: it's
+   current, cross-platform (testable here), and installs alongside the old
+   one. The alternative also targets Windows PowerShell 5.1, which is on
+   every Windows machine but older and quirkier; worth it only if a user
+   can't install 7.
+11. **`pwsh` on this machine** for the tests: installing it is your call
+   (Microsoft's package for Linux). Until then the PowerShell half of the
+   suite skips, loudly.
