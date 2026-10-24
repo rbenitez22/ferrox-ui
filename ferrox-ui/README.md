@@ -34,7 +34,7 @@ call adds nothing.
 | `core` | always on | `Button`, `IconButton`, `Toolbar`, `ToolbarGroup`, `Spinner`, `LoadingOverlay`, `Alert`; help: `HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`, `HelpRequest` |
 | `overlay` | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
 | `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
-| `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` (`plans/navigation.md`; documented with the group's last piece, see the rustdoc meanwhile) |
+| `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
 | `menus`, `layout`, `data` | one each, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)
@@ -665,6 +665,183 @@ How it behaves:
 It doesn't fetch. webapp-lib's `AutocompleteInputModel` is the adapter that
 loads `items`. Groups, create-new and multi-select are planned.
 
+## navigation (feature `navigation`)
+
+Links that say where the user is, and a side menu to hold them. The links
+are leptos_router's `<A>`, so every component here goes inside a
+`<Router>`. The feature turns on `overlay` (the side menu is a `Sheet`) and
+brings in leptos_router. It's the only group that does.
+
+| Use it for | Use |
+|---|---|
+| a list of places: a sidebar, a settings page's sections | `NavList` of `NavLink`s |
+| places that belong together (one service's pages, the account's) | `NavGroup` inside the list, collapsible if it's long or rarely used |
+| the app's navigation on a phone, or any screen without room for a sidebar | `SideMenu`, opened by a `SideMenuButton` |
+
+```rust
+use ferrox_ui::{NavGroup, NavLink, SideMenu, SideMenuButton};
+
+let menu = RwSignal::new(false);
+
+view! {
+    <Router>
+        <header class="app-bar">
+            <SideMenuButton open=menu />
+            <span class="app-bar__title">"Groceries"</span>
+        </header>
+        <SideMenu open=menu title="Groceries">
+            <NavLink href="/" exact=true>"Lists"</NavLink>
+            <NavLink href="/load">"Load Data"</NavLink>
+            <NavGroup label="Product database" collapsible=true>
+                <NavLink href="/units">"Units"</NavLink>
+                <NavLink href="/categories">"Categories"</NavLink>
+                <NavLink href="/products">"Products"</NavLink>
+            </NavGroup>
+            <NavGroup label="Account">
+                <NavLink href="/account">"Account"</NavLink>
+                <NavLink href="/logout">"Logout"</NavLink>
+            </NavGroup>
+        </SideMenu>
+        <Routes fallback=|| "Not found">…</Routes>
+    </Router>
+}
+```
+
+Put the `SideMenu` outside `<Routes>`, beside the header, so it stays
+mounted while the user moves between pages.
+
+### `NavList`, `NavLink`
+
+A labelled `<nav>` landmark holding a `<ul>`, one `<li>` per link, so a
+screen reader hears the landmark's name and how many links it holds.
+
+```rust
+use ferrox_icons::SEARCH;
+use ferrox_ui::{NavLink, NavList};
+
+view! {
+    <NavList label="Settings">
+        <NavLink href="/settings" exact=true>"General"</NavLink>
+        <NavLink href="/settings/search" icon=SEARCH>"Search"</NavLink>
+    </NavList>
+}
+```
+
+- `NavList`: `label` (required, the landmark's name), `class`, children
+  (`NavLink`s and `NavGroup`s).
+- `NavLink`: `href` (required), `exact`, `icon` (an `IconData`, drawn before
+  the words and hidden from screen readers), `class` (on the link), children
+  (the words). It renders an `<li>`, so it goes in a `NavList` or a
+  `NavGroup`.
+
+**The current page.** The router sets `aria-current="page"` on the link to
+the page the user is on, and that's what tints it in the primary fill. A
+link is current on its own path and on every path below it: `/accounts` is
+current on `/accounts/42`. `exact` limits it to its own path, for a link
+whose sub-pages have links of their own. `/` is current only on `/`.
+
+Each link is a full-width row. It answers hover and press in colour only,
+shows the theme's focus ring, and is at least 44px tall on a phone.
+`nav_list_classes(extra)` and `nav_link_classes(extra)` return the class
+lists.
+
+### `NavGroup`
+
+Links that belong together, under a heading that names them. A screen reader
+hears "Product database, list, 3 items".
+
+```rust
+use ferrox_ui::NavGroup;
+
+let remember = RwSignal::new(false);   // store it wherever the app keeps preferences
+
+view! {
+    <NavGroup label="Account">…</NavGroup>                                   // plain
+    <NavGroup label="Product database" collapsible=true>…</NavGroup>         // starts collapsed
+    <NavGroup label="Reports" collapsible=true start_expanded=true>…</NavGroup>
+    <NavGroup label="Admin" collapsible=true expanded=remember>…</NavGroup>   // the app owns it
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `label` | required | the heading, and the name of the group's list |
+| `collapsible` | `false` | the heading is a button that shows and hides the links |
+| `start_expanded` | `false` | where a collapsible group starts |
+| `expanded` | none | `RwSignal<bool>`, two-way, owned by the app; overrides `start_expanded` |
+| `class` | | |
+| children | | `NavLink`s; one level only, no group inside a group |
+
+- **Plain:** the heading is quiet text (small, muted), not focusable, and a
+  hairline splits the group from what comes before it.
+- **Collapsible:** the heading is a `<button aria-expanded aria-controls>`
+  with a chevron that points right while collapsed and turns down once
+  expanded. Enter and Space toggle it. A collapsed group's links are
+  `hidden`, so Tab skips them.
+- **The current page is never hidden.** When the route moves to one of a
+  collapsed group's links, or the page opens on one, the group expands
+  itself. That happens on arrival only, so the user can still collapse the
+  group around the page they're on.
+- **Inside a `SideMenu`** a group's own state starts over each time the
+  menu opens (the menu's body is mounted only while open): collapsed, unless
+  the current page is in it. To remember it, pass `expanded`.
+
+`nav_group_classes(collapsible, extra)` returns the class list.
+
+### `SideMenu`, `SideMenuButton`
+
+A `Sheet` holding a `NavList` of the children, with an optional footer
+pinned to the bottom. It shares an `open` signal with its button.
+
+```rust
+use ferrox_ui::{SideMenu, SideMenuButton};
+
+view! {
+    <SideMenuButton open=menu />
+    <SideMenu
+        open=menu
+        title="Groceries"
+        help=MENU_HELP.clone()
+        footer=|| view! { <span>"Version 1.4"</span> }
+    >
+        …
+    </SideMenu>
+}
+```
+
+**It closes itself.** `open` is an `RwSignal`, not `Sheet`'s `open` plus
+`on_close`, because the menu sets it back to false on its own:
+
+- when the user follows a link inside it: a plain left click on any
+  `<a href>` without a `target`, so a plain `<A>` closes it too. A ctrl- or
+  cmd-click opens a new tab and leaves the menu open;
+- when the current page's link is clicked, though the route doesn't change;
+- on any route change while it's open, such as the back button;
+- on Esc, the × or a backdrop click, as any `Sheet`.
+
+Focus then returns to the `SideMenuButton`. After a navigation, moving focus
+into the new page is the app's routing concern, not the menu's.
+
+| `SideMenu` prop | Default | |
+|---|---|---|
+| `open` | required | `RwSignal<bool>`, shared with `SideMenuButton` |
+| `title` | required | the title bar's text, and the sheet's accessible name |
+| `nav_label` | `"Sections"` | the name of the `<nav>` inside |
+| `side` | `Left` | a `SheetSide` |
+| `footer` | none | a closure returning a view, pinned below the links behind a hairline: a version, a legal line |
+| `help` | none | a `?` in the title bar, before the × |
+| `close_label` | `"Close"` | the ×'s label |
+| `class` | | on the sheet, after `side-menu` |
+| children | | `NavLink`s and `NavGroup`s |
+
+`SideMenuButton` is an `IconButton` drawing `MENU`, with
+`aria-haspopup="dialog"` and an `aria-expanded` that follows `open`. Props:
+`open` (required), `label` (`"Menu"`, its only label and its tooltip),
+`class`. `side_menu_classes(extra)` returns the sheet's class list.
+
+Who's signed in, the app's title bar and a page frame aren't here: the bar
+is the app's (or webapp-lib's), and a page frame is `layout`'s, later.
+
 ## Help (in `core`)
 
 Any component with a label or a title can carry help. Give it a topic and a
@@ -710,6 +887,7 @@ The `id` is stable: an assistant and a guide find the topic by it. The
 | `Switch` | beside the switch, not inside it | `help_skip_tab` |
 | `Toolbar` | right after the title | |
 | `Dialog`, `ConfirmDialog`, `Sheet` | in the title bar, just before the × | |
+| `SideMenu` | in the title bar, just before the × | a request names it as a `sheet` |
 
 ```rust
 <Field label="Amount" help=SPLIT_AMOUNT.clone()>
@@ -871,6 +1049,15 @@ controls are left alone. On a phone (≤ 768px) the controls' text is at least
 16px, so iOS doesn't zoom in when one takes focus. These are injected only
 when the `forms` feature is on.
 
+## CSS classes (navigation)
+
+| Sheet | Classes |
+|---|---|
+| `nav.css` | `.nav-list`, `.nav-list__items`; `.nav-link`, `.nav-link__icon`, `.nav-link[aria-current='page']`; `.nav-group`, `.nav-group--collapsible`, `.nav-group__heading`, `.nav-group__toggle` (`[aria-expanded='true']`), `.nav-group__label`, `.nav-group__chevron`, `.nav-group__list` |
+| `side-menu.css` | `.side-menu` (with `.sheet`), `.side-menu__content`, `.side-menu__footer` |
+
+These are injected only when the `navigation` feature is on.
+
 A unit test (`css.rs`) fails if any shipped selector doesn't start with a
 class.
 
@@ -884,6 +1071,8 @@ class.
 - `overlay`: a browser with `<dialog>`/`showModal()` and `@starting-style`
   (Chrome 117+, Firefox 129+, Safari 17.5+). Without `@starting-style` a
   sheet just appears instead of sliding.
+- `navigation`: leptos_router 0.8, with every component inside a
+  `<Router>`.
 - Help and `Combobox`: a browser with the Popover API (`popover`, `popovertarget`; Chrome
   114+, Firefox 125+, Safari 17+).
 
@@ -899,7 +1088,7 @@ class.
 ## Planned
 
 From `plans/ferrox-ui.md`, one group per piece, each with a demo page and e2e
-tests: `navigation` (Side menu, on `Sheet`), `layout` (Panel), `data` (Data grid). `core` later gains
+tests: `layout` (Panel), `data` (Data grid). `core` later gains
 Skeleton, Badge, Card and a theme toggle. `overlay` later gains
 `TypeToConfirmDialog`, Toast, Popover and Tooltip, and the
 phone variants of Dialog (a bottom sheet, full screen) when an app needs them.
@@ -907,7 +1096,9 @@ Help later gains a topic registry (checked `related` links, a `/help` guide
 rendered from the same topics) and `help` on new components as they land.
 `forms` later gains Combobox groups, create-new and multi-select, and
 NumberInput, DateInput, Radio and the rest of the inventory when an app needs
-them.
+them. `navigation` later gains a persistent sidebar that folds to a rail of
+icons, count badges on links (with `core`'s Badge), Breadcrumb, Pagination,
+Bottom nav and Stepper.
 
 ## Licence
 

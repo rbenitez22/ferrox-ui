@@ -5,8 +5,8 @@ webapp-lib's `SideMenu` / `MenuLink` with a link list that works anywhere and
 a side menu built on `Sheet`. It ports the link styling of conrad's
 `.shell__nav-item` (`ui/src/app/shell.css`) and webapp-lib's `.side-menu a`.
 
-Status: approved (2026-10-23), all open points as recommended. Pieces 1–3
-done (2026-10-23); piece 4 (docs) next.
+Status: done (2026-10-23), all open points as recommended. All four pieces
+done; piece 4 is the navigation section of `ferrox-ui/README.md`.
 
 Notes from piece 1:
 - leptos_router 0.8.17's `<A>` already treats `/` as current only on `/`
