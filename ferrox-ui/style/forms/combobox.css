@@ -1,8 +1,8 @@
 /* Comboboxes (`.combobox`): a field that filters a list. Part of ferrox-ui
    `forms`. Tokens only and class-only.
 
-   The list is a popover in the top layer, placed under the field and as
-   wide as it from script (`left`, `top`, `width`, `data-side`), so a dialog
+   The list (and the offer to create) is a popover in the top layer, placed
+   under the field and as wide as it from script (`left`, `top`, `width`, `data-side`), so a dialog
    body or any `overflow` parent cannot clip it. */
 
 .combobox {
@@ -38,20 +38,34 @@
 
 /* ── The list ── */
 
-.combobox__list {
+/* The popover: the list, and under it the offer to create. */
+.combobox__popup {
   position: fixed;
   inset: auto;
   box-sizing: border-box;
   margin: 0;
-  padding: var(--space-xs) 0;
+  padding: 0;
   max-height: 16rem;
-  overflow-y: auto;
-  list-style: none;
   background: var(--surface-0);
   color: var(--text);
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-lg);
+}
+
+/* Only while open: the browser hides a closed popover with `display`. */
+.combobox__popup:popover-open {
+  display: flex;
+  flex-direction: column;
+}
+
+.combobox__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: var(--space-xs) 0;
+  overflow-y: auto;
+  list-style: none;
 }
 
 .combobox__option {
@@ -74,4 +88,26 @@
   padding: var(--space-xs) var(--space-md);
   color: var(--text-muted);
   font-style: italic;
+}
+
+/* ── The offer to create ── */
+
+.combobox__create {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-xs) var(--space-md);
+  border: 0;
+  border-top: 1px solid var(--line);
+  background: none;
+  color: var(--primary-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.combobox__create:hover {
+  background: var(--surface-2);
 }

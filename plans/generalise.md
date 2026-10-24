@@ -9,7 +9,10 @@ app's: a static list, a REST endpoint, anything.
 Status: approved (2026-10-23), the open point as recommended. Piece 1 done
 (2026-10-23): `on_add`, `add_label`, `can_add` removed from `Panel`; the
 demo puts its `+` in `actions` (behind its own `Show` for the permission).
-Pieces 2 (new entry on Select / Combobox) and 3 (docs) next.
+Piece 2 done (2026-10-24): Combobox `on_create` / `create_label` (a
+"Create “…”" button under the list, in a popover that now wraps the
+listbox), Select `on_create` / `create_label` (a `+` after refresh). Piece 3
+(docs) next.
 
 ## The audit
 

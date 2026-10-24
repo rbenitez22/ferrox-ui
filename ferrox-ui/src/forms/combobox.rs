@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use ferrox_icons::{Icon, CHEVRON_DOWN, CLOSE, REFRESH};
+use ferrox_icons::{Icon, CHEVRON_DOWN, CLOSE, PLUS, REFRESH};
 use leptos::html;
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
@@ -33,6 +33,19 @@ pub(crate) fn step_active(active: Option<usize>, len: usize, step: isize) -> Opt
     })
 }
 
+/// The text to offer creating from: what was typed, trimmed, when it is not
+/// empty and no label matches it.
+pub(crate) fn creatable(labels: impl IntoIterator<Item = String>, text: &str) -> Option<&str> {
+    let text = text.trim();
+    let mut labels = labels.into_iter();
+    (!text.is_empty() && !labels.any(|label| matches_text(&label, text))).then_some(text)
+}
+
+/// The offer's default text.
+fn default_create_label(text: String) -> String {
+    format!("Create “{text}”")
+}
+
 /// The class list for a combobox's input.
 fn input_classes(invalid: bool, extra: &str) -> String {
     control_classes("form-input", invalid, extra)
@@ -53,12 +66,16 @@ fn keep_focus(ev: MouseEvent) {
 /// - ↓ / ↑ move through the options (opening the list), Enter chooses, Tab
 ///   chooses and moves on, Esc closes the list (and, when it is closed,
 ///   clears the text). A click chooses.
+/// - With `on_create`, text that matches nothing brings a "Create “…”"
+///   button under the list; a click or Enter presses it, and `on_create`
+///   gets the trimmed text. What creating does is the app's.
 /// - `on_select` gets `Some(item)` when one is chosen, and `None` when the
 ///   text is cleared or the field is left with text that names no item.
 /// - Its controls (clear, the chevron, refresh) are buttons out of the Tab
 ///   order, so they cost a row of fields no keystrokes.
-/// - The list is in the top layer (a popover), placed under the field and
-///   as wide as it: a `Dialog` body or any `overflow` parent can't clip it.
+/// - The list (and the offer) is in the top layer (a popover), placed under
+///   the field and as wide as it: a `Dialog` body or any `overflow` parent
+///   can't clip it.
 ///
 /// It does not fetch: whatever loaded `items` owns reloading them
 /// (`on_refresh`). Inside a `Field` it takes the field's id, description and
@@ -94,6 +111,10 @@ pub fn Combobox<T>(
     /// Re-read the items; adds a refresh control.
     #[prop(optional, into)] on_refresh: Option<UnsyncCallback<()>>,
     #[prop(optional, into)] refreshing: Signal<bool>,
+    /// Offers to create an item from the typed text when nothing matches.
+    #[prop(optional, into)] on_create: Option<UnsyncCallback<String>>,
+    /// The offer's text, given the typed text; `Create “{text}”` by default.
+    #[prop(optional, into)] create_label: Option<Callback<String, String>>,
     #[prop(into, default = "No matches".into())] empty_label: Signal<String>,
     #[prop(into, default = "Clear".to_string())] clear_label: String,
     #[prop(into, default = "Show all".to_string())] toggle_label: String,
@@ -125,7 +146,7 @@ where
     let active = RwSignal::new(None::<usize>);
     let input_ref = NodeRef::<html::Input>::new();
     let field_ref = NodeRef::<html::Div>::new();
-    let list_ref = NodeRef::<html::Ul>::new();
+    let popup_ref = NodeRef::<html::Div>::new();
 
     let filtered = {
         let label_of = label_of.clone();
@@ -136,20 +157,32 @@ where
         })
     };
     let list_shown = Signal::derive(move || open.get() && (show_all.get() || !text.get().is_empty()));
+    // What the offer would create, while it is shown.
+    let offer = {
+        let label_of = label_of.clone();
+        let offers = on_create.is_some();
+        Signal::derive(move || {
+            if !offers || !list_shown.get() {
+                return None;
+            }
+            let typed = text.get();
+            items.with(|items| creatable(items.iter().map(|item| label_of(item)), &typed).map(str::to_string))
+        })
+    };
 
     // Show or hide the list popover, placed under the field and as wide.
     Effect::new(move |_| {
         let shown = list_shown.get();
-        let (Some(list), Some(field)) = (list_ref.get(), field_ref.get()) else { return };
-        let list: HtmlElement = list.unchecked_into();
-        let is_open = list.matches(":popover-open").unwrap_or(false);
+        let (Some(popup), Some(field)) = (popup_ref.get(), field_ref.get()) else { return };
+        let popup: HtmlElement = popup.unchecked_into();
+        let is_open = popup.matches(":popover-open").unwrap_or(false);
         if shown && !is_open {
-            let _ = list.show_popover();
+            let _ = popup.show_popover();
             let anchor: Element = field.unchecked_into();
-            place(&anchor, &list, true);
-            follow(anchor, list, true);
+            place(&anchor, &popup, true);
+            follow(anchor, popup, true);
         } else if !shown && is_open {
-            let _ = list.hide_popover();
+            let _ = popup.hide_popover();
         }
     });
 
@@ -184,6 +217,12 @@ where
             on_select.run(Some(item));
         }
     };
+    let create = move |typed: String| {
+        if let Some(on_create) = on_create {
+            close();
+            on_create.run(typed);
+        }
+    };
 
     let on_input = move |_| {
         open.set(true);
@@ -212,6 +251,9 @@ where
                     if let Some(item) = chosen() {
                         ev.prevent_default();
                         choose(item);
+                    } else if let Some(typed) = offer.get_untracked() {
+                        ev.prevent_default();
+                        create(typed);
                     }
                 }
                 "Tab" => {
@@ -311,6 +353,30 @@ where
         </button>
     });
 
+    let create_offer = move || {
+        offer.get().map(|typed| {
+            let label = match create_label {
+                Some(label) => label.run(typed.clone()),
+                None => default_create_label(typed.clone()),
+            };
+            view! {
+                <button
+                    type="button"
+                    class="combobox__create"
+                    tabindex="-1"
+                    on:mousedown=keep_focus
+                    on:click=move |_| {
+                        create(typed.clone());
+                        focus_field();
+                    }
+                >
+                    <Icon icon=PLUS />
+                    <span>{label}</span>
+                </button>
+            }
+        })
+    };
+
     let options = {
         let option_id = option_id.clone();
         move || {
@@ -370,9 +436,12 @@ where
                 on:blur=on_blur
             />
             <div class="combobox__controls">{clear}{toggle}{refresh}</div>
-            <ul popover="manual" id=list_id role="listbox" class="combobox__list" node_ref=list_ref>
-                {options}
-            </ul>
+            <div popover="manual" class="combobox__popup" node_ref=popup_ref>
+                <ul id=list_id role="listbox" class="combobox__list">
+                    {options}
+                </ul>
+                {create_offer}
+            </div>
         </div>
     }
 }
@@ -396,5 +465,13 @@ mod tests {
         assert_eq!(step_active(Some(2), 3, 1), Some(2));
         assert_eq!(step_active(Some(0), 3, -1), Some(0));
         assert_eq!(step_active(Some(1), 0, 1), None);
+    }
+
+    #[test]
+    fn creating_is_offered_only_for_text_that_matches_nothing() {
+        let labels = || ["Groceries".to_string(), "Rent".to_string()];
+        assert_eq!(creatable(labels(), "  milk "), Some("milk"));
+        assert_eq!(creatable(labels(), "gro"), None);
+        assert_eq!(creatable(labels(), "   "), None);
     }
 }

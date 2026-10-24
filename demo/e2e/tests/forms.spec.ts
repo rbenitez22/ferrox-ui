@@ -277,6 +277,21 @@ test.describe('Select', () => {
     await expect(account(page)).toHaveValue('savings');
   });
 
+  test('new is a + button after refresh; it calls on_create once', async ({ page }) => {
+    const buttons = page.locator('.select').filter({ has: account(page) }).getByRole('button');
+    await expect(buttons).toHaveCount(2);
+    expect(await buttons.evaluateAll((els) => els.map((el) => el.getAttribute('aria-label')))).toEqual(['Refresh', 'New account…']);
+    await expect(buttons.nth(1).locator('svg.icon')).toHaveAttribute('data-icon', 'plus');
+    await buttons.nth(1).click();
+    await expect(echo(page, 'account-created')).toHaveText('1');
+    await expect(account(page)).toHaveValue('new-1');
+    await expect(account(page).locator('option:checked')).toHaveText('New account 1');
+  });
+
+  test('without on_create there is no new button', async ({ page }) => {
+    await expect(page.locator('.select').filter({ has: currency(page) }).getByRole('button')).toHaveCount(0);
+  });
+
   test('draws its own caret', async ({ page }) => {
     const image = await currency(page).evaluate((el) => getComputedStyle(el).backgroundImage);
     expect(image).toContain('linear-gradient');
@@ -294,7 +309,7 @@ test.describe('Combobox', () => {
     await input(page).fill('util');
     await expect(input(page)).toHaveAttribute('aria-expanded', 'true');
     await expect(await options(page)).toHaveText(['Expenses:Utilities:Power', 'Expenses:Utilities:Water', 'Expenses:Utilities:Internet']);
-    expect(await (await listbox(page)).evaluate((el) => el.matches(':popover-open'))).toBe(true);
+    expect(await (await listbox(page)).evaluate((el) => el.closest('[popover]')!.matches(':popover-open'))).toBe(true);
   });
 
   test('arrows move the active option; Enter chooses it', async ({ page }) => {
@@ -365,6 +380,43 @@ test.describe('Combobox', () => {
     await expect(await options(page)).toHaveText(['Expenses:Pets']);
   });
 
+  test('text that matches nothing offers to create it; a click creates once', async ({ page }) => {
+    const field = page.locator('.combobox').filter({ has: input(page) });
+    const offer = field.locator('.combobox__create');
+    await input(page).fill('util');
+    await expect(await options(page)).toHaveCount(3);
+    await expect(offer).toHaveCount(0);
+
+    await input(page).fill('  Expenses:Pets ');
+    await expect((await options(page)).first()).toHaveText('No matches');
+    await expect(offer).toHaveRole('button');
+    await expect(offer).toHaveText('Create “Expenses:Pets”');
+    await expect(offer).toHaveAttribute('tabindex', '-1');
+    await offer.click();
+    await expect(echo(page, 'combo-created')).toHaveText('Expenses:Pets');
+    await expect(input(page)).toHaveValue('Expenses:Pets');
+    await expect(echo(page, 'combo-chosen')).toHaveText('expenses-pets');
+    await expect(input(page)).toHaveAttribute('aria-expanded', 'false');
+    await expect(input(page)).toBeFocused();
+
+    await input(page).fill('pets');
+    await expect(await options(page)).toHaveText(['Expenses:Pets']);
+    await expect(offer).toHaveCount(0);
+  });
+
+  test('Enter with no active option creates; with one, it chooses', async ({ page }) => {
+    await input(page).fill('Expenses:Toys');
+    await input(page).press('Enter');
+    await expect(echo(page, 'combo-created')).toHaveText('Expenses:Toys');
+    await expect(echo(page, 'combo-chosen')).toHaveText('expenses-toys');
+
+    await input(page).fill('rent');
+    await input(page).press('ArrowDown');
+    await input(page).press('Enter');
+    await expect(echo(page, 'combo-chosen')).toHaveText('expenses-rent');
+    await expect(echo(page, 'combo-created')).toHaveText('Expenses:Toys');
+  });
+
   test('inside a dialog: not clipped, Enter chooses without saving, Esc keeps the dialog', async ({ page }) => {
     await page.getByRole('button', { name: 'Combobox in a dialog…' }).click();
     const dialog = page.getByRole('dialog', { name: 'Move a split' });
@@ -390,5 +442,10 @@ test.describe('Combobox', () => {
     await field.press('Escape');
     await expect(dialog).toBeVisible();
     await expect(field).toHaveAttribute('aria-expanded', 'false');
+
+    // No on_create here: text that matches nothing offers nothing.
+    await field.fill('zzz');
+    await expect(box.getByRole('option')).toHaveText(['No matches']);
+    await expect(dialog.locator('.combobox__create')).toHaveCount(0);
   });
 });

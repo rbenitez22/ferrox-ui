@@ -280,6 +280,17 @@ component), since it takes over a key.
   a shortcut on top of the visible `?`, never the only way in.
 - Most useful where the `?` uses `skip_tab` (rows of fields).
 
+### Follow-up: `?` only while the control is active (proposed by the user 2026-10-24, not started)
+
+A screen may have help on many components, and a `?` beside each one is a
+sea of distractions. The developer chooses, per component (and maybe per
+`HelpScope` as a default), to show the `?` only while that element is
+active (focused, or holding focus within, e.g. after a click on the input).
+Help on the screen's main component stays always shown. To settle: what
+"active" means (`:focus-within`, hover too?), keeping the `?` reachable
+when focus moves onto it (it is the next thing focused), touch, and how
+this fits F1 (the hidden `?` still answers F1).
+
 ### Follow-up: noticing when a user needs help (discussed 2026-10-23, not started)
 
 The user's example: entering a transaction whose splits keep failing the

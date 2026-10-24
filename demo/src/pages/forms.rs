@@ -95,6 +95,7 @@ fn Choices() -> impl IntoView {
     let account = RwSignal::new(String::new());
     let loading = RwSignal::new(false);
     let refreshing = RwSignal::new(false);
+    let created = RwSignal::new(0_u32);
     let accounts = RwSignal::new(vec![
         SelectOption::new("checking", "Checking"),
         SelectOption::new("savings", "Savings"),
@@ -112,6 +113,14 @@ fn Choices() -> impl IntoView {
             refreshing.set(false);
         }, Duration::from_millis(600));
     };
+    // A real app would ask for the name in a dialog; a numbered one will do here.
+    let create_account = move || {
+        created.update(|n| *n += 1);
+        let n = created.get_untracked();
+        let value = format!("new-{n}");
+        accounts.update(|a| a.push(SelectOption::new(value.clone(), format!("New account {n}"))));
+        account.set(value);
+    };
     view! {
         <Section title="Choices">
             <div class="demo-form">
@@ -125,7 +134,7 @@ fn Choices() -> impl IntoView {
                     <Select value=currency options=currencies placeholder="Choose a currency" name="currency" />
                 </Field>
                 <Field label="Account">
-                    <Select value=account options=accounts loading=loading on_refresh=refresh refreshing=refreshing name="account" />
+                    <Select value=account options=accounts loading=loading on_refresh=refresh refreshing=refreshing on_create=create_account create_label="New account…" name="account" />
                 </Field>
             </div>
             <div class="demo-row">
@@ -137,6 +146,7 @@ fn Choices() -> impl IntoView {
                 <dt>"archived"</dt><dd data-echo="archived">{move || archived.get().to_string()}</dd>
                 <dt>"currency"</dt><dd data-echo="currency">{move || currency.get()}</dd>
                 <dt>"account"</dt><dd data-echo="account">{move || account.get()}</dd>
+                <dt>"created"</dt><dd data-echo="account-created">{move || created.get().to_string()}</dd>
             </dl>
         </Section>
     }
@@ -162,8 +172,8 @@ fn accounts() -> Vec<Account> {
     ACCOUNT_NAMES.iter().map(|name| Account { id: name.to_lowercase().replace([':', ' '], "-"), name: name.to_string() }).collect()
 }
 
-/// A combobox of accounts (with refresh), the choice it reports, and the
-/// same combobox inside a dialog, where its list must not be clipped.
+/// A combobox of accounts (with refresh and create), the choice it reports,
+/// and the same combobox inside a dialog, where its list must not be clipped.
 #[component]
 fn Comboboxes() -> impl IntoView {
     let items = RwSignal::new(accounts());
@@ -181,6 +191,15 @@ fn Comboboxes() -> impl IntoView {
     let on_select = move |account: Option<Account>| {
         chosen.set(account);
         reports.update(|n| *n += 1);
+    };
+    // Creating adds the account to the list in the page, then chooses it.
+    let created = RwSignal::new(Vec::<String>::new());
+    let create = move |name: String| {
+        let account = Account { id: name.to_lowercase().replace([':', ' '], "-"), name: name.clone() };
+        items.update(|a| a.push(account.clone()));
+        created.update(|c| c.push(name));
+        text.set(account.name.clone());
+        on_select(Some(account));
     };
 
     let dialog_open = RwSignal::new(false);
@@ -200,6 +219,7 @@ fn Comboboxes() -> impl IntoView {
                         on_select=on_select
                         on_refresh=refresh
                         refreshing=refreshing
+                        on_create=create
                         placeholder="Choose an account"
                         name="account-combo"
                     />
@@ -212,6 +232,7 @@ fn Comboboxes() -> impl IntoView {
                 <dt>"text"</dt><dd data-echo="combo-text">{move || text.get()}</dd>
                 <dt>"chosen"</dt><dd data-echo="combo-chosen">{move || chosen.get().map(|a| a.id).unwrap_or_else(|| "(none)".into())}</dd>
                 <dt>"reports"</dt><dd data-echo="combo-reports">{move || reports.get().to_string()}</dd>
+                <dt>"created"</dt><dd data-echo="combo-created">{move || created.get().join(", ")}</dd>
                 <dt>"in dialog"</dt><dd data-echo="dialog-chosen">{move || dialog_chosen.get().map(|a| a.id).unwrap_or_else(|| "(none)".into())}</dd>
                 <dt>"saves"</dt><dd data-echo="dialog-saves">{move || saves.get().to_string()}</dd>
             </dl>

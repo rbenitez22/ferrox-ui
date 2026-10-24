@@ -1,4 +1,4 @@
-use ferrox_icons::{Icon, REFRESH};
+use ferrox_icons::{Icon, PLUS, REFRESH};
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
@@ -28,6 +28,9 @@ impl SelectOption {
 ///   placeholder reads `loading_label`.
 /// - `on_refresh` adds a refresh button beside it; while `refreshing`, a
 ///   spinner takes the icon's place and the button refuses clicks.
+/// - `on_create` adds a `+` button after it (and after refresh), labelled
+///   `create_label`. What "new" means is the app's: usually a dialog, after
+///   which it adds the option and sets `value`.
 /// - The `<select>` is rendered once: only its options and which one is
 ///   selected react, so it keeps focus when they change.
 ///
@@ -50,6 +53,10 @@ pub fn Select(
     /// The refresh button's label.
     #[prop(into, default = "Refresh".to_string())] refresh_label: String,
     #[prop(into, default = "Refreshing…".into())] refreshing_label: Signal<String>,
+    /// Adds a "new" button beside the select.
+    #[prop(optional, into)] on_create: Option<UnsyncCallback<()>>,
+    /// The new button's label.
+    #[prop(into, default = "New…".to_string())] create_label: String,
     #[prop(optional, into)] name: MaybeProp<String>,
     #[prop(optional)] required: bool,
     #[prop(optional, into)] disabled: Signal<bool>,
@@ -72,6 +79,12 @@ pub fn Select(
             } else {
                 view! { <Icon icon=REFRESH /> }.into_any()
             }}
+        </IconButton>
+    });
+
+    let create = on_create.map(|on_create| view! {
+        <IconButton title=create_label class="select__create" disabled=disabled on_click=move |_| on_create.run(())>
+            <Icon icon=PLUS />
         </IconButton>
     });
 
@@ -103,6 +116,7 @@ pub fn Select(
                 </For>
             </select>
             {refresh}
+            {create}
         </div>
     }
 }

@@ -93,7 +93,7 @@
   background-repeat: no-repeat;
 }
 
-/* `Select`'s wrapper: the select, and its refresh button beside it. */
+/* `Select`'s wrapper: the select, and its refresh and new buttons beside it. */
 .select {
   display: flex;
   align-items: center;

@@ -579,6 +579,8 @@ view! {
             loading=categories_loading
             on_refresh=move || reload_categories()
             refreshing=categories_refreshing
+            on_create=move || new_category_dialog.set(true)
+            create_label="New category…"
         />
     </Field>
 }
@@ -592,12 +594,14 @@ view! {
 | `loading` | `false` | the options are on their way: disabled, `aria-busy`, and the placeholder reads `loading_label` (`"Loading…"`) |
 | `on_refresh` | none | adds a refresh button beside the select (`refresh_label`, `"Refresh"`) |
 | `refreshing` | `false` | a spinner takes the refresh icon's place, labelled `refreshing_label` (`"Refreshing…"`); the button stays put and refuses clicks |
+| `on_create` | none | adds a `+` button after the select (and after refresh), labelled `create_label` (`"New…"`); disabled with the select |
 | `name`, `required`, `disabled`, `class` | | `class` goes on the `<select>` |
 
 The `<select>` is rendered once. Only its options and which one is selected
 react, so it keeps focus and its choice when the options change. Loading the
 options is the caller's job; webapp-lib's `SelectMenu` is an adapter that
-fetches them.
+fetches them. So is creating one: `on_create` only says "new" was pressed.
+Usually the app opens a dialog, then adds the option and sets `value`.
 
 ### `Combobox<T>`
 
@@ -627,6 +631,7 @@ view! {
             placeholder="Type to search"
             on_refresh=move || reload_accounts()
             refreshing=accounts_refreshing
+            on_create=move |name: String| create_account(name)
         />
     </Field>
 }
@@ -644,6 +649,8 @@ view! {
 | `toggleable` | `true` | a chevron that shows and hides the whole list (`toggle_label`, `"Show all"`) |
 | `on_refresh` | none | adds a refresh control (`refresh_label`, `"Refresh"`) |
 | `refreshing` | `false` | a spinner in the refresh control's place (`refreshing_label`, `"Refreshing…"`) |
+| `on_create` | none | `UnsyncCallback<String>`: offers to create an item from the typed text when nothing matches; gets the text trimmed |
+| `create_label` | `Create “{text}”` | `Callback<String, String>`: the offer's text, given the typed text |
 | `empty_label` | `"No matches"` | shown in the open list when nothing matches |
 
 How it behaves:
@@ -656,15 +663,24 @@ How it behaves:
   Inside a `Dialog`, Enter on an option chooses it without submitting, and
   Esc closes the list without closing the dialog.
 - **A click** on an option chooses it.
-- **Its controls** (clear, the chevron, refresh) are buttons out of the Tab
+- **Creating** (with `on_create`): while the trimmed text is not empty and
+  matches no item, a "Create “milk”" button sits under the list. A click
+  presses it, and so does Enter when no option is active. It's a button,
+  not an option: creating is a different act from choosing. The list closes
+  and `on_create` gets `"milk"`. What happens next is the app's: add it to
+  a static list, `POST` it, open a dialog for more. Typically the app then
+  adds the item to `items`, sets `text` to its label and treats it as
+  chosen.
+- **Its controls** (clear, the chevron, refresh, create) are buttons out of the Tab
   order, so a row of comboboxes costs no extra keystrokes. Pressing one
   doesn't take focus from the field.
-- **The list is in the top layer** (a popover), placed under the field and
+- **The list is in the top layer** (a popover, with the offer to create
+  under it), placed under the field and
   as wide as it, and it follows the field as the page scrolls. A `Dialog`
   body or any `overflow` parent can't clip it.
 
 It doesn't fetch. webapp-lib's `AutocompleteInputModel` is the adapter that
-loads `items`. Groups, create-new and multi-select are planned.
+loads `items`. Groups and multi-select are planned.
 
 ## navigation (feature `navigation`)
 
@@ -1185,7 +1201,7 @@ These are injected only when the `overlay` feature is on.
 | `controls.css` | `.form-input`, `.form-textarea`, `.form-select`, `.is-invalid` on each (the danger border); `.select` (a select and its refresh button) |
 | `password.css` | `.password-input`, `.password-input__toggle`; `.password-strength`, `.password-strength--{very-weak,weak,fair,strong}`, `.password-strength__bar`, `.password-strength__fill` |
 | `choices.css` | `.checkbox`, `.checkbox.is-invalid`, `.checkbox__row` (the `<label>`), `.checkbox__input`, `.checkbox__label`, `.checkbox__line` (the row with its `?`); `.switch`, `[aria-checked='true']`, `.switch__track`, `.switch__knob`, `.switch-line` (the switch with its `?`) |
-| `combobox.css` | `.combobox`, `.combobox__controls`, `.combobox__control`, `.combobox__list`, `.combobox__option`, `.combobox__option.is-active`, `.combobox__empty` |
+| `combobox.css` | `.combobox`, `.combobox__controls`, `.combobox__control`, `.combobox__popup`, `.combobox__list`, `.combobox__option`, `.combobox__option.is-active`, `.combobox__empty`, `.combobox__create` |
 
 No rule touches a bare `input`, `select` or `label`: an app's own unclassed
 controls are left alone. On a phone (≤ 768px) the controls' text is at least
@@ -1246,7 +1262,7 @@ Skeleton, Badge, Card and a theme toggle. `overlay` later gains
 phone variants of Dialog (a bottom sheet, full screen) when an app needs them.
 Help later gains a topic registry (checked `related` links, a `/help` guide
 rendered from the same topics) and `help` on new components as they land.
-`forms` later gains Combobox groups, create-new and multi-select, and
+`forms` later gains Combobox groups and multi-select, and
 NumberInput, DateInput, Radio and the rest of the inventory when an app needs
 them. `navigation` later gains a persistent sidebar that folds to a rail of
 icons, count badges on links (with `core`'s Badge), Breadcrumb, Pagination,
