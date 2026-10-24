@@ -181,12 +181,12 @@ test.describe('Alert', () => {
     await check();
   });
 
-  test('only a dismissible alert has a close button; it calls on_dismiss', async ({ page }) => {
+  test('only a dismissible alert has a close button; it calls on_close', async ({ page }) => {
     for (const { severity, text } of SEVERITIES) {
       await expect(alert(page, severity, text).getByRole('button')).toHaveCount(0);
     }
     const dismissible = alert(page, 'error', 'Dismissible');
-    await dismissible.getByRole('button', { name: 'Dismiss' }).click();
+    await dismissible.getByRole('button', { name: 'Close' }).click();
     await expect(dismissible).toHaveCount(0);
 
     await section(page, 'Alerts').getByRole('button', { name: 'Show the dismissible alert again' }).click();

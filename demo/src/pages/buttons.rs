@@ -90,12 +90,12 @@ fn IconButtons() -> impl IntoView {
     view! {
         <Section title="Icon buttons">
             <div class="demo-row">
-                <IconButton title="Search"><Icon icon=SEARCH /></IconButton>
-                <IconButton title="Camera (toggle)" pressed=pressed on_click=move |_| pressed.update(|p| *p = !*p)>
+                <IconButton label="Search"><Icon icon=SEARCH /></IconButton>
+                <IconButton label="Camera (toggle)" pressed=pressed on_click=move |_| pressed.update(|p| *p = !*p)>
                     <Icon icon=CAMERA />
                 </IconButton>
-                <IconButton title="Remove" danger=true><Icon icon=CLOSE /></IconButton>
-                <IconButton title="Disabled" disabled=true><Icon icon=BAN /></IconButton>
+                <IconButton label="Remove" danger=true><Icon icon=CLOSE /></IconButton>
+                <IconButton label="Disabled" disabled=true><Icon icon=BAN /></IconButton>
             </div>
         </Section>
     }
@@ -114,19 +114,19 @@ fn Toolbars() -> impl IntoView {
             <h3 class="demo-role-name">"compact"</h3>
             <Toolbar compact=true>
                 <ToolbarGroup>
-                    <IconButton title="Search"><Icon icon=SEARCH /></IconButton>
-                    <IconButton title="Camera" pressed=camera on_click=move |_| camera.update(|c| *c = !*c)>
+                    <IconButton label="Search"><Icon icon=SEARCH /></IconButton>
+                    <IconButton label="Camera" pressed=camera on_click=move |_| camera.update(|c| *c = !*c)>
                         <Icon icon=CAMERA />
                     </IconButton>
-                    <IconButton title="Clear filter"><Icon icon=BAN /></IconButton>
+                    <IconButton label="Clear filter"><Icon icon=BAN /></IconButton>
                 </ToolbarGroup>
                 <ToolbarGroup>
-                    <IconButton title="Help"><Icon icon=HELP /></IconButton>
+                    <IconButton label="Help"><Icon icon=HELP /></IconButton>
                 </ToolbarGroup>
             </Toolbar>
             <h3 class="demo-role-name">"compact, title and small buttons"</h3>
             <Toolbar compact=true title="Accounts">
-                <IconButton title="Add"><Icon icon=PLUS /></IconButton>
+                <IconButton label="Add"><Icon icon=PLUS /></IconButton>
                 <Button size=ButtonSize::Sm family=ButtonFamily::Secondary>"Expand all"</Button>
             </Toolbar>
         </Section>

@@ -79,7 +79,7 @@ pub fn DataLayoutSwitch(
 ) -> impl IntoView {
     let buttons = choices.into_iter().map(|choice| view! {
         <IconButton
-            title=labels.for_layout(choice).to_string()
+            label=labels.for_layout(choice).to_string()
             pressed=Signal::derive(move || layout.get() == choice)
             on_click=move |_| layout.set(choice)
         >

@@ -39,9 +39,9 @@ fn Spinners() -> impl IntoView {
                 </div>
                 <h3 class="demo-role-name">"inline (in a row action's place)"</h3>
                 <div class="demo-row">
-                    <IconButton title="Search"><Icon icon=SEARCH /></IconButton>
+                    <IconButton label="Search"><Icon icon=SEARCH /></IconButton>
                     <Spinner kind=SpinnerKind::Inline label="Deleting the row" />
-                    <IconButton title="Help"><Icon icon=HELP /></IconButton>
+                    <IconButton label="Help"><Icon icon=HELP /></IconButton>
                 </div>
                 <h3 class="demo-role-name">"field"</h3>
                 <div class="demo-row">
@@ -71,7 +71,7 @@ fn Overlay() -> impl IntoView {
                 <Button on_click=show>"Show the overlay for 2s"</Button>
             </div>
             <Show when=move || shown.get()>
-                <LoadingOverlay text="Signing in…" />
+                <LoadingOverlay label="Signing in…" />
             </Show>
         </Section>
     }
@@ -97,8 +97,8 @@ fn Alerts() -> impl IntoView {
                         </div>
                     }
                 >
-                    <Alert severity=AlertSeverity::Error on_dismiss=move |_| dismissed.set(true)>
-                        "Dismissible: the close button calls on_dismiss, and the page removes the alert."
+                    <Alert severity=AlertSeverity::Error on_close=move |_| dismissed.set(true)>
+                        "Dismissible: the close button calls on_close, and the page removes the alert."
                     </Alert>
                 </Show>
             </div>

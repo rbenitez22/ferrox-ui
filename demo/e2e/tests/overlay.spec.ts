@@ -129,7 +129,7 @@ test.describe('Enter', () => {
 });
 
 test.describe('footer', () => {
-  test('order is fixed: dismiss, alternate, affirm', async ({ page }) => {
+  test('order is fixed: cancel, alternate, affirm', async ({ page }) => {
     const d = await open(page, 'Edit account…', 'Edit account');
     const buttons = d.locator('.dialog__footer button');
     await expect(buttons).toHaveText(['Cancel', 'Save as draft', 'Save']);
@@ -138,7 +138,7 @@ test.describe('footer', () => {
     await expect(buttons.nth(2)).toHaveClass(/\bbtn--primary\b/);
   });
 
-  test('no_dismiss leaves only the affirm button; × and Esc still close', async ({ page }) => {
+  test('no_cancel leaves only the affirm button; × and Esc still close', async ({ page }) => {
     const d = await open(page, 'Notice…', 'Saved');
     await expect(d.locator('.dialog__footer button')).toHaveText(['Got it']);
     await page.keyboard.press('Escape');

@@ -419,6 +419,48 @@ Where the docs failed it (its own report, confirmed in its code):
   > `[build-dependencies]`, from the same tag webapp-lib uses; a mismatch fails
   > the build with a message saying so.
 
+## Piece 3: the names audit (approved 2026-10-24, all twelve)
+
+Every public component's props, read from the source (40 components). An
+agent generalises from one component to the next, so where the same idea
+has two names or two types, it guesses wrong on one of them. Proposed,
+with the call sites each one touches in this repo (demo, starter, the
+crate itself):
+
+| # | Today | Proposed | Why | Call sites |
+|---|---|---|---|---|
+| 1 | Visible words typed three ways: `Signal<String>` (most), plain `String` (`IconButton` `title`, every `close_label`, `Alert` `dismiss_label`, `Select` `refresh_label` / `create_label`, `PasswordInput` `show_label`, `SideMenuButton` `label`, `SplitButton` `text` / `menu_label`), `Option<String>` (`Button` `title`) | Every human-readable word is `Signal<String>` (`into`), or `MaybeProp<String>` when optional | One rule: any word can be a literal or a signal (translation, state). Literals keep working | none (literals convert either way) |
+| 2 | `IconButton` `title` is the button's **name** (and tooltip); everywhere else `title` is a **heading** (`Panel`, `Card`, `Dialog`, `Sheet`, `Toolbar`, `SideMenu`) | `IconButton` `label`. `Button` keeps `title` (a plain tooltip, as in HTML) | "`label` names a control, `title` is a heading" holds everywhere | 28 |
+| 3 | `LoadingOverlay` `text`; `Spinner` `label` for the same thing | `LoadingOverlay` `label` | Same idea, same name | 2 |
+| 4 | `on_click` gets the `MouseEvent` on `Button`, `IconButton`, `SplitButton` (`move \|_\|`), nothing on `Card` (`move \|\|`); `SplitButton`'s is a generic `impl Fn(MouseEvent)` | Every `on_*` callback is an `UnsyncCallback`, and none passes a DOM event: `on_click=move \|\| …` | Every callback in the library is written the same way; no example needs the event | 54, mechanical |
+| 5 | `Dialog`, `Sheet`, `ConfirmDialog` take `open: Signal<bool>` plus a required `on_close` that must set it false; `SideMenu` takes `open: RwSignal<bool>` and closes itself | Every overlay takes `open: RwSignal<bool>` and closes itself (×, Esc, Cancel, the backdrop); `on_close` / `on_cancel` become optional notices | Removes `on_close=move \|\| open.set(false)` from every dialog; one way for all four | 20 uses; ~16 `on_close` lines go |
+| 6 | `Alert`: `on_dismiss`, `dismiss_label` for its ×; every other × is `close_label` | `on_close`, `close_label` | Every × is "close" | 6 |
+| 7 | `Dialog`: `dismiss_label`, `no_dismiss` for its Cancel button; `ConfirmDialog`: `cancel_label` for the same button | `Dialog`: `cancel_label`, `no_cancel` | Same button, same name | 2 |
+| 8 | `DataView` `empty` | `empty_label` | Every other word prop ends in `_label` (`Combobox` already has `empty_label`) | 1 |
+| 9 | `ContextMenu` `items` is a view; `items` is the data on `DataView` and `Combobox` | `ContextMenu` `menu` | One meaning per name | 3 |
+| 10 | `Menu`, `SplitButton`, `ContextMenu`, `Panel` take re-buildable children (`ChildrenFn`), so a closure inside can't move a value: the starter needed a `StoredValue` (piece 2's notes) | They build their children **once** (on first opening) and keep them, so take `Children` (`ViewFnOnce` for `ContextMenu`'s `menu`): closures may move values, no `StoredValue` idiom | The trap goes away instead of being documented. `Dialog`, `Sheet`, `ConfirmDialog` and `SideMenu` keep re-buildable bodies (a fresh form on each opening), documented as the one place closures must be re-runnable | none for users; the starter's `StoredValue` goes |
+| 11 | `DataView` never redraws an item whose key is unchanged, so a renamed record keyed by id shows its old name (piece 2's notes); the starter keys by id **and** name | `DataView` keys by `key_of` for identity and also redraws an item whose value changed (`T: PartialEq`, compared with its last value) | Key by id, as every agent will; edits show | the starter's key; `T: PartialEq` on items (the demo's already are) |
+| 12 | `class` on almost every component; missing on `MenuItem`, `MenuLink`, `LoadingOverlay` | `class` on every component that renders an element | "Every component takes `class`" becomes true | none |
+
+Kept as they are, deliberately:
+- `label` for both a field's visible label (`Field`, `Checkbox`, `Switch`)
+  and an accessible name (`Menu`, `DataView`, `Spinner`, `NavList`): both
+  name the thing.
+- One word → an `x_label` prop; a set of words for repeated parts → an
+  `XLabels` struct with `Default` (`StrengthLabels`, `PaginationLabels`,
+  `DataLayoutLabels`). Already the case; the docs will state it.
+- `Combobox` `text` (the field's text) beside `on_select` (the choice);
+  inputs' `value`. Different things.
+- `on_select` for both a `MenuItem` (run an action) and `Combobox` (choose
+  a value): both are "chose this".
+- `Button` children as its text; `SplitButton` `text` (its children are
+  the menu).
+
+Order of work, once approved: 1–3, 6–9, 12 (renames and types, one
+commit), 4 (the callback sweep), 5 (overlays own their state), 10 (built
+once), 11 (`DataView` redraw); demo, starter, tests and README with each;
+a CHANGELOG started with the renames.
+
 ## Pieces
 
 Each is small and reviewed on its own.

@@ -71,7 +71,7 @@ pub fn Sheet(
     /// Shown in the title bar; also the sheet's accessible name.
     #[prop(into)] title: Signal<String>,
     /// The × button's label.
-    #[prop(into, default = "Close".to_string())] close_label: String,
+    #[prop(into, default = "Close".into())] close_label: Signal<String>,
     /// A help topic: a `?` in the title bar, before the ×.
     #[prop(optional, into)] help: MaybeHelp,
     /// Extra classes, appended to the generated ones. May be reactive.
@@ -108,7 +108,7 @@ pub fn Sheet(
             <div class="sheet__title-bar">
                 <h2 class="sheet__title" id=title_id>{move || title.get()}</h2>
                 {help}
-                <IconButton title=close_label class="sheet__close" on_click=move |_| on_close.run(())>
+                <IconButton label=close_label class="sheet__close" on_click=move |_| on_close.run(())>
                     <Icon icon=CLOSE />
                 </IconButton>
             </div>

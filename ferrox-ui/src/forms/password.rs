@@ -33,7 +33,7 @@ pub fn PasswordInput(
     #[prop(default = 80.0)] min_bits: f64,
     #[prop(optional)] strength_labels: StrengthLabels,
     /// The show/hide button's label.
-    #[prop(into, default = "Show password".to_string())] show_label: String,
+    #[prop(into, default = "Show password".into())] show_label: Signal<String>,
     #[prop(optional, into)] placeholder: MaybeProp<String>,
     #[prop(optional, into)] name: MaybeProp<String>,
     #[prop(optional)] required: bool,
@@ -87,7 +87,7 @@ pub fn PasswordInput(
                 bind:value=value
             />
             <IconButton
-                title=show_label
+                label=show_label
                 class="password-input__toggle"
                 pressed=shown
                 disabled=disabled

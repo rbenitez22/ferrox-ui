@@ -60,7 +60,7 @@
 
 /* The close button takes the alert's colour, and its negative margin keeps a
    one-line alert as tall as one without it. */
-.alert__dismiss {
+.alert__close {
   margin-block: calc((1lh - 1.75rem) / 2);
   color: inherit;
 }

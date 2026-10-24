@@ -17,11 +17,11 @@ use super::{component_help, MaybeHelp};
 ///
 /// <Toolbar compact=true>
 ///     <ToolbarGroup>
-///         <IconButton title="Search" on_click=…>…</IconButton>
-///         <IconButton title="Camera" pressed=camera_on on_click=…>…</IconButton>
+///         <IconButton label="Search" on_click=…>…</IconButton>
+///         <IconButton label="Camera" pressed=camera_on on_click=…>…</IconButton>
 ///     </ToolbarGroup>
 ///     <ToolbarGroup>
-///         <IconButton title="Help" on_click=…>…</IconButton>
+///         <IconButton label="Help" on_click=…>…</IconButton>
 ///     </ToolbarGroup>
 /// </Toolbar>
 /// ```

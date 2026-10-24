@@ -49,7 +49,7 @@ pub(crate) fn still_resting(from: (f64, f64), to: (f64, f64)) -> bool {
 ///   visible too (a row's ⋮ `Menu`): this is a shortcut, not the only way.
 ///
 /// ```ignore
-/// <ContextMenu label="Recipe actions" items=move || view! {
+/// <ContextMenu label="Recipe actions" menu=move || view! {
 ///     <MenuItem icon=EDIT on_select=move || edit()>"Edit"</MenuItem>
 ///     <MenuItem icon=DELETE danger=true on_select=move || ask_delete()>"Delete"</MenuItem>
 /// }>
@@ -61,7 +61,7 @@ pub fn ContextMenu(
     /// The menu's accessible name: "Recipe actions".
     #[prop(into)] label: Signal<String>,
     /// `MenuItem`s, `MenuLink`s and `MenuDivider`s.
-    #[prop(into)] items: ViewFn,
+    #[prop(into)] menu: ViewFn,
     /// Shown above the items, outside the menu itself.
     #[prop(optional, into)] header: Option<ViewFn>,
     /// Leaves the browser's own menu in place.
@@ -226,7 +226,7 @@ pub fn ContextMenu(
                 built=built.into()
                 context=context
                 on_toggle=on_toggle
-                items=items
+                items=menu
             />
         </div>
     }

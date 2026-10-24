@@ -96,15 +96,15 @@ use ferrox_icons::{Icon, CAMERA, DELETE, SEARCH};
 use ferrox_ui::IconButton;
 
 view! {
-    <IconButton title="Search" on_click=move |_| open_search()><Icon icon=SEARCH/></IconButton>
-    <IconButton title="Camera" pressed=camera on_click=move |_| camera.update(|c| *c = !*c)><Icon icon=CAMERA/></IconButton>
-    <IconButton title="Remove line" danger=true on_click=move |_| remove()><Icon icon=DELETE/></IconButton>
+    <IconButton label="Search" on_click=move |_| open_search()><Icon icon=SEARCH/></IconButton>
+    <IconButton label="Camera" pressed=camera on_click=move |_| camera.update(|c| *c = !*c)><Icon icon=CAMERA/></IconButton>
+    <IconButton label="Remove line" danger=true on_click=move |_| remove()><Icon icon=DELETE/></IconButton>
 }
 ```
 
 | Prop | |
 |---|---|
-| `title` | required: the button's only label (also `aria-label`) |
+| `label` | required: the button's only name (`aria-label`, and its tooltip) |
 | `pressed` | makes it a switch (`aria-pressed`); on reads as tinted |
 | `danger` | for a destructive action: drawn in the danger colour, tinted on hover |
 | `disabled`, `on_click`, `class` | |
@@ -128,11 +128,11 @@ view! {
 
     <Toolbar compact=true>
         <ToolbarGroup>
-            <IconButton title="Search"><Icon icon=SEARCH/></IconButton>
-            <IconButton title="Camera" pressed=camera><Icon icon=CAMERA/></IconButton>
+            <IconButton label="Search"><Icon icon=SEARCH/></IconButton>
+            <IconButton label="Camera" pressed=camera><Icon icon=CAMERA/></IconButton>
         </ToolbarGroup>
         <ToolbarGroup>
-            <IconButton title="Help"><Icon icon=HELP/></IconButton>
+            <IconButton label="Help"><Icon icon=HELP/></IconButton>
         </ToolbarGroup>
     </Toolbar>
 }
@@ -167,14 +167,14 @@ use ferrox_ui::{LoadingOverlay, Spinner, SpinnerKind};
 view! {
     <Spinner label="Loading accounts"/>
     <Spinner kind=SpinnerKind::Inline label="Deleting the row"/>
-    {move || signing_in.get().then(|| view! { <LoadingOverlay text="Signing in…"/> })}
+    {move || signing_in.get().then(|| view! { <LoadingOverlay label="Signing in…"/> })}
 }
 ```
 
 - `Spinner`: `label` (required; read out by screen readers, not shown),
   `kind` (`Region` by default, `Inline` or `Field`), `class`. It renders
   `role="status"`.
-- `LoadingOverlay`: `text` (optional; shown under the spinner and read out;
+- `LoadingOverlay`: `label` (optional; shown under the spinner and read out;
   without it screen readers hear "Loading…"). A fixed scrim over the whole
   page, `role="status"` with `aria-live="polite"`.
 
@@ -194,7 +194,7 @@ view! {
     <Alert severity=AlertSeverity::Error>"The server refused the change: the period is closed."</Alert>
     <Alert severity=AlertSeverity::Info icon=false>"Changes apply to new entries only."</Alert>
     {move || error.get().map(|e| view! {
-        <Alert severity=AlertSeverity::Error on_dismiss=move |_| error.set(None)>{e}</Alert>
+        <Alert severity=AlertSeverity::Error on_close=move |_| error.set(None)>{e}</Alert>
     })}
 }
 ```
@@ -203,8 +203,8 @@ view! {
 |---|---|---|
 | `severity` | required | `Info`, `Success`, `Warning` (non-blocking: if it should stop a submit, it's an `Error`), `Error` |
 | `icon` | `true` | draws the severity's icon (ferrox-icons `INFO`, `SUCCESS`, `WARNING`, `ERROR`), so severity doesn't rest on colour alone |
-| `on_dismiss` | none | shows a close button that calls it; the caller removes the alert |
-| `dismiss_label` | `"Dismiss"` | the close button's label |
+| `on_close` | none | shows a close button (×) that calls it; the caller removes the alert |
+| `close_label` | `"Close"` | the close button's label |
 | `class` | | |
 
 Only `Error` interrupts a screen reader (`role="alert"`); the others are
@@ -219,7 +219,7 @@ browser makes the page behind inert, keeps focus inside, and puts the modal in
 the top layer, above everything including `LoadingOverlay`. All three share
 the same behaviour:
 
-- **`open` drives it.** Every way out (Esc, the ×, the dismiss button, a
+- **`open` drives it.** Every way out (Esc, the ×, the Cancel button, a
   sheet's backdrop) calls `on_close` / `on_cancel`, and the app sets `open`
   to false. If the browser closes the element itself, the callback runs too,
   so the app's state and the element never disagree.
@@ -244,7 +244,7 @@ dialogs are declared.
 ### `Dialog`, `DialogAction`
 
 A title bar with the ×, the body, and a footer band. **The footer isn't a
-slot.** Pass the actions and the component fixes the order: dismiss,
+slot.** Pass the actions and the component fixes the order: cancel,
 alternate, affirm, with the heaviest button last.
 
 ```rust
@@ -269,11 +269,11 @@ view! {
 
 | Prop | Default | |
 |---|---|---|
-| `open`, `title`, `on_close` | required | `on_close` is called by Esc, the × and the dismiss button: the same act |
+| `open`, `title`, `on_close` | required | `on_close` is called by Esc, the × and the Cancel button: the same act |
 | `affirm` | none | the last button; `DialogAction::new(label, fn)`, plus `.danger()` for a destructive commit, `.saving(signal)`, `.disabled(signal)` |
 | `alternate` | none | a lighter way to finish, before `affirm`, always secondary; Enter never reaches it |
-| `dismiss_label` | `"Cancel"` | |
-| `no_dismiss` | `false` | no dismiss button (the × and Esc still close) |
+| `cancel_label` | `"Cancel"` | |
+| `no_cancel` | `false` | no Cancel button (the × and Esc still close) |
 | `submit_on_enter` | `true` | Enter fires `affirm`, but not from a textarea, a button or a link, and not while it's saving or disabled |
 | `size` | `Md` | `Md` (32rem) or `Wide` (52rem, for a body that's a table) |
 | `alert` | `false` | `role="alertdialog"`, for a dialog that interrupts to ask for a decision |
@@ -327,7 +327,7 @@ the sheet doesn't close it.
 use ferrox_ui::{Sheet, SheetSide};
 
 view! {
-    <IconButton title="Menu" on_click=move |_| menu.set(true)><Icon icon=MENU/></IconButton>
+    <IconButton label="Menu" on_click=move |_| menu.set(true)><Icon icon=MENU/></IconButton>
     <Sheet open=menu title="Menu" on_close=move || menu.set(false)>
         <nav>…</nav>
     </Sheet>
@@ -888,10 +888,10 @@ view! {
     <Panel
         title="Items"
         actions=move || view! {
-            <IconButton title="Search items" on_click=move |_| search()><Icon icon=SEARCH /></IconButton>
+            <IconButton label="Search items" on_click=move |_| search()><Icon icon=SEARCH /></IconButton>
             // The app's own permission decides whether "add" shows.
             <Show when=move || can_add_items.get()>
-                <IconButton title="Add item" on_click=move |_| new_item()><Icon icon=PLUS /></IconButton>
+                <IconButton label="Add item" on_click=move |_| new_item()><Icon icon=PLUS /></IconButton>
             </Show>
         }
     >
@@ -965,7 +965,7 @@ view! {
         title=employee.name.clone()
         href=format!("/employees/{}", employee.id)
         actions=move || view! {
-            <IconButton title="Remove" danger=true on_click=move |_| remove()><Icon icon=DELETE /></IconButton>
+            <IconButton label="Remove" danger=true on_click=move |_| remove()><Icon icon=DELETE /></IconButton>
         }
     >
         <p>{employee.role.clone()}</p>
@@ -1067,7 +1067,7 @@ view! {
         loading=loading
         error=error
         on_retry=move || reload()
-        empty="No recipes yet."
+        empty_label="No recipes yet."
     />
 }
 ```
@@ -1082,8 +1082,8 @@ view! {
 | `loading` | `false` | no items yet: a spinner (`loading_label`, `"Loading…"`) and no list; with items: they stay, the list is `aria-busy` |
 | `error` | none | an error `Alert` above the list; items already shown stay |
 | `on_retry` | none | adds Retry to the error (`retry_label`, `"Retry"`) |
-| `empty` | `"Nothing here yet."` | shown when there are no items, no error and no loading |
-| `empty_view` | none | a view shown instead of `empty`, e.g. a line and an Add button |
+| `empty_label` | `"Nothing here yet."` | shown when there are no items, no error and no loading |
+| `empty_view` | none | a view shown instead of `empty_label`, e.g. a line and an Add button |
 | `on_more` | none | infinite scroll: called when the end of the list comes within 300px of the viewport and `has_more` |
 | `has_more` | `false` | there are more pages to fetch |
 | `loading_more` | `false` | a page is on its way: a spinner at the end (`loading_more_label`, `"Loading more…"`), and no new calls |
@@ -1335,7 +1335,7 @@ a card) instead of a trigger.
 use ferrox_ui::{ContextMenu, MenuItem};
 
 view! {
-    <ContextMenu label="Recipe actions" items=move || view! {
+    <ContextMenu label="Recipe actions" menu=move || view! {
         <MenuItem icon=EDIT on_select=move || edit()>"Edit"</MenuItem>
         <MenuItem icon=DELETE danger=true on_select=move || ask_delete()>"Delete"</MenuItem>
     }>
@@ -1347,7 +1347,7 @@ view! {
 | Prop | Default | |
 |---|---|---|
 | `label` | required | the menu's accessible name |
-| `items` | required | a closure returning the `MenuItem`s, `MenuLink`s and `MenuDivider`s |
+| `menu` | required | a closure returning the `MenuItem`s, `MenuLink`s and `MenuDivider`s |
 | `header` | none | a view above the items |
 | `disabled` | `false` | the browser's own menu stays |
 | `class` | | extra classes on the area's wrapper |
@@ -1548,7 +1548,7 @@ selected by class only.
 | `icon.css` | `.icon`: an SVG icon as a block with no pointer events |
 | `toolbar.css` | `.toolbar`, `.toolbar--compact`, `.toolbar__title`, `.toolbar__group`, `.toolbar__heading` (a title with its `?`) |
 | `spinner.css` | `.spinner`, `.spinner--{region,inline,field}`, `.spinner-status`, `.spinner-status--region`, `.spinner-overlay`, `.spinner-overlay__text`; keyframes `ferrox-spin`, `ferrox-spinner-appear` |
-| `alert.css` | `.alert`, `.alert--{info,success,warning,error}`, `.alert__icon`, `.alert__body`, `.alert__dismiss` |
+| `alert.css` | `.alert`, `.alert--{info,success,warning,error}`, `.alert__icon`, `.alert__body`, `.alert__close` |
 | `help.css` | `.help-btn` (the `?`, with `.icon-btn`), `.help-popover`, `__title`, `__body`, `__paragraph`, `__list`, `__table` / `__heading` / `__cell`, `__actions`, `__link`, `__ask`; `[data-side]` below or above |
 
 ## CSS classes (overlay)

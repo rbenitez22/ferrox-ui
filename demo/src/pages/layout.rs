@@ -27,7 +27,7 @@ pub fn LayoutPage() -> impl IntoView {
 /// The `+` an app puts in a panel's actions: an `IconButton` drawing `PLUS`.
 fn add_button(label: &'static str, on_add: impl Fn() + Send + Sync + 'static) -> impl IntoView {
     view! {
-        <IconButton title=label on_click=move |_| on_add()>
+        <IconButton label=label on_click=move |_| on_add()>
             <Icon icon=PLUS />
         </IconButton>
     }
@@ -61,7 +61,7 @@ fn SectionPanels() -> impl IntoView {
                     title="Items"
                     help=ITEMS_HELP.clone()
                     actions=move || view! {
-                        <IconButton title="Search items" on_click=move |_| searched.update(|n| *n += 1)>
+                        <IconButton label="Search items" on_click=move |_| searched.update(|n| *n += 1)>
                             <Icon icon=SEARCH />
                         </IconButton>
                         <Show when=move || may_add.get()>{add_button("Add item", || {})}</Show>
@@ -160,7 +160,7 @@ fn Cards() -> impl IntoView {
     let removed = RwSignal::new(0);
     let opened = RwSignal::new(0);
     let remove = move || view! {
-        <IconButton title="Remove" danger=true on_click=move |_| removed.update(|n| *n += 1)>
+        <IconButton label="Remove" danger=true on_click=move |_| removed.update(|n| *n += 1)>
             <Icon icon=DELETE />
         </IconButton>
     };

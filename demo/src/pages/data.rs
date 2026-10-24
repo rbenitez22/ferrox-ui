@@ -105,7 +105,7 @@ fn Recipes() -> impl IntoView {
                 loading_label="Loading recipes…"
                 error=error
                 on_retry=move || retries.update(|n| *n += 1)
-                empty="No recipes yet."
+                empty_label="No recipes yet."
             />
             <dl class="demo-echo">
                 <dt>"layout"</dt><dd data-echo="layout">{move || format!("{:?}", layout.get())}</dd>

@@ -81,22 +81,31 @@ pub fn Spinner(
 /// auth, the post-login redirect. Never for a route change or a data fetch:
 /// loading one region must not grey out the rest; use [`Spinner`].
 ///
-/// `text` is shown under the spinner and read out; without it, screen
+/// `label` is shown under the spinner and read out; without it, screen
 /// readers hear "Loading…". Like the spinner, both appear after
 /// `--loading-delay`.
 ///
 /// ```ignore
-/// {move || signing_in.get().then(|| view! { <LoadingOverlay text="Signing in…" /> })}
+/// {move || signing_in.get().then(|| view! { <LoadingOverlay label="Signing in…" /> })}
 /// ```
 #[component]
 pub fn LoadingOverlay(
-    #[prop(optional, into)] text: MaybeProp<String>,
+    #[prop(optional, into)] label: MaybeProp<String>,
+    /// Extra classes on the overlay. May be reactive.
+    #[prop(optional, into)] class: MaybeProp<String>,
 ) -> impl IntoView {
     view! {
-        <div class="spinner-overlay" role="status" aria-live="polite">
+        <div
+            class=move || match class.get() {
+                Some(extra) if !extra.is_empty() => format!("spinner-overlay {extra}"),
+                _ => "spinner-overlay".to_string(),
+            }
+            role="status"
+            aria-live="polite"
+        >
             <span class="spinner"></span>
-            {move || match text.get() {
-                Some(text) => view! { <span class="spinner-overlay__text">{text}</span> }.into_any(),
+            {move || match label.get() {
+                Some(label) => view! { <span class="spinner-overlay__text">{label}</span> }.into_any(),
                 None => view! { <span class="sr-only">"Loading…"</span> }.into_any(),
             }}
         </div>

@@ -13,21 +13,22 @@ pub fn icon_button_classes(danger: bool, extra: &str) -> String {
 /// A compact glyph button (`.icon-btn`): 1.75rem square, no border,
 /// answers in colour rather than size. For toolbars and row actions.
 ///
-/// - `title` is required: the glyph has no text, so it is the button's only
-///   label. It is also set as `aria-label`.
+/// - `label` is required: the glyph has no text, so it is the button's only
+///   name. It is set as `aria-label`, and as `title` for a tooltip.
 /// - `pressed` makes it a switch (`aria-pressed`); on reads as tinted.
 /// - `children` is the icon: ferrox-icons' `Icon`, or any `<svg class="icon">`.
 ///
 /// ```ignore
-/// <IconButton title="Search" on_click=move |_| open_search()>
+/// <IconButton label="Search" on_click=move |_| open_search()>
 ///     <Icon icon=SEARCH/>
 /// </IconButton>
-/// <IconButton title="Camera" pressed=camera_on on_click=move |_| camera_on.update(|v| *v = !*v)>…</IconButton>
-/// <IconButton title="Remove line" danger=true on_click=move |_| remove()>…</IconButton>
+/// <IconButton label="Camera" pressed=camera_on on_click=move |_| camera_on.update(|v| *v = !*v)>…</IconButton>
+/// <IconButton label="Remove line" danger=true on_click=move |_| remove()>…</IconButton>
 /// ```
 #[component]
 pub fn IconButton(
-    #[prop(into)] title: String,
+    /// The button's name (`aria-label`), and its tooltip.
+    #[prop(into)] label: Signal<String>,
     #[prop(optional, into)] pressed: Option<Signal<bool>>,
     #[prop(optional)] danger: bool,
     #[prop(optional, into)] disabled: Signal<bool>,
@@ -44,8 +45,8 @@ pub fn IconButton(
         <button
             type="button"
             class=move || icon_button_classes(danger, &class.get().unwrap_or_default())
-            title=title.clone()
-            aria-label=title
+            title=move || label.get()
+            aria-label=move || label.get()
             aria-pressed=move || pressed.map(|p| if p.get() { "true" } else { "false" })
             disabled=move || disabled.get()
             on:click=on_click

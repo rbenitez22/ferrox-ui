@@ -116,9 +116,9 @@ pub fn Combobox<T>(
     /// The offer's text, given the typed text; `Create “{text}”` by default.
     #[prop(optional, into)] create_label: Option<Callback<String, String>>,
     #[prop(into, default = "No matches".into())] empty_label: Signal<String>,
-    #[prop(into, default = "Clear".to_string())] clear_label: String,
-    #[prop(into, default = "Show all".to_string())] toggle_label: String,
-    #[prop(into, default = "Refresh".to_string())] refresh_label: String,
+    #[prop(into, default = "Clear".into())] clear_label: Signal<String>,
+    #[prop(into, default = "Show all".into())] toggle_label: Signal<String>,
+    #[prop(into, default = "Refresh".into())] refresh_label: Signal<String>,
     #[prop(into, default = "Refreshing…".into())] refreshing_label: Signal<String>,
     #[prop(optional, into)] name: MaybeProp<String>,
     #[prop(optional)] required: bool,
@@ -297,7 +297,7 @@ where
             type="button"
             class="icon-btn combobox__control"
             tabindex="-1"
-            aria-label=clear_label.clone()
+            aria-label=clear_label
             title=clear_label
             hidden=move || text.get().is_empty()
             disabled=move || disabled.get()
@@ -317,7 +317,7 @@ where
             type="button"
             class="icon-btn combobox__control"
             tabindex="-1"
-            aria-label=toggle_label.clone()
+            aria-label=toggle_label
             title=toggle_label
             disabled=move || disabled.get()
             on:mousedown=keep_focus
@@ -339,7 +339,7 @@ where
             type="button"
             class="icon-btn combobox__control"
             tabindex="-1"
-            aria-label=refresh_label.clone()
+            aria-label=refresh_label
             title=refresh_label
             disabled=move || disabled.get() || refreshing.get()
             on:mousedown=keep_focus

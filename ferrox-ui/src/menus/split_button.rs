@@ -22,10 +22,10 @@ use crate::{Button, ButtonFamily};
 #[component]
 pub fn SplitButton(
     /// The main button's text.
-    #[prop(into)] text: String,
+    #[prop(into)] text: Signal<String>,
     on_click: impl Fn(MouseEvent) + 'static,
     /// The chevron's name, which is also the menu's: "More save options".
-    #[prop(into)] menu_label: String,
+    #[prop(into)] menu_label: Signal<String>,
     #[prop(optional)] family: ButtonFamily,
     #[prop(optional, into)] saving: Signal<bool>,
     #[prop(optional, into)] disabled: Signal<bool>,
@@ -44,7 +44,7 @@ pub fn SplitButton(
                 {text}
             </Button>
             <Menu
-                label=menu_label.clone()
+                label=menu_label
                 trigger=MenuTrigger::chevron(menu_label, family)
                 align=MenuAlign::End
                 disabled=menu_disabled

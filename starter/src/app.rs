@@ -97,7 +97,7 @@ pub fn App() -> impl IntoView {
             title="Items"
             heading_level=HeadingLevel::H1
             actions=move || view! {
-                <IconButton title="Add item" on_click=move |_| open_add()><Icon icon=PLUS /></IconButton>
+                <IconButton label="Add item" on_click=move |_| open_add()><Icon icon=PLUS /></IconButton>
             }
         >
             <DataView

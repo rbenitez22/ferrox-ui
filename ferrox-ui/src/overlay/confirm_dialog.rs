@@ -36,10 +36,10 @@ pub fn ConfirmDialog(
     #[prop(into)] on_confirm: UnsyncCallback<()>,
     #[prop(into)] on_cancel: UnsyncCallback<()>,
     #[prop(optional, into)] saving: Signal<bool>,
-    /// The dismissive button's label.
+    /// The Cancel button's label.
     #[prop(into, default = "Cancel".into())] cancel_label: Signal<String>,
     /// The × button's label.
-    #[prop(into, default = "Close".to_string())] close_label: String,
+    #[prop(into, default = "Close".into())] close_label: Signal<String>,
     /// A help topic: a `?` in the title bar, before the ×.
     #[prop(optional, into)] help: MaybeHelp,
     children: ChildrenFn,
@@ -56,7 +56,7 @@ pub fn ConfirmDialog(
             open=open
             title=title
             on_close=on_cancel
-            dismiss_label=cancel_label
+            cancel_label=cancel_label
             close_label=close_label
             alert=true
             help=help

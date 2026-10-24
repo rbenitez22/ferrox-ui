@@ -47,7 +47,7 @@ pub fn SideMenu(
     /// A help topic: a `?` in the title bar, before the ×.
     #[prop(optional, into)] help: MaybeHelp,
     /// The × button's label.
-    #[prop(into, default = "Close".to_string())] close_label: String,
+    #[prop(into, default = "Close".into())] close_label: Signal<String>,
     /// Extra classes on the sheet, appended to `side-menu`. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
     children: ChildrenFn,

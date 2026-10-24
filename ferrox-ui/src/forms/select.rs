@@ -51,12 +51,12 @@ pub fn Select(
     #[prop(optional, into)] on_refresh: Option<UnsyncCallback<()>>,
     #[prop(optional, into)] refreshing: Signal<bool>,
     /// The refresh button's label.
-    #[prop(into, default = "Refresh".to_string())] refresh_label: String,
+    #[prop(into, default = "Refresh".into())] refresh_label: Signal<String>,
     #[prop(into, default = "Refreshing…".into())] refreshing_label: Signal<String>,
     /// Adds a "new" button beside the select.
     #[prop(optional, into)] on_create: Option<UnsyncCallback<()>>,
     /// The new button's label.
-    #[prop(into, default = "New…".to_string())] create_label: String,
+    #[prop(into, default = "New…".into())] create_label: Signal<String>,
     #[prop(optional, into)] name: MaybeProp<String>,
     #[prop(optional)] required: bool,
     #[prop(optional, into)] disabled: Signal<bool>,
@@ -69,7 +69,7 @@ pub fn Select(
 
     let refresh = on_refresh.map(|on_refresh| view! {
         <IconButton
-            title=refresh_label
+            label=refresh_label
             class="select__refresh"
             disabled=refreshing
             on_click=move |_| on_refresh.run(())
@@ -83,7 +83,7 @@ pub fn Select(
     });
 
     let create = on_create.map(|on_create| view! {
-        <IconButton title=create_label class="select__create" disabled=disabled on_click=move |_| on_create.run(())>
+        <IconButton label=create_label class="select__create" disabled=disabled on_click=move |_| on_create.run(())>
             <Icon icon=PLUS />
         </IconButton>
     });

@@ -33,7 +33,7 @@ pub fn data_view_classes(layout: DataLayout, extra: &str) -> String {
 ///   items yet) shows a spinner; a refresh keeps the items and marks the list
 ///   `aria-busy`. An error is an `Alert` above the list, with Retry when
 ///   `on_retry` is given. No items, not loading, no error: `empty_view` if
-///   given, else the `empty` text.
+///   given, else the `empty_label` text.
 /// - **Infinite scroll** (`on_more`): a marker after the last item calls
 ///   `on_more` when it comes within 300px of the viewport and `has_more`:
 ///   once per sighting. It doesn't care what scrolls (inside an `overflow:
@@ -72,10 +72,10 @@ pub fn DataView<T, IV>(
     #[prop(optional, into)] error: MaybeProp<String>,
     /// Adds Retry to the error.
     #[prop(optional, into)] on_retry: Option<UnsyncCallback<()>>,
-    #[prop(into, default = "Retry".to_string())] retry_label: String,
+    #[prop(into, default = "Retry".into())] retry_label: Signal<String>,
     /// Shown when there is nothing to list.
-    #[prop(into, default = "Nothing here yet.".into())] empty: Signal<String>,
-    /// Shown instead of `empty`: a view, e.g. a line and an Add button.
+    #[prop(into, default = "Nothing here yet.".into())] empty_label: Signal<String>,
+    /// Shown instead of `empty_label`: a view, e.g. a line and an Add button.
     #[prop(optional, into)] empty_view: Option<ViewFn>,
     /// Called when the end of the list comes into view and `has_more`.
     #[prop(optional, into)] on_more: Option<UnsyncCallback<()>>,
@@ -96,7 +96,6 @@ where
 
     let alert = move || {
         error.get().map(|message| {
-            let retry_label = retry_label.clone();
             let retry = on_retry.map(|on_retry| view! {
                 <Button family=ButtonFamily::Secondary size=ButtonSize::Sm class="data-view__retry" on_click=move |_| on_retry.run(())>
                     {retry_label}
@@ -114,7 +113,7 @@ where
     let empty_state = move || {
         is_empty().then(|| match &empty_view {
             Some(view) => view! { <div class="data-view__empty">{view.run()}</div> }.into_any(),
-            None => view! { <p class="data-view__empty">{move || empty.get()}</p> }.into_any(),
+            None => view! { <p class="data-view__empty">{move || empty_label.get()}</p> }.into_any(),
         })
     };
 

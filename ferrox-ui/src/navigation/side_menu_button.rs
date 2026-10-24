@@ -16,13 +16,13 @@ pub fn SideMenuButton(
     /// The menu's open state, shared with its `SideMenu`.
     open: RwSignal<bool>,
     /// The button's only label (also its tooltip).
-    #[prop(into, default = "Menu".to_string())] label: String,
+    #[prop(into, default = "Menu".into())] label: Signal<String>,
     /// Extra classes, appended to the button's own. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
 ) -> impl IntoView {
     view! {
         <IconButton
-            title=label
+            label=label
             class=class
             on_click=move |_| open.set(true)
             attr:aria-haspopup="dialog"

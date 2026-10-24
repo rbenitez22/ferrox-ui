@@ -117,7 +117,7 @@ fn NoDismissDialog(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
         <Dialog
             open=open
             title="Saved"
-            no_dismiss=true
+            no_cancel=true
             on_close=move || { open.set(false); note("notice: closed"); }
             affirm=DialogAction::new("Got it", move || { open.set(false); note("notice: ok"); })
         >

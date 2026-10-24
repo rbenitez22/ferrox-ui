@@ -14,31 +14,31 @@ use crate::{button_classes, icon_button_classes, ButtonFamily, ButtonSize};
 #[derive(Clone)]
 pub enum MenuTrigger {
     /// A button with the text and a chevron: "Export ▾".
-    Button { text: String, family: ButtonFamily },
+    Button { text: Signal<String>, family: ButtonFamily },
     /// An icon button; `label` is its only name. Row actions, "More".
-    Icon { icon: IconData, label: String },
+    Icon { icon: IconData, label: Signal<String> },
     /// The caller's view inside a plain button; `label` names it.
-    Custom { view: ViewFn, label: String },
+    Custom { view: ViewFn, label: Signal<String> },
     /// A button of the family showing only a chevron; `label` is its name.
     /// `SplitButton`'s second half.
-    Chevron { label: String, family: ButtonFamily },
+    Chevron { label: Signal<String>, family: ButtonFamily },
 }
 
 impl MenuTrigger {
     /// A secondary button with the text and a chevron.
-    pub fn button(text: impl Into<String>) -> Self {
+    pub fn button(text: impl Into<Signal<String>>) -> Self {
         Self::Button { text: text.into(), family: ButtonFamily::Secondary }
     }
 
-    pub fn icon(icon: IconData, label: impl Into<String>) -> Self {
+    pub fn icon(icon: IconData, label: impl Into<Signal<String>>) -> Self {
         Self::Icon { icon, label: label.into() }
     }
 
-    pub fn custom(view: impl Into<ViewFn>, label: impl Into<String>) -> Self {
+    pub fn custom(view: impl Into<ViewFn>, label: impl Into<Signal<String>>) -> Self {
         Self::Custom { view: view.into(), label: label.into() }
     }
 
-    pub fn chevron(label: impl Into<String>, family: ButtonFamily) -> Self {
+    pub fn chevron(label: impl Into<Signal<String>>, family: ButtonFamily) -> Self {
         Self::Chevron { label: label.into(), family }
     }
 }
@@ -169,7 +169,7 @@ pub fn Menu(
                 disabled=move || disabled.get()
                 on:keydown=on_trigger_key
             >
-                <span>{text}</span>
+                <span>{move || text.get()}</span>
                 <Icon icon=CHEVRON_DOWN class="menu__chevron" />
             </button>
         }.into_any(),
@@ -178,8 +178,8 @@ pub fn Menu(
                 type="button"
                 node_ref=trigger_ref
                 class=icon_button_classes(false, "menu__trigger")
-                aria-label=name.clone()
-                title=name
+                aria-label=move || name.get()
+                title=move || name.get()
                 aria-haspopup="menu"
                 aria-expanded=expanded
                 aria-controls=controls
@@ -195,8 +195,8 @@ pub fn Menu(
                 type="button"
                 node_ref=trigger_ref
                 class=button_classes(family, false, ButtonSize::Md, false, "menu__trigger menu__trigger--chevron")
-                aria-label=name.clone()
-                title=name
+                aria-label=move || name.get()
+                title=move || name.get()
                 aria-haspopup="menu"
                 aria-expanded=expanded
                 aria-controls=controls
@@ -212,7 +212,7 @@ pub fn Menu(
                 type="button"
                 node_ref=trigger_ref
                 class="menu__trigger menu__trigger--custom"
-                aria-label=name
+                aria-label=move || name.get()
                 aria-haspopup="menu"
                 aria-expanded=expanded
                 aria-controls=controls

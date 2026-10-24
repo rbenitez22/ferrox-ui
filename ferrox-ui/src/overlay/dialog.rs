@@ -109,10 +109,10 @@ pub fn dialog_classes(size: DialogSize, extra: &str) -> String {
 /// band. It is the native `<dialog>` opened with `showModal()`, so the page
 /// behind is inert and focus stays inside.
 ///
-/// - `open` drives it. Esc, the × and the dismiss button all call `on_close`,
+/// - `open` drives it. Esc, the × and the Cancel button all call `on_close`,
 ///   which should set `open` to false; they are the same act.
 /// - **The footer is not a slot.** Pass `affirm` (and `alternate`); the order
-///   is fixed: dismiss, alternate, affirm — the heaviest button last.
+///   is fixed: cancel, alternate, affirm — the heaviest button last.
 /// - Enter fires `affirm` (`submit_on_enter`), except from a textarea, a
 ///   button or a link, and not while it is saving or disabled.
 /// - The body is mounted only while open, so each opening starts fresh. Mark
@@ -134,10 +134,10 @@ pub fn Dialog(
     #[prop(into)] open: Signal<bool>,
     #[prop(into)] title: Signal<String>,
     #[prop(into)] on_close: UnsyncCallback<()>,
-    /// The dismissive button's label.
-    #[prop(into, default = "Cancel".into())] dismiss_label: Signal<String>,
-    /// No dismiss button. The × and Esc still close.
-    #[prop(optional)] no_dismiss: bool,
+    /// The Cancel button's label.
+    #[prop(into, default = "Cancel".into())] cancel_label: Signal<String>,
+    /// No Cancel button. The × and Esc still close.
+    #[prop(optional)] no_cancel: bool,
     #[prop(optional)] affirm: Option<DialogAction>,
     /// A lighter way to finish, before `affirm`; always secondary.
     #[prop(optional)] alternate: Option<DialogAction>,
@@ -149,7 +149,7 @@ pub fn Dialog(
     /// A help topic: a `?` in the title bar, before the ×.
     #[prop(optional, into)] help: MaybeHelp,
     /// The × button's label.
-    #[prop(into, default = "Close".to_string())] close_label: String,
+    #[prop(into, default = "Close".into())] close_label: Signal<String>,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
     children: ChildrenFn,
@@ -173,12 +173,12 @@ pub fn Dialog(
     let kind = if alert { "alertdialog" } else { "dialog" };
     let help = component_help(help, kind, title, Signal::stored(None), false, "dialog__help");
 
-    let has_footer = !no_dismiss || alternate.is_some() || affirm.is_some();
+    let has_footer = !no_cancel || alternate.is_some() || affirm.is_some();
     let footer = has_footer.then(|| view! {
         <div class="dialog__footer">
-            {(!no_dismiss).then(|| view! {
+            {(!no_cancel).then(|| view! {
                 <Button family=ButtonFamily::Cancel on_click=move |_| on_close.run(())>
-                    {move || dismiss_label.get()}
+                    {move || cancel_label.get()}
                 </Button>
             })}
             {alternate.map(|action| action.button(ButtonFamily::Secondary))}
@@ -199,7 +199,7 @@ pub fn Dialog(
             <div class="dialog__title-bar">
                 <h2 class="dialog__title" id=title_id>{move || title.get()}</h2>
                 {help}
-                <IconButton title=close_label class="dialog__close" on_click=move |_| on_close.run(())>
+                <IconButton label=close_label class="dialog__close" on_click=move |_| on_close.run(())>
                     <Icon icon=CLOSE />
                 </IconButton>
             </div>

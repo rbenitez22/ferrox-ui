@@ -71,8 +71,8 @@ pub fn panel_classes(collapsible: bool, compact: bool, flush: bool, tone: PanelT
 ///     …
 /// </Panel>
 /// <Panel title="Items" actions=move || view! {
-///     <IconButton title="Search items" …>…</IconButton>
-///     <Show when=move || can_add.get()><IconButton title="Add item" …>…</IconButton></Show>
+///     <IconButton label="Search items" …>…</IconButton>
+///     <Show when=move || can_add.get()><IconButton label="Add item" …>…</IconButton></Show>
 /// }>
 ///     …
 /// </Panel>

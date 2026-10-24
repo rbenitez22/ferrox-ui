@@ -6,10 +6,11 @@ use web_sys::KeyboardEvent;
 use super::panel::MenuContext;
 
 /// The class list for a `.menu__item`.
-pub fn menu_item_classes(danger: bool, current: bool) -> String {
+pub fn menu_item_classes(danger: bool, current: bool, extra: &str) -> String {
     let mut classes = vec!["menu__item"];
     if danger { classes.push("menu__item--danger"); }
     if current { classes.push("menu__item--current"); }
+    if !extra.is_empty() { classes.push(extra); }
     classes.join(" ")
 }
 
@@ -37,6 +38,8 @@ pub fn MenuItem(
     #[prop(optional)] danger: bool,
     #[prop(optional, into)] disabled: Signal<bool>,
     #[prop(optional, into)] current: Signal<bool>,
+    /// Extra classes, appended to the generated ones. May be reactive.
+    #[prop(optional, into)] class: MaybeProp<String>,
     children: Children,
 ) -> impl IntoView {
     let menu = use_context::<MenuContext>();
@@ -53,7 +56,7 @@ pub fn MenuItem(
         <button
             type="button"
             role="menuitem"
-            class=move || menu_item_classes(danger, current.get())
+            class=move || menu_item_classes(danger, current.get(), &class.get().unwrap_or_default())
             tabindex="-1"
             aria-disabled=move || disabled.get().then_some("true")
             aria-current=move || current.get().then_some("true")
@@ -77,6 +80,8 @@ pub fn MenuItem(
 pub fn MenuLink(
     #[prop(into)] href: String,
     #[prop(optional)] icon: Option<IconData>,
+    /// Extra classes, appended to `menu__item`. May be reactive.
+    #[prop(optional, into)] class: MaybeProp<String>,
     children: Children,
 ) -> impl IntoView {
     let menu = use_context::<MenuContext>();
@@ -96,7 +101,7 @@ pub fn MenuLink(
         }
     };
     view! {
-        <a href=href role="menuitem" class="menu__item" tabindex="-1" on:click=on_click on:keydown=on_keydown>
+        <a href=href role="menuitem" class=move || menu_item_classes(false, false, &class.get().unwrap_or_default()) tabindex="-1" on:click=on_click on:keydown=on_keydown>
             {icon.map(|icon| view! { <Icon icon=icon class="menu__icon" /> })}
             <span class="menu__label">{children()}</span>
         </a>
@@ -115,7 +120,7 @@ mod tests {
 
     #[test]
     fn classes() {
-        assert_eq!(menu_item_classes(false, false), "menu__item");
-        assert_eq!(menu_item_classes(true, true), "menu__item menu__item--danger menu__item--current");
+        assert_eq!(menu_item_classes(false, false, ""), "menu__item");
+        assert_eq!(menu_item_classes(true, true, "x"), "menu__item menu__item--danger menu__item--current x");
     }
 }

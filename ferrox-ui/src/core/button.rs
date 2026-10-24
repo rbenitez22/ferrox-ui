@@ -90,7 +90,7 @@ pub fn Button(
     #[prop(optional, into)] disabled: Signal<bool>,
     #[prop(default = "button")] button_type: &'static str,
     #[prop(optional, into)] on_click: Option<UnsyncCallback<MouseEvent>>,
-    #[prop(optional, into)] title: Option<String>,
+    #[prop(optional, into)] title: MaybeProp<String>,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
     children: Children,
@@ -107,7 +107,7 @@ pub fn Button(
         <button
             type=button_type
             class=move || button_classes(family, quiet, size, saving.get(), &class.get().unwrap_or_default())
-            title=title
+            title=move || title.get()
             disabled=move || disabled.get()
             aria-disabled=move || saving.get().then_some("true")
             on:click=on_click

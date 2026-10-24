@@ -27,7 +27,7 @@ pub fn card_classes(clickable: bool, compact: bool, extra: &str) -> String {
 ///
 /// ```ignore
 /// <Card title=employee.name href=format!("/employees/{}", employee.id)
-///       actions=move || view! { <IconButton title="Remove" danger=true …>…</IconButton> }>
+///       actions=move || view! { <IconButton label="Remove" danger=true …>…</IconButton> }>
 ///     <p>{employee.role}</p>
 /// </Card>
 /// ```

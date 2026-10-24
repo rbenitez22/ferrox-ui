@@ -71,23 +71,23 @@ pub fn alert_classes(severity: AlertSeverity, extra: &str) -> String {
 ///
 /// - `icon` draws the severity's icon before the text (default `true`), so
 ///   severity does not rest on colour alone.
-/// - `on_dismiss` adds a close button that calls it; the caller removes the
+/// - `on_close` adds a close button that calls it; the caller removes the
 ///   alert. Without it there is no button.
-/// - `dismiss_label` is that button's label (default `"Dismiss"`).
+/// - `close_label` is that button's label (default `"Close"`).
 ///
 /// ```ignore
 /// <Alert severity=AlertSeverity::Error>"The server refused the change."</Alert>
 /// <Alert severity=AlertSeverity::Info icon=false>"Changes apply to new entries only."</Alert>
 /// {move || error.get().map(|e| view! {
-///     <Alert severity=AlertSeverity::Error on_dismiss=move |_| error.set(None)>{e}</Alert>
+///     <Alert severity=AlertSeverity::Error on_close=move |_| error.set(None)>{e}</Alert>
 /// })}
 /// ```
 #[component]
 pub fn Alert(
     severity: AlertSeverity,
     #[prop(default = true)] icon: bool,
-    #[prop(optional, into)] on_dismiss: Option<UnsyncCallback<()>>,
-    #[prop(into, default = "Dismiss".to_string())] dismiss_label: String,
+    #[prop(optional, into)] on_close: Option<UnsyncCallback<()>>,
+    #[prop(into, default = "Close".into())] close_label: Signal<String>,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
     children: Children,
@@ -96,8 +96,8 @@ pub fn Alert(
         <div class=move || alert_classes(severity, &class.get().unwrap_or_default()) role=severity.role()>
             {icon.then(|| view! { <Icon icon=severity.icon() class="alert__icon" /> })}
             <div class="alert__body">{children()}</div>
-            {on_dismiss.map(|dismiss| view! {
-                <IconButton title=dismiss_label class="alert__dismiss" on_click=move |_| dismiss.run(())>
+            {on_close.map(|close| view! {
+                <IconButton label=close_label class="alert__close" on_click=move |_| close.run(())>
                     <Icon icon=CLOSE />
                 </IconButton>
             })}

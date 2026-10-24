@@ -145,7 +145,7 @@ fn ContextRows(chosen: RwSignal<Vec<String>>) -> impl IntoView {
             <ContextMenu
                 label=format!("{name} actions")
                 disabled=disabled
-                items=move || view! {
+                menu=move || view! {
                     <MenuItem icon=EDIT on_select=log("edit")>"Edit"</MenuItem>
                     <MenuItem on_select=log("duplicate")>"Duplicate"</MenuItem>
                     <MenuDivider />
