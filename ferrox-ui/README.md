@@ -1196,7 +1196,22 @@ view! {
 
 ## menus (feature `menus`)
 
-*Built; the overview comes with `plans/menus.md` piece 5.*
+Lists of actions that hang off the control or area that offered them.
+
+| Need | Use |
+|---|---|
+| a row's or card's actions, an overflow "More" | `Menu` with `MenuTrigger::icon(MORE_VERTICAL, "More actions")` |
+| a button that offers a few related actions ("Export ▾") | `Menu` with `MenuTrigger::button("Export")` |
+| a user menu, a book or workspace switcher | `Menu` with `MenuTrigger::custom(view, label)`, a `header`, `current` items |
+| one main action and its variants ("Save ▾") | `SplitButton` |
+| the same actions on right-click, Shift+F10 or a long press | `ContextMenu` around the area, alongside a visible `Menu` |
+| choosing a value, not running an action | not a menu: `Select` or `Combobox` (`forms`) |
+
+All of them share one panel (top layer, never clipped, kept inside the
+window, never scrolling sideways), one set of items (`MenuItem`,
+`MenuLink`, `MenuDivider`) and one keyboard contract (ARIA's menu button).
+Checkable items, submenus, a menubar and a command palette are not here
+(see Planned).
 
 ### `Menu`
 
@@ -1633,7 +1648,7 @@ class.
 ## Planned
 
 From `plans/ferrox-ui.md`, one group per piece, each with a demo page and e2e
-tests: `menus` (under way). `core` later gains
+tests: every group is built. `core` later gains
 Skeleton, Badge and a theme toggle. `overlay` later gains
 `TypeToConfirmDialog`, Toast, Popover and Tooltip, and the
 phone variants of Dialog (a bottom sheet, full screen) when an app needs them.
@@ -1647,7 +1662,9 @@ and Stepper. `layout` later gains Tabs and Accordion (a stack of
 collapsible panels), when an app needs them. `data` later gains selecting
 records (one or many, with listbox or grid roles), Table and DataTable
 (columns, sorting, filtering) and virtualised rendering, when an app needs
-them.
+them. `menus` later gains checkable items (`menuitemcheckbox`,
+`menuitemradio`), submenus, a Menubar and a command palette, when an app
+needs them.
 
 ## Licence
 

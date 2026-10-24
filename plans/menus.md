@@ -5,8 +5,10 @@ The `menus` step of piece 6 in `plans/ferrox-ui.md`, scheduled after `data`
 A list of actions that hangs off the control that offered it, with ARIA's
 menu-button keyboard contract.
 
-Status: approved (2026-10-24), all open points as recommended, with
-`ContextMenu` added as piece 4 at the user's request.
+Status: done (2026-10-24), all five pieces. Approved 2026-10-24, all open
+points as recommended, with `ContextMenu` added as piece 4 at the user's
+request. Piece 5: the menus overview in `ferrox-ui/README.md` ("which
+component for which need"), root and demo READMEs.
 
 Notes from piece 1 (done 2026-10-24):
 - The items get the menu's context through a `Provider` inside the lazy
