@@ -91,7 +91,7 @@ pub fn PasswordInput(
                 class="password-input__toggle"
                 pressed=shown
                 disabled=disabled
-                on_click=move |_| shown.update(|s| *s = !*s)
+                on_click=move || shown.update(|s| *s = !*s)
             >
                 <Icon icon=move || if shown.get() { EYE_OFF } else { EYE } />
             </IconButton>

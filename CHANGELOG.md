@@ -25,6 +25,9 @@ From the names audit in `plans/agent-first.md` (piece 3).
 - `Dialog` `dismiss_label` → `cancel_label`, `no_dismiss` → `no_cancel`.
 - `DataView` `empty` → `empty_label`.
 - `ContextMenu` `items` → `menu`.
+- No callback passes a DOM event: `Button`, `IconButton` and `SplitButton`
+  `on_click` are `UnsyncCallback<()>` (as `Card`'s already was). Write
+  every callback as `move || …`.
 
 ### Added
 

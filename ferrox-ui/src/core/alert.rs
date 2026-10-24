@@ -79,7 +79,7 @@ pub fn alert_classes(severity: AlertSeverity, extra: &str) -> String {
 /// <Alert severity=AlertSeverity::Error>"The server refused the change."</Alert>
 /// <Alert severity=AlertSeverity::Info icon=false>"Changes apply to new entries only."</Alert>
 /// {move || error.get().map(|e| view! {
-///     <Alert severity=AlertSeverity::Error on_close=move |_| error.set(None)>{e}</Alert>
+///     <Alert severity=AlertSeverity::Error on_close=move || error.set(None)>{e}</Alert>
 /// })}
 /// ```
 #[component]
@@ -97,7 +97,7 @@ pub fn Alert(
             {icon.then(|| view! { <Icon icon=severity.icon() class="alert__icon" /> })}
             <div class="alert__body">{children()}</div>
             {on_close.map(|close| view! {
-                <IconButton label=close_label class="alert__close" on_click=move |_| close.run(())>
+                <IconButton label=close_label class="alert__close" on_click=move || close.run(())>
                     <Icon icon=CLOSE />
                 </IconButton>
             })}

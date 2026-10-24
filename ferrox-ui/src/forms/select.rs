@@ -72,7 +72,7 @@ pub fn Select(
             label=refresh_label
             class="select__refresh"
             disabled=refreshing
-            on_click=move |_| on_refresh.run(())
+            on_click=move || on_refresh.run(())
         >
             {move || if refreshing.get() {
                 view! { <Spinner kind=SpinnerKind::Inline label=refreshing_label /> }.into_any()
@@ -83,7 +83,7 @@ pub fn Select(
     });
 
     let create = on_create.map(|on_create| view! {
-        <IconButton label=create_label class="select__create" disabled=disabled on_click=move |_| on_create.run(())>
+        <IconButton label=create_label class="select__create" disabled=disabled on_click=move || on_create.run(())>
             <Icon icon=PLUS />
         </IconButton>
     });

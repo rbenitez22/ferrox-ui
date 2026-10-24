@@ -63,7 +63,7 @@ fn Sizes() -> impl IntoView {
 fn States() -> impl IntoView {
     let saving = RwSignal::new(false);
     let clicks = RwSignal::new(0u32);
-    let save = move |_| {
+    let save = move || {
         clicks.update(|n| *n += 1);
         saving.set(true);
         set_timeout(move || saving.set(false), Duration::from_millis(SAVING_MS));
@@ -91,7 +91,7 @@ fn IconButtons() -> impl IntoView {
         <Section title="Icon buttons">
             <div class="demo-row">
                 <IconButton label="Search"><Icon icon=SEARCH /></IconButton>
-                <IconButton label="Camera (toggle)" pressed=pressed on_click=move |_| pressed.update(|p| *p = !*p)>
+                <IconButton label="Camera (toggle)" pressed=pressed on_click=move || pressed.update(|p| *p = !*p)>
                     <Icon icon=CAMERA />
                 </IconButton>
                 <IconButton label="Remove" danger=true><Icon icon=CLOSE /></IconButton>
@@ -115,7 +115,7 @@ fn Toolbars() -> impl IntoView {
             <Toolbar compact=true>
                 <ToolbarGroup>
                     <IconButton label="Search"><Icon icon=SEARCH /></IconButton>
-                    <IconButton label="Camera" pressed=camera on_click=move |_| camera.update(|c| *c = !*c)>
+                    <IconButton label="Camera" pressed=camera on_click=move || camera.update(|c| *c = !*c)>
                         <Icon icon=CAMERA />
                     </IconButton>
                     <IconButton label="Clear filter"><Icon icon=BAN /></IconButton>

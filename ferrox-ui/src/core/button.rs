@@ -76,8 +76,8 @@ pub fn button_classes(family: ButtonFamily, quiet: bool, size: ButtonSize, savin
 ///   `"submit"` for a form's submit button.
 ///
 /// ```ignore
-/// <Button on_click=move |_| save()>"Save"</Button>
-/// <Button family=ButtonFamily::Cancel on_click=move |_| close()>"Cancel"</Button>
+/// <Button on_click=move || save()>"Save"</Button>
+/// <Button family=ButtonFamily::Cancel on_click=move || close()>"Cancel"</Button>
 /// <Button family=ButtonFamily::Secondary quiet=true size=ButtonSize::Sm>"Export"</Button>
 /// <Button saving=saving button_type="submit">"Create"</Button>
 /// ```
@@ -89,7 +89,7 @@ pub fn Button(
     #[prop(optional, into)] saving: Signal<bool>,
     #[prop(optional, into)] disabled: Signal<bool>,
     #[prop(default = "button")] button_type: &'static str,
-    #[prop(optional, into)] on_click: Option<UnsyncCallback<MouseEvent>>,
+    #[prop(optional, into)] on_click: Option<UnsyncCallback<()>>,
     #[prop(optional, into)] title: MaybeProp<String>,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
@@ -100,7 +100,7 @@ pub fn Button(
             ev.prevent_default();
             return;
         }
-        if let Some(cb) = &on_click { cb.run(ev); }
+        if let Some(cb) = &on_click { cb.run(()); }
     };
 
     view! {

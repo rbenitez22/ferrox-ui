@@ -1,6 +1,5 @@
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
-use web_sys::MouseEvent;
 
 use super::menu::{Menu, MenuAlign, MenuTrigger};
 use crate::{Button, ButtonFamily};
@@ -14,7 +13,7 @@ use crate::{Button, ButtonFamily};
 /// main button sweeps and refuses clicks, and the menu can't open.
 ///
 /// ```ignore
-/// <SplitButton text="Save" on_click=move |_| save() menu_label="More save options">
+/// <SplitButton text="Save" on_click=move || save() menu_label="More save options">
 ///     <MenuItem on_select=move || save_as_draft()>"Save as draft"</MenuItem>
 ///     <MenuItem on_select=move || save_and_close()>"Save and close"</MenuItem>
 /// </SplitButton>
@@ -23,7 +22,7 @@ use crate::{Button, ButtonFamily};
 pub fn SplitButton(
     /// The main button's text.
     #[prop(into)] text: Signal<String>,
-    on_click: impl Fn(MouseEvent) + 'static,
+    #[prop(into)] on_click: UnsyncCallback<()>,
     /// The chevron's name, which is also the menu's: "More save options".
     #[prop(into)] menu_label: Signal<String>,
     #[prop(optional)] family: ButtonFamily,

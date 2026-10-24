@@ -12,7 +12,7 @@ use super::{component_help, MaybeHelp};
 ///
 /// ```ignore
 /// <Toolbar title="Accounts">
-///     <Button family=ButtonFamily::Primary on_click=move |_| add()>"New account"</Button>
+///     <Button family=ButtonFamily::Primary on_click=move || add()>"New account"</Button>
 /// </Toolbar>
 ///
 /// <Toolbar compact=true>

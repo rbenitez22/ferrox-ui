@@ -19,11 +19,11 @@ pub fn icon_button_classes(danger: bool, extra: &str) -> String {
 /// - `children` is the icon: ferrox-icons' `Icon`, or any `<svg class="icon">`.
 ///
 /// ```ignore
-/// <IconButton label="Search" on_click=move |_| open_search()>
+/// <IconButton label="Search" on_click=move || open_search()>
 ///     <Icon icon=SEARCH/>
 /// </IconButton>
-/// <IconButton label="Camera" pressed=camera_on on_click=move |_| camera_on.update(|v| *v = !*v)>…</IconButton>
-/// <IconButton label="Remove line" danger=true on_click=move |_| remove()>…</IconButton>
+/// <IconButton label="Camera" pressed=camera_on on_click=move || camera_on.update(|v| *v = !*v)>…</IconButton>
+/// <IconButton label="Remove line" danger=true on_click=move || remove()>…</IconButton>
 /// ```
 #[component]
 pub fn IconButton(
@@ -32,13 +32,13 @@ pub fn IconButton(
     #[prop(optional, into)] pressed: Option<Signal<bool>>,
     #[prop(optional)] danger: bool,
     #[prop(optional, into)] disabled: Signal<bool>,
-    #[prop(optional, into)] on_click: Option<UnsyncCallback<MouseEvent>>,
+    #[prop(optional, into)] on_click: Option<UnsyncCallback<()>>,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
     children: Children,
 ) -> impl IntoView {
-    let on_click = move |ev: MouseEvent| {
-        if let Some(cb) = &on_click { cb.run(ev); }
+    let on_click = move |_: MouseEvent| {
+        if let Some(cb) = &on_click { cb.run(()); }
     };
 
     view! {

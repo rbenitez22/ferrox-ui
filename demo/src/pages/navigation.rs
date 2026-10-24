@@ -114,7 +114,7 @@ fn GroupStates() -> impl IntoView {
                 </NavList>
             </div>
             <div class="demo-row">
-                <Button family=ButtonFamily::Secondary size=ButtonSize::Sm on_click=move |_| remembered.update(|e| *e = !*e)>
+                <Button family=ButtonFamily::Secondary size=ButtonSize::Sm on_click=move || remembered.update(|e| *e = !*e)>
                     "Toggle from code"
                 </Button>
                 <span>

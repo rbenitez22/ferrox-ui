@@ -70,7 +70,7 @@ fn FormDialog(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
         note("form: draft");
     };
     view! {
-        <Button on_click=move |_| open.set(true)>"Edit account…"</Button>
+        <Button on_click=move || open.set(true)>"Edit account…"</Button>
         <Dialog
             open=open
             title="Edit account"
@@ -89,7 +89,7 @@ fn FormDialog(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
 fn WideDialog(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
     let open = RwSignal::new(false);
     view! {
-        <Button family=ButtonFamily::Secondary on_click=move |_| open.set(true)>"Show splits…"</Button>
+        <Button family=ButtonFamily::Secondary on_click=move || open.set(true)>"Show splits…"</Button>
         <Dialog
             open=open
             title="Splits"
@@ -113,7 +113,7 @@ fn WideDialog(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
 fn NoDismissDialog(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
     let open = RwSignal::new(false);
     view! {
-        <Button family=ButtonFamily::Secondary on_click=move |_| open.set(true)>"Notice…"</Button>
+        <Button family=ButtonFamily::Secondary on_click=move || open.set(true)>"Notice…"</Button>
         <Dialog
             open=open
             title="Saved"
@@ -132,13 +132,13 @@ fn NestedDialogs(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
     let outer = RwSignal::new(false);
     let inner = RwSignal::new(false);
     view! {
-        <Button family=ButtonFamily::Secondary on_click=move |_| outer.set(true)>"Nested…"</Button>
+        <Button family=ButtonFamily::Secondary on_click=move || outer.set(true)>"Nested…"</Button>
         <Dialog
             open=outer
             title="Outer"
             on_close=move || { outer.set(false); note("outer: closed"); }
         >
-            <Button on_click=move |_| inner.set(true)>"Open the inner dialog"</Button>
+            <Button on_click=move || inner.set(true)>"Open the inner dialog"</Button>
         </Dialog>
         <Dialog
             open=inner
@@ -167,7 +167,7 @@ fn DeleteConfirm(note: impl Fn(&str) + Copy + 'static) -> impl IntoView {
         }, Duration::from_millis(SAVING_MS));
     };
     view! {
-        <Button family=ButtonFamily::Danger on_click=move |_| open.set(true)>"Delete account…"</Button>
+        <Button family=ButtonFamily::Danger on_click=move || open.set(true)>"Delete account…"</Button>
         <ConfirmDialog
             open=open
             title="Delete account?"
@@ -189,10 +189,10 @@ fn EdgeSheet(side: SheetSide, label: &'static str, note: impl Fn(&str) + Copy + 
     let closed = format!("{name}: closed");
     let chosen = StoredValue::new(format!("{name}: chose"));
     view! {
-        <Button family=ButtonFamily::Secondary on_click=move |_| open.set(true)>{format!("{label}…")}</Button>
+        <Button family=ButtonFamily::Secondary on_click=move || open.set(true)>{format!("{label}…")}</Button>
         <Sheet open=open side=side title=label on_close=move || { open.set(false); note(&closed); }>
             <div class="demo-stack">
-                <Button quiet=true on_click=move |_| { open.set(false); note(&chosen.get_value()); }>"Accounts"</Button>
+                <Button quiet=true on_click=move || { open.set(false); note(&chosen.get_value()); }>"Accounts"</Button>
                 <Button quiet=true>"Budgets"</Button>
                 <Button quiet=true>"Reports"</Button>
             </div>

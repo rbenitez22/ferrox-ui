@@ -97,7 +97,7 @@ pub fn App() -> impl IntoView {
             title="Items"
             heading_level=HeadingLevel::H1
             actions=move || view! {
-                <IconButton label="Add item" on_click=move |_| open_add()><Icon icon=PLUS /></IconButton>
+                <IconButton label="Add item" on_click=move || open_add()><Icon icon=PLUS /></IconButton>
             }
         >
             <DataView
@@ -111,7 +111,7 @@ pub fn App() -> impl IntoView {
                 loading_label="Loading items…"
                 empty_view=move || view! {
                     <p>"No items yet."</p>
-                    <Button on_click=move |_| open_add()>"Add an item"</Button>
+                    <Button on_click=move || open_add()>"Add an item"</Button>
                 }
             />
         </Panel>

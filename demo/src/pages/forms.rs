@@ -47,7 +47,7 @@ fn Fields() -> impl IntoView {
                 <Input value=query kind=InputKind::Search name="query" placeholder="Search (no field)" />
             </div>
             <div class="demo-row">
-                <Button family=ButtonFamily::Secondary on_click=move |_| { name.set("Groceries".into()); notes.set("Line one\nLine two".into()); }>
+                <Button family=ButtonFamily::Secondary on_click=move || { name.set("Groceries".into()); notes.set("Line one\nLine two".into()); }>
                     "Fill from code"
                 </Button>
             </div>
@@ -138,7 +138,7 @@ fn Choices() -> impl IntoView {
                 </Field>
             </div>
             <div class="demo-row">
-                <Button family=ButtonFamily::Secondary on_click=move |_| currency.set("gbp".into())>"Choose pounds from code"</Button>
+                <Button family=ButtonFamily::Secondary on_click=move || currency.set("gbp".into())>"Choose pounds from code"</Button>
             </div>
             <dl class="demo-echo">
                 <dt>"recurring"</dt><dd data-echo="recurring">{move || recurring.get().to_string()}</dd>
@@ -226,7 +226,7 @@ fn Comboboxes() -> impl IntoView {
                 </Field>
             </div>
             <div class="demo-row">
-                <Button family=ButtonFamily::Secondary on_click=move |_| dialog_open.set(true)>"Combobox in a dialog…"</Button>
+                <Button family=ButtonFamily::Secondary on_click=move || dialog_open.set(true)>"Combobox in a dialog…"</Button>
             </div>
             <dl class="demo-echo">
                 <dt>"text"</dt><dd data-echo="combo-text">{move || text.get()}</dd>

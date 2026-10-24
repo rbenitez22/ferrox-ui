@@ -86,7 +86,7 @@ impl DialogAction {
     fn button(self, family: ButtonFamily) -> impl IntoView {
         let Self { label, on_click, saving, disabled, .. } = self;
         view! {
-            <Button family=family saving=saving disabled=disabled on_click=move |_| on_click.run(())>
+            <Button family=family saving=saving disabled=disabled on_click=move || on_click.run(())>
                 {move || label.get()}
             </Button>
         }
@@ -177,7 +177,7 @@ pub fn Dialog(
     let footer = has_footer.then(|| view! {
         <div class="dialog__footer">
             {(!no_cancel).then(|| view! {
-                <Button family=ButtonFamily::Cancel on_click=move |_| on_close.run(())>
+                <Button family=ButtonFamily::Cancel on_click=move || on_close.run(())>
                     {move || cancel_label.get()}
                 </Button>
             })}
@@ -199,7 +199,7 @@ pub fn Dialog(
             <div class="dialog__title-bar">
                 <h2 class="dialog__title" id=title_id>{move || title.get()}</h2>
                 {help}
-                <IconButton label=close_label class="dialog__close" on_click=move |_| on_close.run(())>
+                <IconButton label=close_label class="dialog__close" on_click=move || on_close.run(())>
                     <Icon icon=CLOSE />
                 </IconButton>
             </div>

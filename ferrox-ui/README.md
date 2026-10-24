@@ -49,10 +49,18 @@ call adds nothing.
   `#[non_exhaustive]`: match them with a `_` arm.
 - Each component has a `*_classes` function that returns the class list it
   renders, for markup that needs the same look without the component.
-- User-facing text (button labels, "Close", "Cancel", "Dismiss") is a prop
-  with an English default.
-- A callback with no input is a zero-argument closure:
-  `on_close=move || open.set(false)`.
+- Every human-readable word is a prop, typed `Signal<String>` (a literal
+  or a signal), with an English default where it has one. One word is an
+  `x_label` prop ("Close", "Cancel", "Retry"); a set of words for repeated
+  parts is an `XLabels` struct with `Default` (`PaginationLabels`).
+- `label` names a control (its visible label, or its accessible name);
+  `title` is a heading's text. `IconButton` takes `label`; `Panel`, `Card`
+  and the overlays take `title`. (`Button`'s `title` is a plain tooltip.)
+- Every callback is an `on_*` prop, and none passes a DOM event: write
+  `on_click=move || save()`. Where a component hands you something, it's
+  the value itself: `on_select=move |item| …`, `on_create=move |text| …`.
+- Every × is "close" (`on_close`, `close_label`); a dismissive button is
+  "cancel" (`cancel_label`).
 - Components with a label or a title take `help` (a `HelpTopic`): see
   [Help](#help-in-core).
 
@@ -67,8 +75,8 @@ is a separate axis: how heavy it looks.
 use ferrox_ui::{Button, ButtonFamily, ButtonSize};
 
 view! {
-    <Button on_click=move |_| save()>"Save"</Button>
-    <Button family=ButtonFamily::Cancel on_click=move |_| close()>"Cancel"</Button>
+    <Button on_click=move || save()>"Save"</Button>
+    <Button family=ButtonFamily::Cancel on_click=move || close()>"Cancel"</Button>
     <Button family=ButtonFamily::Secondary quiet=true size=ButtonSize::Sm>"Export"</Button>
     <Button saving=saving button_type="submit">"Create"</Button>
 }
@@ -96,9 +104,9 @@ use ferrox_icons::{Icon, CAMERA, DELETE, SEARCH};
 use ferrox_ui::IconButton;
 
 view! {
-    <IconButton label="Search" on_click=move |_| open_search()><Icon icon=SEARCH/></IconButton>
-    <IconButton label="Camera" pressed=camera on_click=move |_| camera.update(|c| *c = !*c)><Icon icon=CAMERA/></IconButton>
-    <IconButton label="Remove line" danger=true on_click=move |_| remove()><Icon icon=DELETE/></IconButton>
+    <IconButton label="Search" on_click=move || open_search()><Icon icon=SEARCH/></IconButton>
+    <IconButton label="Camera" pressed=camera on_click=move || camera.update(|c| *c = !*c)><Icon icon=CAMERA/></IconButton>
+    <IconButton label="Remove line" danger=true on_click=move || remove()><Icon icon=DELETE/></IconButton>
 }
 ```
 
@@ -123,7 +131,7 @@ use ferrox_ui::{Toolbar, ToolbarGroup};
 
 view! {
     <Toolbar title="Accounts">
-        <Button on_click=move |_| add()>"New account"</Button>
+        <Button on_click=move || add()>"New account"</Button>
     </Toolbar>
 
     <Toolbar compact=true>
@@ -194,7 +202,7 @@ view! {
     <Alert severity=AlertSeverity::Error>"The server refused the change: the period is closed."</Alert>
     <Alert severity=AlertSeverity::Info icon=false>"Changes apply to new entries only."</Alert>
     {move || error.get().map(|e| view! {
-        <Alert severity=AlertSeverity::Error on_close=move |_| error.set(None)>{e}</Alert>
+        <Alert severity=AlertSeverity::Error on_close=move || error.set(None)>{e}</Alert>
     })}
 }
 ```
@@ -254,7 +262,7 @@ let editing = RwSignal::new(false);
 let saving = RwSignal::new(false);
 
 view! {
-    <Button on_click=move |_| editing.set(true)>"Edit account…"</Button>
+    <Button on_click=move || editing.set(true)>"Edit account…"</Button>
     <Dialog
         open=editing
         title="Edit account"
@@ -327,7 +335,7 @@ the sheet doesn't close it.
 use ferrox_ui::{Sheet, SheetSide};
 
 view! {
-    <IconButton label="Menu" on_click=move |_| menu.set(true)><Icon icon=MENU/></IconButton>
+    <IconButton label="Menu" on_click=move || menu.set(true)><Icon icon=MENU/></IconButton>
     <Sheet open=menu title="Menu" on_close=move || menu.set(false)>
         <nav>…</nav>
     </Sheet>
@@ -888,10 +896,10 @@ view! {
     <Panel
         title="Items"
         actions=move || view! {
-            <IconButton label="Search items" on_click=move |_| search()><Icon icon=SEARCH /></IconButton>
+            <IconButton label="Search items" on_click=move || search()><Icon icon=SEARCH /></IconButton>
             // The app's own permission decides whether "add" shows.
             <Show when=move || can_add_items.get()>
-                <IconButton label="Add item" on_click=move |_| new_item()><Icon icon=PLUS /></IconButton>
+                <IconButton label="Add item" on_click=move || new_item()><Icon icon=PLUS /></IconButton>
             </Show>
         }
     >
@@ -965,7 +973,7 @@ view! {
         title=employee.name.clone()
         href=format!("/employees/{}", employee.id)
         actions=move || view! {
-            <IconButton label="Remove" danger=true on_click=move |_| remove()><Icon icon=DELETE /></IconButton>
+            <IconButton label="Remove" danger=true on_click=move || remove()><Icon icon=DELETE /></IconButton>
         }
     >
         <p>{employee.role.clone()}</p>
@@ -1303,7 +1311,7 @@ A main action and, joined to it, a chevron that opens related actions.
 use ferrox_ui::{MenuItem, SplitButton};
 
 view! {
-    <SplitButton text="Save" on_click=move |_| save() menu_label="More save options" saving=saving>
+    <SplitButton text="Save" on_click=move || save() menu_label="More save options" saving=saving>
         <MenuItem on_select=move || save_as_draft()>"Save as draft"</MenuItem>
         <MenuItem on_select=move || save_and_close()>"Save and close"</MenuItem>
     </SplitButton>

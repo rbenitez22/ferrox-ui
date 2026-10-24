@@ -81,7 +81,7 @@ pub fn DataLayoutSwitch(
         <IconButton
             label=labels.for_layout(choice).to_string()
             pressed=Signal::derive(move || layout.get() == choice)
-            on_click=move |_| layout.set(choice)
+            on_click=move || layout.set(choice)
         >
             <Icon icon=layout_icon(choice) />
         </IconButton>

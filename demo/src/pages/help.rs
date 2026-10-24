@@ -119,7 +119,7 @@ fn Asking() -> impl IntoView {
         asked.set(Some(request));
         assistant_open.set(true);
     };
-    let next_account = move |_| account.update(|a| *a = if a == "checking" { "savings".into() } else { "checking".into() });
+    let next_account = move || account.update(|a| *a = if a == "checking" { "savings".into() } else { "checking".into() });
     view! {
         <Section title="Asking an assistant">
             <HelpAssistant on_ask=on_ask>
@@ -211,9 +211,9 @@ fn OnComponents() -> impl IntoView {
                         </div>
                     </div>
                     <div class="demo-row">
-                        <Button family=ButtonFamily::Secondary on_click=move |_| editing.set(true)>"Dialog with help…"</Button>
-                        <Button family=ButtonFamily::Danger on_click=move |_| deleting.set(true)>"Confirm with help…"</Button>
-                        <Button family=ButtonFamily::Secondary on_click=move |_| menu.set(true)>"Sheet with help…"</Button>
+                        <Button family=ButtonFamily::Secondary on_click=move || editing.set(true)>"Dialog with help…"</Button>
+                        <Button family=ButtonFamily::Danger on_click=move || deleting.set(true)>"Confirm with help…"</Button>
+                        <Button family=ButtonFamily::Secondary on_click=move || menu.set(true)>"Sheet with help…"</Button>
                     </div>
                     <Dialog open=editing title="Edit split" help=about("edit-split", "Editing a split") on_close=move || editing.set(false)>
                         <p>"A dialog's ? sits in its title bar, before the ×."</p>

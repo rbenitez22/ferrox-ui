@@ -108,7 +108,7 @@ pub fn Sheet(
             <div class="sheet__title-bar">
                 <h2 class="sheet__title" id=title_id>{move || title.get()}</h2>
                 {help}
-                <IconButton label=close_label class="sheet__close" on_click=move |_| on_close.run(())>
+                <IconButton label=close_label class="sheet__close" on_click=move || on_close.run(())>
                     <Icon icon=CLOSE />
                 </IconButton>
             </div>

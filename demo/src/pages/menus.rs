@@ -69,7 +69,7 @@ pub fn MenusPage() -> impl IntoView {
                 <Menu label="Locked actions" trigger=MenuTrigger::button("Locked") disabled=true>
                     <MenuItem on_select=choose("never")>"Never"</MenuItem>
                 </Menu>
-                <Button family=ButtonFamily::Secondary on_click=move |_| dialog_open.set(true)>"Menu in a dialog…"</Button>
+                <Button family=ButtonFamily::Secondary on_click=move || dialog_open.set(true)>"Menu in a dialog…"</Button>
             </div>
             <Switch checked=archiving label="Archiving allowed" />
             <dl class="demo-echo">
@@ -107,7 +107,7 @@ fn SplitButtons(chosen: RwSignal<Vec<String>>) -> impl IntoView {
     let saving = RwSignal::new(false);
     let locked = RwSignal::new(false);
     let saves = RwSignal::new(0_u32);
-    let save = move |_| {
+    let save = move || {
         saving.set(true);
         set_timeout(move || {
             saves.update(|n| *n += 1);
@@ -121,7 +121,7 @@ fn SplitButtons(chosen: RwSignal<Vec<String>>) -> impl IntoView {
                     <MenuItem on_select=move || chosen.update(|c| c.push("save as draft".into()))>"Save as draft"</MenuItem>
                     <MenuItem on_select=move || chosen.update(|c| c.push("save and close".into()))>"Save and close"</MenuItem>
                 </SplitButton>
-                <SplitButton text="Publish" family=ButtonFamily::Secondary on_click=move |_| chosen.update(|c| c.push("publish".into())) menu_label="More publish options">
+                <SplitButton text="Publish" family=ButtonFamily::Secondary on_click=move || chosen.update(|c| c.push("publish".into())) menu_label="More publish options">
                     <MenuItem on_select=move || chosen.update(|c| c.push("schedule".into()))>"Schedule…"</MenuItem>
                 </SplitButton>
                 <Switch checked=locked label="Saving locked" />
@@ -154,7 +154,7 @@ fn ContextRows(chosen: RwSignal<Vec<String>>) -> impl IntoView {
             >
                 <div class="demo-context-row" data-row=name>
                     <span>{name}</span>
-                    <Button family=ButtonFamily::Secondary on_click=move |_| opened.update(|o| o.push(name.to_string()))>
+                    <Button family=ButtonFamily::Secondary on_click=move || opened.update(|o| o.push(name.to_string()))>
                         {format!("Open {name}")}
                     </Button>
                 </div>

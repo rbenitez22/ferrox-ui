@@ -97,7 +97,7 @@ where
     let alert = move || {
         error.get().map(|message| {
             let retry = on_retry.map(|on_retry| view! {
-                <Button family=ButtonFamily::Secondary size=ButtonSize::Sm class="data-view__retry" on_click=move |_| on_retry.run(())>
+                <Button family=ButtonFamily::Secondary size=ButtonSize::Sm class="data-view__retry" on_click=move || on_retry.run(())>
                     {retry_label}
                 </Button>
             });

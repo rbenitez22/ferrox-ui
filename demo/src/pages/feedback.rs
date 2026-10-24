@@ -28,7 +28,7 @@ fn Spinners() -> impl IntoView {
     view! {
         <Section title="Spinners">
             <div class="demo-row">
-                <Button on_click=move |_| shown.update(|s| *s = !*s)>
+                <Button on_click=move || shown.update(|s| *s = !*s)>
                     {move || if shown.get() { "Hide spinners" } else { "Show spinners" }}
                 </Button>
             </div>
@@ -60,7 +60,7 @@ fn Spinners() -> impl IntoView {
 #[component]
 fn Overlay() -> impl IntoView {
     let shown = RwSignal::new(false);
-    let show = move |_| {
+    let show = move || {
         shown.set(true);
         set_timeout(move || shown.set(false), Duration::from_millis(OVERLAY_MS));
     };
@@ -93,11 +93,11 @@ fn Alerts() -> impl IntoView {
                     when=move || !dismissed.get()
                     fallback=move || view! {
                         <div class="demo-row">
-                            <Button on_click=move |_| dismissed.set(false)>"Show the dismissible alert again"</Button>
+                            <Button on_click=move || dismissed.set(false)>"Show the dismissible alert again"</Button>
                         </div>
                     }
                 >
-                    <Alert severity=AlertSeverity::Error on_close=move |_| dismissed.set(true)>
+                    <Alert severity=AlertSeverity::Error on_close=move || dismissed.set(true)>
                         "Dismissible: the close button calls on_close, and the page removes the alert."
                     </Alert>
                 </Show>

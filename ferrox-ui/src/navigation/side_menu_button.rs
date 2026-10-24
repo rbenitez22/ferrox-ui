@@ -24,7 +24,7 @@ pub fn SideMenuButton(
         <IconButton
             label=label
             class=class
-            on_click=move |_| open.set(true)
+            on_click=move || open.set(true)
             attr:aria-haspopup="dialog"
             attr:aria-expanded=move || open.get().to_string()
         >

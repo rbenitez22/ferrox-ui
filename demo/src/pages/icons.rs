@@ -53,7 +53,7 @@ fn ChosenAtRuntime() -> impl IntoView {
     view! {
         <Section title="Chosen at runtime">
             <div class="demo-row">
-                <Button on_click=move |_| open.update(|o| *o = !*o)>
+                <Button on_click=move || open.update(|o| *o = !*o)>
                     <Icon icon=move || if open.get() { CHEVRON_DOWN } else { CHEVRON_RIGHT } />
                     {move || if open.get() { "Collapse" } else { "Expand" }}
                 </Button>

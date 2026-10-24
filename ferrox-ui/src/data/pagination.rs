@@ -126,7 +126,7 @@ pub fn Pagination(
                         <IconButton
                             label=labels.with_value(|l| l.previous.clone())
                             disabled=Signal::derive(move || current.get() <= 1)
-                            on_click=move |_| go(current.get_untracked() - 1)
+                            on_click=move || go(current.get_untracked() - 1)
                         >
                             <Icon icon=CHEVRON_LEFT />
                         </IconButton>
@@ -159,7 +159,7 @@ pub fn Pagination(
                         <IconButton
                             label=labels.with_value(|l| l.next.clone())
                             disabled=Signal::derive(move || current.get() >= page_count.get())
-                            on_click=move |_| go(current.get_untracked() + 1)
+                            on_click=move || go(current.get_untracked() + 1)
                         >
                             <Icon icon=CHEVRON_RIGHT />
                         </IconButton>

@@ -68,21 +68,21 @@ fn Recipes() -> impl IntoView {
     let next_id = RwSignal::new(RECIPE_NAMES.len() as u32 + 1);
     let error = Signal::derive(move || failing.get().then(|| "Couldn't load the recipes.".to_string()));
 
-    let update = move |_| items.update(|list| *list = list.clone());
-    let append = move |_| {
+    let update = move || items.update(|list| *list = list.clone());
+    let append = move || {
         let id = next_id.get_untracked();
         next_id.set(id + 1);
         items.update(|list| list.push(Recipe { id, name: format!("New recipe {id}") }));
     };
-    let reverse = move |_| items.update(|list| list.reverse());
-    let empty_out = move |_| items.set(Vec::new());
-    let restore = move |_| items.set(recipes());
+    let reverse = move || items.update(|list| list.reverse());
+    let empty_out = move || items.set(Vec::new());
+    let restore = move || items.set(recipes());
 
     view! {
         <Section title="Data view">
             <div class="demo-row">
                 <DataLayoutSwitch layout=layout choices=LAYOUTS.to_vec() />
-                <Button family=ButtonFamily::Secondary on_click=move |_| layout.set(DataLayout::List)>"Choose List from code"</Button>
+                <Button family=ButtonFamily::Secondary on_click=move || layout.set(DataLayout::List)>"Choose List from code"</Button>
             </div>
             <div class="demo-row">
                 <Button family=ButtonFamily::Secondary on_click=update>"Update"</Button>
@@ -140,7 +140,7 @@ fn Tags() -> impl IntoView {
 #[component]
 fn Lists() -> impl IntoView {
     let lists = RwSignal::new(Vec::<String>::new());
-    let add = move |_| lists.update(|l| l.push(format!("List {}", l.len() + 1)));
+    let add = move || lists.update(|l| l.push(format!("List {}", l.len() + 1)));
     view! {
         <Section title="Empty view">
             <DataView
@@ -178,10 +178,10 @@ fn Paged() -> impl IntoView {
     view! {
         <Section title="Pagination">
             <div class="demo-row">
-                <Button family=ButtonFamily::Secondary on_click=move |_| set_count(20)>"20 pages"</Button>
-                <Button family=ButtonFamily::Secondary on_click=move |_| set_count(5)>"5 pages"</Button>
-                <Button family=ButtonFamily::Secondary on_click=move |_| set_count(1)>"1 page"</Button>
-                <Button family=ButtonFamily::Secondary on_click=move |_| page.set(20)>"Go to page 20 from code"</Button>
+                <Button family=ButtonFamily::Secondary on_click=move || set_count(20)>"20 pages"</Button>
+                <Button family=ButtonFamily::Secondary on_click=move || set_count(5)>"5 pages"</Button>
+                <Button family=ButtonFamily::Secondary on_click=move || set_count(1)>"1 page"</Button>
+                <Button family=ButtonFamily::Secondary on_click=move || page.set(20)>"Go to page 20 from code"</Button>
             </div>
             <DataView
                 items=slice

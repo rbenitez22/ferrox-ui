@@ -27,7 +27,7 @@ pub fn LayoutPage() -> impl IntoView {
 /// The `+` an app puts in a panel's actions: an `IconButton` drawing `PLUS`.
 fn add_button(label: &'static str, on_add: impl Fn() + Send + Sync + 'static) -> impl IntoView {
     view! {
-        <IconButton label=label on_click=move |_| on_add()>
+        <IconButton label=label on_click=move || on_add()>
             <Icon icon=PLUS />
         </IconButton>
     }
@@ -61,7 +61,7 @@ fn SectionPanels() -> impl IntoView {
                     title="Items"
                     help=ITEMS_HELP.clone()
                     actions=move || view! {
-                        <IconButton label="Search items" on_click=move |_| searched.update(|n| *n += 1)>
+                        <IconButton label="Search items" on_click=move || searched.update(|n| *n += 1)>
                             <Icon icon=SEARCH />
                         </IconButton>
                         <Show when=move || may_add.get()>{add_button("Add item", || {})}</Show>
@@ -137,7 +137,7 @@ fn Collapsible() -> impl IntoView {
                     <p>"The page holds this state."</p>
                 </Panel>
                 <div class="demo-row">
-                    <Button family=ButtonFamily::Secondary size=ButtonSize::Sm on_click=move |_| owned.update(|o| *o = !*o)>
+                    <Button family=ButtonFamily::Secondary size=ButtonSize::Sm on_click=move || owned.update(|o| *o = !*o)>
                         "Toggle the owned panel"
                     </Button>
                     <span>{move || if owned.get() { "Owned panel: open" } else { "Owned panel: shut" }}</span>
@@ -160,7 +160,7 @@ fn Cards() -> impl IntoView {
     let removed = RwSignal::new(0);
     let opened = RwSignal::new(0);
     let remove = move || view! {
-        <IconButton label="Remove" danger=true on_click=move |_| removed.update(|n| *n += 1)>
+        <IconButton label="Remove" danger=true on_click=move || removed.update(|n| *n += 1)>
             <Icon icon=DELETE />
         </IconButton>
     };
