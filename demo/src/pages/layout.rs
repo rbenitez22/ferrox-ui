@@ -3,7 +3,7 @@
 
 use std::sync::LazyLock;
 
-use ferrox_icons::{Icon, DELETE, SEARCH};
+use ferrox_icons::{Icon, DELETE, PLUS, SEARCH};
 use ferrox_ui::{Button, ButtonFamily, ButtonSize, Card, Field, HeadingLevel, HelpTopic, IconButton, Input, Panel, PanelTone, Switch};
 use leptos::prelude::*;
 
@@ -24,21 +24,31 @@ pub fn LayoutPage() -> impl IntoView {
     }
 }
 
+/// The `+` an app puts in a panel's actions: an `IconButton` drawing `PLUS`.
+fn add_button(label: &'static str, on_add: impl Fn() + Send + Sync + 'static) -> impl IntoView {
+    view! {
+        <IconButton title=label on_click=move |_| on_add()>
+            <Icon icon=PLUS />
+        </IconButton>
+    }
+}
+
 /// A page's own panel (H1), with a `+` that counts its clicks.
 #[component]
 fn PagePanel() -> impl IntoView {
     let added = RwSignal::new(0);
     view! {
         <Section title="Page panel">
-            <Panel title="Shopping Lists" heading_level=HeadingLevel::H1 on_add=move || added.update(|n| *n += 1)>
+            <Panel title="Shopping Lists" heading_level=HeadingLevel::H1 actions=move || add_button("Add", move || added.update(|n| *n += 1))>
                 <p>{move || format!("Added {} times", added.get())}</p>
             </Panel>
         </Section>
     }
 }
 
-/// Sections: actions before the `+`, a `+` that follows a permission, help;
-/// and a panel with no buttons at all.
+/// Sections: a search action, then a `+` the page shows only while a
+/// permission allows (an app's own `Show`), help; and a panel with no buttons
+/// at all.
 #[component]
 fn SectionPanels() -> impl IntoView {
     let may_add = RwSignal::new(true);
@@ -49,14 +59,12 @@ fn SectionPanels() -> impl IntoView {
                 <Switch checked=may_add label="May add items" />
                 <Panel
                     title="Items"
-                    can_add=may_add
-                    on_add=move || {}
-                    add_label="Add item"
                     help=ITEMS_HELP.clone()
                     actions=move || view! {
                         <IconButton title="Search items" on_click=move |_| searched.update(|n| *n += 1)>
                             <Icon icon=SEARCH />
                         </IconButton>
+                        <Show when=move || may_add.get()>{add_button("Add item", || {})}</Show>
                     }
                 >
                     <p>{move || format!("Searched {} times", searched.get())}</p>
@@ -64,7 +72,7 @@ fn SectionPanels() -> impl IntoView {
                 <Panel title="Load Data">
                     <p>"A panel with no buttons."</p>
                 </Panel>
-                <Panel title="A very long panel title that cannot fit beside its buttons on a phone" on_add=move || {}>
+                <Panel title="A very long panel title that cannot fit beside its buttons on a phone" actions=|| add_button("Add", || {})>
                     <p>"The title ends in an ellipsis instead of wrapping."</p>
                 </Panel>
             </div>
@@ -77,7 +85,7 @@ fn Variants() -> impl IntoView {
     view! {
         <Section title="Variants">
             <div class="demo-stack">
-                <Panel title="Compact" compact=true on_add=move || {}>
+                <Panel title="Compact" compact=true actions=|| add_button("Add", || {})>
                     <p>"One panel among several on a working screen."</p>
                 </Panel>
                 <Panel title="Flush" flush=true>
@@ -111,8 +119,7 @@ fn Collapsible() -> impl IntoView {
                     collapsible=true
                     summary="2 notes"
                     help=ITEMS_HELP.clone()
-                    on_add=move || added.update(|n| *n += 1)
-                    add_label="Add note"
+                    actions=move || add_button("Add note", move || added.update(|n| *n += 1))
                 >
                     <CountsBuilds builds=builds />
                     <Field label="Note"><Input value=note /></Field>

@@ -860,21 +860,22 @@ left and the actions on the right, then the body. One component serves a
 page's own title (`H1`) and a section inside a page (`H2`, the default).
 
 ```rust
-use ferrox_icons::{Icon, SEARCH};
+use ferrox_icons::{Icon, PLUS, SEARCH};
 use ferrox_ui::{HeadingLevel, IconButton, Panel, PanelTone};
 
 view! {
-    <Panel title="Shopping Lists" heading_level=HeadingLevel::H1 on_add=move || new_list()>
+    <Panel title="Shopping Lists" heading_level=HeadingLevel::H1>
         …
     </Panel>
 
     <Panel
         title="Items"
-        can_add=can_add_items                         // a permission: false removes the +
-        on_add=move || new_item()
-        add_label="Add item"
         actions=move || view! {
             <IconButton title="Search items" on_click=move |_| search()><Icon icon=SEARCH /></IconButton>
+            // The app's own permission decides whether "add" shows.
+            <Show when=move || can_add_items.get()>
+                <IconButton title="Add item" on_click=move |_| new_item()><Icon icon=PLUS /></IconButton>
+            </Show>
         }
     >
         …
@@ -889,10 +890,7 @@ view! {
 |---|---|---|
 | `title` | required | the heading's text, and the section's name |
 | `heading_level` | `H2` | `H1`…`H4`, for the page's outline. Every level looks the same |
-| `actions` | none | a closure returning buttons, at the right of the band before the `+` |
-| `on_add` | none | adds a `+` (`IconButton` drawing `PLUS`) as the last action |
-| `add_label` | `"Add"` | the `+`'s label and tooltip: name what it adds ("Add item") |
-| `can_add` | `true` | false removes the `+`; a user who may not add isn't shown the button |
+| `actions` | none | a closure returning buttons (add, search, export: whatever the app needs), at the right of the band |
 | `compact` | `false` | a slimmer band in body type and a tighter body, for one panel among several |
 | `flush` | `false` | no padding round the body, for a table or a grid |
 | `tone` | `Default` | `Warning`: something to act on. `Danger`: something that can't be undone (the title turns red too). Tints the band and the border |
@@ -929,7 +927,7 @@ view! {
 - **The body isn't rendered until it's first opened**, so a shut panel that
   would load data doesn't. From then on it stays mounted and is `hidden`
   while shut, so whatever was typed in it survives.
-- **While shut** the actions and the `+` are hidden; the `?` stays, since
+- **While shut** the actions are hidden; the `?` stays, since
   help explains a shut panel too. On a collapsible panel the `?` sits after
   the toggle.
 - The section is named by the title alone, never by the summary.

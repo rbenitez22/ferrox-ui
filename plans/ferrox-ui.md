@@ -9,7 +9,7 @@ webapp-lib keeps the app plumbing (http, storage, reactive, auth, app-level
 components such as `Login`) and depends on ferrox-ui; see webapp-lib's
 `plans/crate-split.md` for that side.
 
-Status: pieces 0–5 done; piece 6 under way (core, overlay, help (plan `plans/help.md`), forms (plan `plans/forms.md`) navigation (plan `plans/navigation.md`) and layout (plan `plans/layout.md`) done; next: `data`, then `menus`; then the help follow-ups F1 and help signals (`plans/help.md`), before webapp-lib piece 2). Repo `/programming/ferrox-ui`
+Status: pieces 0–5 done; piece 6 under way (core, overlay, help (plan `plans/help.md`), forms (plan `plans/forms.md`) navigation (plan `plans/navigation.md`) and layout (plan `plans/layout.md`) done; next: finish `plans/generalise.md` (take the user's stack out of the ported components; piece 1 done), then `data` (`plans/data.md`, approved), then `menus`; then the help follow-ups F1 and help signals (`plans/help.md`), before webapp-lib piece 2). Repo `/programming/ferrox-ui`
 (`git@github.com:rbenitez22/ferrox-ui.git`, branch `master`).
 
 ## Crates (one workspace, this repo)

@@ -1,11 +1,11 @@
-use ferrox_icons::{Icon, CHEVRON_RIGHT, PLUS};
+use ferrox_icons::{Icon, CHEVRON_RIGHT};
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
 use super::heading::{heading, HeadingLevel};
 use crate::core::component_help;
 use crate::ids::unique_id;
-use crate::{IconButton, MaybeHelp};
+use crate::MaybeHelp;
 
 // ---------------------------------------------------------------------------
 // PanelTone
@@ -53,9 +53,7 @@ pub fn panel_classes(collapsible: bool, compact: bool, flush: bool, tone: PanelT
 /// a section inside a page alike.
 ///
 /// - The title sits on the left and the actions on the right, as in a
-///   `Toolbar`. `on_add` adds a `+` as the last action.
-/// - `can_add` follows a permission: false removes the `+` (a user who may
-///   not add is not shown the button).
+///   `Toolbar`. What the actions are (add, search, export) is the app's.
 /// - `help` puts a `?` right after the title (after the toggle, on a
 ///   collapsible panel).
 /// - `collapsible`: the title is a button inside the heading that opens and
@@ -63,17 +61,19 @@ pub fn panel_classes(collapsible: bool, compact: bool, flush: bool, tone: PanelT
 ///   `expanded` to own the state. The body isn't rendered until it's first
 ///   opened (a shut panel loads nothing), then stays and is `hidden` while
 ///   shut, so typed text survives. While shut, `summary` says one line in
-///   the band, and the actions (the `+` too) are hidden.
+///   the band, and the actions are hidden.
 /// - `compact` slims the band and the body for one panel among several;
 ///   `flush` drops the body's padding for a table or a grid; `tone` marks a
 ///   panel holding something to act on, or something that can't be undone.
 ///
 /// ```ignore
-/// <Panel title="Shopping Lists" heading_level=HeadingLevel::H1 on_add=move || new_list()>
+/// <Panel title="Shopping Lists" heading_level=HeadingLevel::H1>
 ///     …
 /// </Panel>
-/// <Panel title="Items" can_add=can_add_items on_add=move || new_item()
-///        actions=move || view! { <IconButton title="Search items" …>…</IconButton> }>
+/// <Panel title="Items" actions=move || view! {
+///     <IconButton title="Search items" …>…</IconButton>
+///     <Show when=move || can_add.get()><IconButton title="Add item" …>…</IconButton></Show>
+/// }>
 ///     …
 /// </Panel>
 /// ```
@@ -82,13 +82,8 @@ pub fn Panel(
     #[prop(into)] title: Signal<String>,
     /// H2 by default; H1 for the page's own panel.
     #[prop(optional)] heading_level: HeadingLevel,
-    /// Buttons at the right of the band, before the `+`.
+    /// Buttons at the right of the band.
     #[prop(optional, into)] actions: Option<ViewFn>,
-    /// Adds a `+` as the last action, labelled `add_label`.
-    #[prop(optional, into)] on_add: Option<UnsyncCallback<()>>,
-    #[prop(into, default = "Add".to_string())] add_label: String,
-    /// Whether the `+` shows. Hidden, not disabled.
-    #[prop(into, default = true.into())] can_add: Signal<bool>,
     /// The title is a button that opens and closes the body.
     #[prop(optional)] collapsible: bool,
     /// Where a collapsible panel starts: shut unless this is true.
@@ -118,14 +113,6 @@ pub fn Panel(
         heading(heading_level, "panel__title", Some(title_id), (move || title.get()).into_any())
     };
     let help = component_help(help, "panel", title, Signal::stored(None), false, "panel__help");
-    let add = on_add.map(|on_add| {
-        let add_label = StoredValue::new(add_label);
-        move || can_add.get().then(|| view! {
-            <IconButton title=add_label.get_value() class="panel__add" on_click=move |_| on_add.run(())>
-                <Icon icon=PLUS />
-            </IconButton>
-        })
-    });
 
     view! {
         <section
@@ -134,7 +121,7 @@ pub fn Panel(
         >
             <div class="panel__header">
                 <div class="panel__heading">{title_view}{help}</div>
-                <div class="panel__actions" hidden=move || !open.get()>{actions.map(|actions| actions.run())}{add}</div>
+                <div class="panel__actions" hidden=move || !open.get()>{actions.map(|actions| actions.run())}</div>
             </div>
             <div class="panel__body" id=body_id hidden=move || !open.get()>
                 <Show when=move || opened.get()>{children()}</Show>

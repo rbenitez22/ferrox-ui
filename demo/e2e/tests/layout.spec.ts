@@ -30,7 +30,7 @@ test.describe('Panel', () => {
     await expect(panel(page, 'Items').getByRole('heading', { level: 2, name: 'Items' })).toBeVisible();
   });
 
-  test('the title sits left, the actions right, the + last', async ({ page }) => {
+  test('the title sits left, the actions right, in the order given', async ({ page }) => {
     const items = panel(page, 'Items');
     const title = items.locator('.panel__title');
     const search = items.getByRole('button', { name: 'Search items' });
@@ -47,7 +47,7 @@ test.describe('Panel', () => {
     await expect(add.locator('svg')).toHaveAttribute('data-icon', 'plus');
   });
 
-  test('the + runs on_add once per click, and the actions run their own', async ({ page }) => {
+  test('each action runs once per click', async ({ page }) => {
     const lists = panel(page, 'Shopping Lists');
     await lists.getByRole('button', { name: 'Add' }).click();
     await lists.getByRole('button', { name: 'Add' }).click();
@@ -58,7 +58,7 @@ test.describe('Panel', () => {
     await expect(items.getByText('Searched 1 times')).toBeVisible();
   });
 
-  test('can_add removes the + and brings it back', async ({ page }) => {
+  test('an action the app shows behind a permission comes and goes', async ({ page }) => {
     const items = panel(page, 'Items');
     const add = items.getByRole('button', { name: 'Add item' });
     const mayAdd = page.getByRole('switch', { name: 'May add items' });
@@ -118,7 +118,7 @@ test.describe('Panel', () => {
     );
   });
 
-  test('on a phone the title ends in an ellipsis beside the buttons, and the + is 44px', async ({ page }) => {
+  test('on a phone the title ends in an ellipsis beside the buttons, which are 44px', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     const long = panel(page, 'A very long panel title that cannot fit beside its buttons on a phone');
     const header = long.locator('.panel__header');
@@ -204,7 +204,7 @@ test.describe('Panel, collapsible', () => {
     await expect(button).toHaveAttribute('aria-expanded', 'false');
   });
 
-  test('the actions and the + show only while open, outside the toggle', async ({ page }) => {
+  test('the actions show only while open, outside the toggle', async ({ page }) => {
     const notes = panel(page, 'Notes');
     const add = notes.getByRole('button', { name: 'Add note' });
     await expect(add).toBeHidden();
