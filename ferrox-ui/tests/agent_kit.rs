@@ -67,8 +67,11 @@ fn scratch(name: &str) -> PathBuf {
     dir
 }
 
+/// Files, each by its relative path, with its bytes.
+type Tree = Vec<(String, Vec<u8>)>;
+
 /// Every file under `dir`, relative, sorted, with its bytes.
-fn tree(dir: &Path) -> Vec<(String, Vec<u8>)> {
+fn tree(dir: &Path) -> Tree {
     fn walk(base: &Path, dir: &Path, out: &mut Vec<(String, Vec<u8>)>) {
         for entry in std::fs::read_dir(dir).unwrap() {
             let path = entry.unwrap().path();
@@ -248,7 +251,7 @@ fn kit_tsv_lists_files_that_exist_and_version_is_the_crates() {
 /// the same `CLAUDE.md` of the app's own), checks they agree, and returns
 /// one app's files and the output.
 fn install_everywhere(name: &str, args: &[&str]) -> (PathBuf, String) {
-    let mut results: Vec<(PathBuf, String, Vec<(String, Vec<u8>)>)> = Vec::new();
+    let mut results: Vec<(PathBuf, String, Tree)> = Vec::new();
     for shell in shells() {
         let app = scratch(&format!("{name}-{shell}"));
         std::fs::write(app.join("CLAUDE.md"), "# My app\n\nMy own rules.").unwrap();
