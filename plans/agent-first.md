@@ -511,6 +511,27 @@ a CHANGELOG started with the renames.
   crate README is a 90-line overview; the webapp-lib line left it.
 - Eight public enums had no doc comment; they do now (the index showed it).
 
+## Notes from piece 6 (recipes, 2026-10-24)
+
+- The recipes are one small app, "Cookbook", at `/recipes` in the demo,
+  outside the demo's frame (the demo's pages became a `ParentRoute` with an
+  `Outlet`; the recipes are another): a shell, a list page, a form in a
+  dialog, a detail page, a settings page, over an in-memory store that
+  behaves like a server (its own copy; every change goes through it; `?offline`
+  fails the first load). `docs/recipes.md` lists the files; each file is the
+  recipe (no copy in the docs).
+- **Gaps the recipes found, approved and built:** `AppBar` (there was no
+  app bar, so the header was unpadded and flush), plain-link styling in
+  `.ferrox-app` (a bare `<a>` was the browser's blue), and `Facts` / `Fact`
+  (a record's labels and values; it was a raw `<dl>`). An agent would have
+  written CSS for each.
+- **Bugs the tests found in the recipes:** a duplicate (id 0) opened as
+  "Edit recipe" (the title only asked whether anything was being edited);
+  the stand-in store re-seeded when empty, so "delete all" raced the first
+  load. The store now keeps a server-side copy, and the settings page
+  deletes through `remove_all`.
+- The starter stays the smallest app (one list page, no shell).
+
 ## Pieces
 
 Each is small and reviewed on its own.

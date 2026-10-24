@@ -4,6 +4,7 @@
 mod app;
 mod menu;
 mod pages;
+mod recipes;
 mod section;
 mod swatch;
 mod theme_bar;

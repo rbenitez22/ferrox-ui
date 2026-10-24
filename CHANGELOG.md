@@ -42,6 +42,11 @@ From the names audit in `plans/agent-first.md` (piece 3).
 
 ### Added
 
+- `layout`: `AppBar` (the app's top band: menu button, name, actions) and
+  `Facts` / `Fact` (a record's labels and values).
+- `.ferrox-app` styles plain links (an `<a>` with no class) in the theme's
+  link colour.
+- Recipes: whole screens in `demo/src/recipes`, listed in `docs/recipes.md`.
 - `layout`: `PageGrid` (the page: a width cap, padding, `<main>` and an
   optional side column that moves under it on a phone), `Stack` and
   `Cluster` (a column, or a wrapping row, with a token gap), and `Gap`,

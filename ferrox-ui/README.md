@@ -22,6 +22,7 @@ call adds nothing.
 | To | Read |
 |---|---|
 | pick the component for a need | [`docs/choosing.md`](docs/choosing.md) |
+| build a whole screen (list, form, detail, settings, app shell) | [`docs/recipes.md`](docs/recipes.md): working screens to copy |
 | see every public item and its props, one line each | [`docs/index.md`](docs/index.md) (generated from the source) |
 | use one component: its props, example and behaviour | `docs/<component>.md`, linked from its group's page below |
 | learn the rules every component follows (names, callbacks, words, `class`) | [`docs/conventions.md`](docs/conventions.md) |
@@ -35,7 +36,7 @@ call adds nothing.
 | [`overlay`](docs/overlay.md) | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
 | [`forms`](docs/forms.md) | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
 | [`navigation`](docs/navigation.md) | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
-| [`layout`](docs/layout.md) | `layout` | `PageGrid`, `Stack`, `Cluster` (with `PageWidth`, `SidePosition`, `Gap`, `Align`, `Justify`), `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card` |
+| [`layout`](docs/layout.md) | `layout` | `AppBar`, `PageGrid`, `Stack`, `Cluster` (with `PageWidth`, `SidePosition`, `Gap`, `Align`, `Justify`), `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card`, `Facts`, `Fact` |
 | [`data`](docs/data.md) | `data` | `DataView` (with infinite scroll), `DataLayout`, `CardSize`, `DataLayoutSwitch`, `DataLayoutLabels`, `Pagination`, `PaginationLabels`, `page_window`, `PageItem` |
 | [`menus`](docs/menus.md) | `menus` | `Menu`, `MenuTrigger`, `MenuAlign`, `MenuItem`, `MenuLink`, `MenuDivider`, `SplitButton`, `ContextMenu` |
 

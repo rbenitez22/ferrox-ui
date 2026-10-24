@@ -15,6 +15,7 @@ const ROUTES = [
   { path: '/layout', heading: 'Page panel' },
   { path: '/data', heading: 'Data view' },
   { path: '/menus', heading: 'Menu' },
+  { path: '/recipes', heading: 'Recipes' },
 ];
 
 for (const { path, heading } of ROUTES) {
