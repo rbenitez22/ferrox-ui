@@ -1,6 +1,7 @@
 //! One module per demo page.
 
 pub mod buttons;
+pub mod data;
 pub mod feedback;
 pub mod forms;
 pub mod help;

@@ -9,7 +9,7 @@ publish = false
 leptos        = { workspace = true }
 leptos_router = { workspace = true }
 ferrox-theme  = { path = "../ferrox-theme", features = ["leptos"] }
-ferrox-ui     = { path = "../ferrox-ui", features = ["overlay", "forms", "navigation", "layout"] }
+ferrox-ui     = { path = "../ferrox-ui", features = ["overlay", "forms", "navigation", "layout", "data"] }
 ferrox-icons  = { path = "../ferrox-icons" }
 web-sys       = { workspace = true, features = ["Window", "Document", "Element", "CssStyleDeclaration", "Location"] }
 

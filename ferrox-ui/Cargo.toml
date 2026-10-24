@@ -21,6 +21,8 @@ forms = []
 navigation = ["overlay", "dep:leptos_router"]
 # Panel and Card: boxes that title and hold content.
 layout = []
+# DataView: record lists in a grid, a list, a strip or wrapping chips.
+data = []
 
 [dependencies]
 ferrox-icons = { path = "../ferrox-icons" }

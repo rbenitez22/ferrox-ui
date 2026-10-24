@@ -5,8 +5,12 @@ through one item template and laid out as the screen needs (a grid of cards,
 a list of rows, a strip, a cloud of chips), with its loading, error and empty
 states, infinite scroll, a layout switch and pagination.
 
-Status: approved (2026-10-23), all open points as recommended. Waits for
-`plans/generalise.md`.
+Status: approved (2026-10-23), all open points as recommended. Piece 1 done
+(2026-10-24): `DataView`, `DataLayout`, `CardSize`, `data-view.css`, demo
+`/data`. Markup as built: the root is a `<div class="data-view
+data-view--grid-md">` holding the states and the `<ul class="data-view__list">`
+(hidden while there are no items); a `loading_label` and `retry_label` were
+added. Piece 2 (infinite scroll) next.
 
 ## Where it comes from
 
@@ -70,7 +74,7 @@ where T: Clone + Send + Sync + 'static, IV: IntoView + 'static
 ```
 
 ```rust
-<Panel title="Recipes" heading_level=HeadingLevel::H1 on_add=move || add()
+<Panel title="Recipes" heading_level=HeadingLevel::H1
        actions=move || view! { <DataLayoutSwitch layout=layout /> }>
     <DataView
         items=recipes

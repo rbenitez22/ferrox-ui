@@ -36,7 +36,8 @@ call adds nothing.
 | `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
 | `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
 | `layout` | `layout` | `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card` |
-| `data`, `menus` | one each, planned | see `plans/ferrox-ui.md` |
+| `data` | `data` | `DataView`, `DataLayout`, `CardSize` (infinite scroll, `DataLayoutSwitch` and `Pagination` under way) |
+| `menus` | `menus`, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)
 
@@ -1000,6 +1001,55 @@ clickable card without a `title` logs a warning.
 is left to the list that holds them. `card_classes(clickable, compact,
 extra)` returns the class list.
 
+## data (feature `data`)
+
+*Under way (`plans/data.md`): infinite scroll, `DataLayoutSwitch` and
+`Pagination` come next, then the full section.*
+
+### `DataView<T>`
+
+A record list rendered through one item template and laid out as the screen
+needs, with its loading, error and empty states beside it.
+
+```rust
+use ferrox_ui::{Card, DataLayout, DataView};
+
+view! {
+    <DataView
+        items=recipes
+        key_of=|r: &Recipe| r.id.clone()
+        item=|r: Recipe| view! { <Card title=r.name.clone() href=format!("/recipes/{}", r.id)>…</Card> }
+        label="Recipes"
+        layout=DataLayout::default()
+        loading=loading
+        error=error
+        on_retry=move || reload()
+        empty="No recipes yet."
+    />
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `items` | required | `Signal<Vec<T>>`; `T: Clone + Send + Sync + 'static` |
+| `key_of` | required | a stable key per item |
+| `item` | required | renders one item: a `Card` in a grid, a row in a list |
+| `label` | required | the list's accessible name |
+| `layout` | `Grid(CardSize::Md)` | `DataLayout::Grid(CardSize::{Sm,Md,Lg})` (columns at least 10 / 14 / 20rem, as many as fit), `List` (full-width rows, a hairline between), `Row` (a sideways strip that snaps), `Wrap` (content-sized, wrapping: tags, chips). May be reactive |
+| `loading` | `false` | no items yet: a spinner (`loading_label`, `"Loading…"`) and no list; with items: they stay, the list is `aria-busy` |
+| `error` | none | an error `Alert` above the list; items already shown stay |
+| `on_retry` | none | adds Retry to the error (`retry_label`, `"Retry"`) |
+| `empty` | `"Nothing here yet."` | shown when there are no items, no error and no loading |
+| `empty_view` | none | a view shown instead of `empty`, e.g. a line and an Add button |
+| `class` | | extra classes on the root |
+
+The `<For>` is keyed and rendered once: an item whose key stays keeps its DOM
+node and state (a loaded image, typed text) through updates, appends,
+re-orders and layout changes, and is not rendered again. To show a record
+that changed, give it a key that changes with it (an id plus a version), or
+have the template read signals. It doesn't fetch, sort or filter.
+`data_view_classes(layout, extra)` returns the class list.
+
 ## Help (in `core`)
 
 Any component with a label or a title can carry help. Give it a topic and a
@@ -1226,6 +1276,14 @@ These are injected only when the `navigation` feature is on.
 | `card.css` | `.card`, `.card--clickable`, `.card--compact`, `.card__header`, `.card__title`, `.card__link` (the title as a link or button, its `::after` the stretched target), `.card__actions`, `.card__body` |
 
 These are injected only when the `layout` feature is on.
+
+## CSS classes (data)
+
+| Sheet | Classes |
+|---|---|
+| `data-view.css` | `.data-view`, `.data-view--{grid-sm,grid-md,grid-lg,list,row,wrap}`, `.data-view__list` (`[hidden]` while there are no items), `.data-view__item`, `.data-view__error`, `.data-view__empty` |
+
+These are injected only when the `data` feature is on.
 
 A unit test (`css.rs`) fails if any shipped selector doesn't start with a
 class.

@@ -8,9 +8,8 @@
 //! `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`,
 //! `Combobox`. Feature `navigation`: `NavList`, `NavLink`,
 //! `NavGroup`, `SideMenu`, `SideMenuButton`. Feature `layout`: `Panel` (also collapsible),
-//! `Card`.
-//! Further groups (`data`, `menus`) arrive as they
-//! are built.
+//! `Card`. Feature `data`: `DataView`.
+//! Further groups (`menus`) arrive as they are built.
 //!
 //! Call [`init`] once at startup, before mounting, to add the components'
 //! CSS. The theme itself (tokens, themes, fonts) comes from ferrox-theme.
@@ -23,6 +22,8 @@
 
 mod core;
 mod css;
+#[cfg(feature = "data")]
+mod data;
 #[cfg(feature = "forms")]
 mod forms;
 mod ids;
@@ -34,6 +35,8 @@ mod navigation;
 mod overlay;
 
 pub use core::*;
+#[cfg(feature = "data")]
+pub use data::*;
 #[cfg(feature = "forms")]
 pub use forms::*;
 #[cfg(feature = "layout")]

@@ -1,0 +1,103 @@
+/* Data views (`.data-view`): a record list in one of four layouts. Part of
+   ferrox-ui `data`. Tokens only and class-only.
+
+   The layout is a modifier on the root (`.data-view--grid-md`, `--list`,
+   `--row`, `--wrap`); switching it re-lays the same `<li>`s. */
+
+.data-view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.data-view__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each layout sets `display`, which would beat the `hidden` attribute. */
+.data-view__list[hidden] {
+  display: none;
+}
+
+/* An item fills its cell, so cards in a grid row share one height. */
+.data-view__item {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.data-view__item > * {
+  flex: 1 1 auto;
+}
+
+/* ── Grid: as many columns as fit, never narrower than the card size ── */
+
+.data-view--grid-sm > .data-view__list,
+.data-view--grid-md > .data-view__list,
+.data-view--grid-lg > .data-view__list {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.data-view--grid-sm > .data-view__list {
+  grid-template-columns: repeat(auto-fill, minmax(min(10rem, 100%), 1fr));
+}
+
+.data-view--grid-md > .data-view__list {
+  grid-template-columns: repeat(auto-fill, minmax(min(14rem, 100%), 1fr));
+}
+
+.data-view--grid-lg > .data-view__list {
+  grid-template-columns: repeat(auto-fill, minmax(min(20rem, 100%), 1fr));
+}
+
+/* ── List: full-width rows, a hairline between ── */
+
+.data-view--list > .data-view__list > .data-view__item {
+  padding-block: var(--space-sm);
+}
+
+.data-view--list > .data-view__list > .data-view__item + .data-view__item {
+  border-top: 1px solid var(--line);
+}
+
+/* ── Row: one strip that scrolls sideways, snapping to items ── */
+
+.data-view--row > .data-view__list {
+  display: flex;
+  gap: var(--space-md);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--space-xs);
+}
+
+.data-view--row > .data-view__list > .data-view__item {
+  flex: 0 0 min(16rem, 80%);
+  scroll-snap-align: start;
+}
+
+/* ── Wrap: side by side, wrapping, sized to their content ── */
+
+.data-view--wrap > .data-view__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+/* ── States ── */
+
+.data-view__error .alert__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.data-view__empty {
+  margin: 0;
+  color: var(--text-muted);
+}
