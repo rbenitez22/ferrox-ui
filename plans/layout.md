@@ -7,8 +7,8 @@ actions and its body. It adds a `Card`, the item template for `data`'s
 `CollapsiblePanel` (`ui/src/components/CollapsiblePanel.tsx`,
 `theme/components.css:616-770`).
 
-Status: approved (2026-10-23), all open points as recommended. Pieces 1–3
-done (2026-10-23); piece 4 (docs) next.
+Status: done (2026-10-23), all open points as recommended. All four pieces
+done; piece 4 is the layout section of `ferrox-ui/README.md`.
 
 Notes from piece 1:
 - `HeadingLevel` lives in `layout/heading.rs`, with a crate-private

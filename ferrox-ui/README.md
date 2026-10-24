@@ -35,7 +35,7 @@ call adds nothing.
 | `overlay` | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
 | `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
 | `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
-| `layout` | `layout` | `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card` (`plans/layout.md`; documented with the group's last piece, see the rustdoc meanwhile) |
+| `layout` | `layout` | `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card` |
 | `data`, `menus` | one each, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)
@@ -843,6 +843,149 @@ into the new page is the app's routing concern, not the menu's.
 Who's signed in, the app's title bar and a page frame aren't here: the bar
 is the app's (or webapp-lib's), and a page frame is `layout`'s, later.
 
+## layout (feature `layout`)
+
+Boxes that title and hold content. No dependencies beyond `core`.
+
+| Use it for | Use |
+|---|---|
+| a page's own title and content, or a titled section of a page, with its buttons (add, search) | `Panel` |
+| a section most users skip, or one that loads data only some need | `Panel collapsible=true` |
+| one thing in a list (a record, an item, a choice), as a whole a link or a button if it opens something | `Card` |
+
+### `Panel`
+
+A `<section>` named by a real heading: a header band with the title on the
+left and the actions on the right, then the body. One component serves a
+page's own title (`H1`) and a section inside a page (`H2`, the default).
+
+```rust
+use ferrox_icons::{Icon, SEARCH};
+use ferrox_ui::{HeadingLevel, IconButton, Panel, PanelTone};
+
+view! {
+    <Panel title="Shopping Lists" heading_level=HeadingLevel::H1 on_add=move || new_list()>
+        …
+    </Panel>
+
+    <Panel
+        title="Items"
+        can_add=can_add_items                         // a permission: false removes the +
+        on_add=move || new_item()
+        add_label="Add item"
+        actions=move || view! {
+            <IconButton title="Search items" on_click=move |_| search()><Icon icon=SEARCH /></IconButton>
+        }
+    >
+        …
+    </Panel>
+
+    <Panel title="Load Data" heading_level=HeadingLevel::H1>…</Panel>   // a bar with no buttons
+    <Panel title="Transactions" flush=true>…</Panel>                     // a table runs to the edges
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `title` | required | the heading's text, and the section's name |
+| `heading_level` | `H2` | `H1`…`H4`, for the page's outline. Every level looks the same |
+| `actions` | none | a closure returning buttons, at the right of the band before the `+` |
+| `on_add` | none | adds a `+` (`IconButton` drawing `PLUS`) as the last action |
+| `add_label` | `"Add"` | the `+`'s label and tooltip: name what it adds ("Add item") |
+| `can_add` | `true` | false removes the `+`; a user who may not add isn't shown the button |
+| `compact` | `false` | a slimmer band in body type and a tighter body, for one panel among several |
+| `flush` | `false` | no padding round the body, for a table or a grid |
+| `tone` | `Default` | `Warning`: something to act on. `Danger`: something that can't be undone (the title turns red too). Tints the band and the border |
+| `help` | none | a `?` right after the title |
+| `class` | | |
+| children | | the body |
+
+The title ends in an ellipsis rather than wrapping under the buttons, and a
+band with no buttons is as tall as one with them. On a phone the band's
+buttons are 44px. `panel_classes(collapsible, compact, flush, tone, extra)`
+returns the class list.
+
+**Collapsible.** The title becomes a button inside the heading, so the page's
+outline keeps the heading and the whole band is the target.
+
+```rust
+view! {
+    <Panel title="Danger zone" tone=PanelTone::Danger collapsible=true summary="Delete this book">
+        …
+    </Panel>
+    <Panel title="Notes" collapsible=true expanded=notes_open summary=Signal::derive(move || format!("{} notes", count.get()))>
+        …
+    </Panel>
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `collapsible` | `false` | the title opens and closes the body (`aria-expanded`, `aria-controls`; Enter and Space) |
+| `start_expanded` | `false` | where it starts |
+| `expanded` | none | `RwSignal<bool>`, two-way, for an app that owns or remembers the state; overrides `start_expanded` |
+| `summary` | none | one line in the band while it's shut, in body type: "3 overdue" |
+
+- **The body isn't rendered until it's first opened**, so a shut panel that
+  would load data doesn't. From then on it stays mounted and is `hidden`
+  while shut, so whatever was typed in it survives.
+- **While shut** the actions and the `+` are hidden; the `?` stays, since
+  help explains a shut panel too. On a collapsible panel the `?` sits after
+  the toggle.
+- The section is named by the title alone, never by the summary.
+- The chevron points right while shut and down once open (no animation
+  under reduced motion). Hovering the toggle tints the whole band.
+
+### `Card`
+
+A surface for one thing: an `<article>` with an optional heading, its own
+buttons, and the body. It's the item template for a list or a grid of cards.
+
+```rust
+use ferrox_icons::{Icon, DELETE};
+use ferrox_ui::{Card, IconButton};
+
+view! {
+    <Card
+        title=employee.name.clone()
+        href=format!("/employees/{}", employee.id)
+        actions=move || view! {
+            <IconButton title="Remove" danger=true on_click=move |_| remove()><Icon icon=DELETE /></IconButton>
+        }
+    >
+        <p>{employee.role.clone()}</p>
+    </Card>
+
+    <Card title="Groceries" on_click=move || open_list()>…</Card>   // the whole card is a button
+    <Card title="Note" compact=true>…</Card>                         // just a surface
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `title` | none | the heading; required for a clickable card |
+| `heading_level` | `H3` | a card usually sits inside a panel or a section |
+| `href` | none | the whole card follows this link |
+| `on_click` | none | the whole card is this button (not with `href`) |
+| `actions` | none | a closure returning the card's own buttons, in its top-right corner |
+| `compact` | `false` | tighter padding and a body-type title, for dense lists |
+| `class` | | |
+| children | | the body |
+
+**A whole card as one target, done accessibly.** With `href` the *title* is
+the link; with `on_click` it's a button. Its hit area is stretched over the
+card, so a click anywhere follows it, but a screen reader meets one link or
+button, named by the title, not the whole card read out as a link. The
+`actions` sit above that layer and stay separate targets: pressing one never
+follows the card. A clickable card answers hover and press in colour (its
+border and surface) and shows the focus ring round the whole card. A
+clickable card without a `title` logs a warning.
+
+`href` is a plain `<a href>`: inside a `<Router>` the router handles it, so
+`layout` doesn't depend on leptos_router. Choosing records (a selected card)
+is left to the list that holds them. `card_classes(clickable, compact,
+extra)` returns the class list.
+
 ## Help (in `core`)
 
 Any component with a label or a title can carry help. Give it a topic and a
@@ -889,6 +1032,7 @@ The `id` is stable: an assistant and a guide find the topic by it. The
 | `Toolbar` | right after the title | |
 | `Dialog`, `ConfirmDialog`, `Sheet` | in the title bar, just before the × | |
 | `SideMenu` | in the title bar, just before the × | a request names it as a `sheet` |
+| `Panel` | right after the title (after the toggle, on a collapsible panel) | |
 
 ```rust
 <Field label="Amount" help=SPLIT_AMOUNT.clone()>
@@ -982,7 +1126,7 @@ view! {
 | `HelpRequest` field | |
 |---|---|
 | `topic_id`, `topic_title` | the topic |
-| `component` | what carries the `?`: `field`, `checkbox`, `switch`, `toolbar`, `dialog`, `alertdialog`, `sheet`, or `help` for a bare `HelpButton` |
+| `component` | what carries the `?`: `field`, `checkbox`, `switch`, `toolbar`, `dialog`, `alertdialog`, `sheet`, `panel`, or `help` for a bare `HelpButton` |
 | `label` | that component's label or title |
 | `context` | every enclosing scope's pairs, outermost first |
 | `value` | the control's value, only when the component opted in |
@@ -1059,6 +1203,15 @@ when the `forms` feature is on.
 
 These are injected only when the `navigation` feature is on.
 
+## CSS classes (layout)
+
+| Sheet | Classes |
+|---|---|
+| `panel.css` | `.panel`, `.panel--{compact,flush,warning,danger,collapsible}`, `.panel__header` (the band), `.panel__heading` (the title and its `?`), `.panel__title`, `.panel__actions`, `.panel__body`; collapsible: `.panel__toggle` (`[aria-expanded='true']`), `.panel__title-text`, `.panel__summary`, `.panel__chevron`, `.panel__body[hidden]` |
+| `card.css` | `.card`, `.card--clickable`, `.card--compact`, `.card__header`, `.card__title`, `.card__link` (the title as a link or button, its `::after` the stretched target), `.card__actions`, `.card__body` |
+
+These are injected only when the `layout` feature is on.
+
 A unit test (`css.rs`) fails if any shipped selector doesn't start with a
 class.
 
@@ -1089,7 +1242,7 @@ class.
 ## Planned
 
 From `plans/ferrox-ui.md`, one group per piece, each with a demo page and e2e
-tests: `layout` (Panel), `data` (Data grid). `core` later gains
+tests: `data` (`DataView`: one item template, usually a `Card`, laid out as a grid, a list or a column; `Pagination`), then `menus` (dropdown menu, menu button). `core` later gains
 Skeleton, Badge, Card and a theme toggle. `overlay` later gains
 `TypeToConfirmDialog`, Toast, Popover and Tooltip, and the
 phone variants of Dialog (a bottom sheet, full screen) when an app needs them.
@@ -1099,7 +1252,8 @@ rendered from the same topics) and `help` on new components as they land.
 NumberInput, DateInput, Radio and the rest of the inventory when an app needs
 them. `navigation` later gains a persistent sidebar that folds to a rail of
 icons, count badges on links (with `core`'s Badge), Breadcrumb, Pagination,
-Bottom nav and Stepper.
+Bottom nav and Stepper. `layout` later gains Tabs and Accordion (a stack of
+collapsible panels), when an app needs them.
 
 ## Licence
 
