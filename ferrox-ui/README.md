@@ -37,7 +37,7 @@ call adds nothing.
 | `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
 | `layout` | `layout` | `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card` |
 | `data` | `data` | `DataView` (with infinite scroll), `DataLayout`, `CardSize`, `DataLayoutSwitch`, `DataLayoutLabels`, `Pagination`, `PaginationLabels`, `page_window`, `PageItem` |
-| `menus` | `menus` | `Menu`, `MenuTrigger`, `MenuAlign`, `MenuItem`, `MenuLink`, `MenuDivider` (`SplitButton` and `ContextMenu` under way) |
+| `menus` | `menus` | `Menu`, `MenuTrigger`, `MenuAlign`, `MenuItem`, `MenuLink`, `MenuDivider`, `SplitButton` (`ContextMenu` under way) |
 
 ### Conventions (every component)
 
@@ -1196,8 +1196,7 @@ view! {
 
 ## menus (feature `menus`)
 
-*Under way (`plans/menus.md`): `SplitButton`, `ContextMenu`, then the full
-section.*
+*Under way (`plans/menus.md`): `ContextMenu`, then the full section.*
 
 ### `Menu`
 
@@ -1220,7 +1219,7 @@ view! {
 | Prop | Default | |
 |---|---|---|
 | `label` | required | the menu's accessible name |
-| `trigger` | required | `MenuTrigger::button("Export")` (a secondary `.btn` with a chevron; `MenuTrigger::Button { text, family }` for another family), `MenuTrigger::icon(icon, label)` (an icon button named by `label`), `MenuTrigger::custom(view, label)` (the caller's view in a plain button) |
+| `trigger` | required | `MenuTrigger::button("Export")` (a secondary `.btn` with a chevron; `MenuTrigger::Button { text, family }` for another family), `MenuTrigger::icon(icon, label)` (an icon button named by `label`), `MenuTrigger::custom(view, label)` (the caller's view in a plain button), `MenuTrigger::chevron(label, family)` (a `.btn` showing only a chevron: `SplitButton`'s second half) |
 | `align` | `MenuAlign::End` | which edge of the trigger the panel lines up with: `End` for a menu at a row's end, `Start` for one read from its button |
 | `header` | none | a view above the items, outside the menu itself (who is signed in) |
 | `disabled` | `false` | the trigger is disabled |
@@ -1275,6 +1274,37 @@ Choosing a `MenuItem` closes the menu and returns focus to the trigger
 before `on_select` runs. Choosing a `MenuLink` closes the menu; the link
 then navigates. `menu_item_classes(danger, current)` returns an item's
 classes.
+
+### `SplitButton`
+
+A main action and, joined to it, a chevron that opens related actions.
+
+```rust
+use ferrox_ui::{MenuItem, SplitButton};
+
+view! {
+    <SplitButton text="Save" on_click=move |_| save() menu_label="More save options" saving=saving>
+        <MenuItem on_select=move || save_as_draft()>"Save as draft"</MenuItem>
+        <MenuItem on_select=move || save_and_close()>"Save and close"</MenuItem>
+    </SplitButton>
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `text` | required | the main button's text |
+| `on_click` | required | the main action |
+| `menu_label` | required | the chevron's name, and the menu's |
+| `family` | `Primary` | both halves |
+| `saving` | `false` | the main button sweeps and refuses clicks; the menu can't open |
+| `disabled` | `false` | both halves |
+| `class` | | extra classes on the group |
+| children | | the menu's items |
+
+Two buttons, two tab stops, two names. The halves join into one shape
+(square inner corners, a faint hairline between) and don't grow under the
+pointer, so one never rides over the other. The menu hangs from the
+group's end.
 
 ## Help (in `core`)
 
@@ -1517,7 +1547,8 @@ These are injected only when the `data` feature is on.
 
 | Sheet | Classes |
 |---|---|
-| `menu.css` | `.menu` (the wrapper), `.menu__trigger` (`[aria-expanded='true']`), `.menu__chevron`, `.menu__trigger--custom`, `.menu__panel` (the popover; `data-side`), `.menu__header`, `.menu__items` (`role="menu"`), `.menu__item` (`--danger`, `--current`, `[aria-disabled='true']`), `.menu__icon`, `.menu__label`, `.menu__check`, `.menu__divider` |
+| `menu.css` | `.menu` (the wrapper), `.menu__trigger` (`[aria-expanded='true']`), `.menu__chevron`, `.menu__trigger--custom`, `.menu__panel` (the popover; `data-side`), `.menu__header`, `.menu__items` (`role="menu"`), `.menu__item` (`--danger`, `--current`, `[aria-disabled='true']`), `.menu__icon`, `.menu__label`, `.menu__check`, `.menu__divider`, `.menu__trigger--chevron` |
+| `split-button.css` | `.split-button`, `.split-button__main`, `.split-button__menu` |
 
 These are injected only when the `menus` feature is on.
 

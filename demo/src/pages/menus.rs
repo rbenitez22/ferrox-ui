@@ -1,10 +1,13 @@
 //! Menus: each kind of trigger (an icon at a row's end, a button, a custom
 //! view with a header), item icons, a danger item, a disabled one, a
-//! current one, links, a log of what was chosen, a disabled menu,
+//! current one, links, a split button (saving, locked), a log of what was
+//! chosen, a disabled menu,
 //! a menu inside a dialog, and one low on the page to watch it flip above.
 
 use ferrox_icons::{DELETE, EDIT, MORE_VERTICAL};
-use ferrox_ui::{Button, ButtonFamily, Dialog, Menu, MenuAlign, MenuDivider, MenuItem, MenuLink, MenuTrigger, Switch};
+use std::time::Duration;
+
+use ferrox_ui::{Button, ButtonFamily, Dialog, Menu, MenuAlign, MenuDivider, MenuItem, MenuLink, MenuTrigger, SplitButton, Switch};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -75,6 +78,7 @@ pub fn MenusPage() -> impl IntoView {
                 </Menu>
             </Dialog>
         </Section>
+        <SplitButtons chosen=chosen />
         <Section title="Low on the page">
             <p>"Make the window short enough and this menu opens above its button."</p>
             <div>
@@ -85,6 +89,39 @@ pub fn MenusPage() -> impl IntoView {
                     <MenuItem on_select=choose("low four")>"Four"</MenuItem>
                 </Menu>
             </div>
+        </Section>
+    }
+}
+
+/// A split button: Save (a second of saving, then counted) with Save as
+/// draft and Save and close behind its chevron; a switch locks it.
+#[component]
+fn SplitButtons(chosen: RwSignal<Vec<String>>) -> impl IntoView {
+    let saving = RwSignal::new(false);
+    let locked = RwSignal::new(false);
+    let saves = RwSignal::new(0_u32);
+    let save = move |_| {
+        saving.set(true);
+        set_timeout(move || {
+            saves.update(|n| *n += 1);
+            saving.set(false);
+        }, Duration::from_millis(1000));
+    };
+    view! {
+        <Section title="Split button">
+            <div class="demo-row">
+                <SplitButton text="Save" on_click=save menu_label="More save options" saving=saving disabled=locked>
+                    <MenuItem on_select=move || chosen.update(|c| c.push("save as draft".into()))>"Save as draft"</MenuItem>
+                    <MenuItem on_select=move || chosen.update(|c| c.push("save and close".into()))>"Save and close"</MenuItem>
+                </SplitButton>
+                <SplitButton text="Publish" family=ButtonFamily::Secondary on_click=move |_| chosen.update(|c| c.push("publish".into())) menu_label="More publish options">
+                    <MenuItem on_select=move || chosen.update(|c| c.push("schedule".into()))>"Schedule…"</MenuItem>
+                </SplitButton>
+                <Switch checked=locked label="Saving locked" />
+            </div>
+            <dl class="demo-echo">
+                <dt>"saves"</dt><dd data-echo="saves">{move || saves.get().to_string()}</dd>
+            </dl>
         </Section>
     }
 }

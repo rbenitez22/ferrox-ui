@@ -29,6 +29,14 @@ Notes from piece 2 (done 2026-10-24):
 - `current` draws `CHECK` at the item's end; `menu_item_classes` is public.
 - e2e: 40 menu tests.
 
+Notes from piece 3 (done 2026-10-24):
+- The chevron is a public `MenuTrigger::Chevron { label, family }` (a
+  `.btn` showing only a chevron), so `SplitButton` is a `Button` and a
+  `Menu` side by side, end-aligned.
+- Saving disables the chevron too; disabled reaches both halves.
+- Joined halves drop the `.btn` hover grow (one would ride over the other).
+- e2e: 54 menu tests.
+
 ## Where it comes from
 
 - **conrad's `Menu`** (`ui/src/components/Menu.tsx`, 166 lines;

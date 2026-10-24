@@ -1,0 +1,30 @@
+/* Split buttons (`.split-button`): a main button and a chevron that opens a
+   menu, joined into one shape. Part of ferrox-ui `menus`. Tokens only and
+   class-only. */
+
+.split-button {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+/* Square inner corners: the halves read as one button. */
+.split-button > .split-button__main {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.split-button__menu > .menu__trigger--chevron {
+  height: 100%;
+  padding-inline: 0.6em;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  /* A hairline in the button's own text colour, faint, between the halves. */
+  box-shadow: inset 1px 0 0 color-mix(in srgb, currentColor 35%, transparent);
+}
+
+/* Joined halves don't grow under the pointer: one would ride over the
+   other. The press stays. */
+.split-button > .split-button__main:hover,
+.split-button__menu > .menu__trigger--chevron:hover {
+  transform: none;
+}

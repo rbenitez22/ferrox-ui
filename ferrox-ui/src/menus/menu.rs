@@ -20,6 +20,9 @@ pub enum MenuTrigger {
     Icon { icon: IconData, label: String },
     /// The caller's view inside a plain button; `label` names it.
     Custom { view: ViewFn, label: String },
+    /// A button of the family showing only a chevron; `label` is its name.
+    /// `SplitButton`'s second half.
+    Chevron { label: String, family: ButtonFamily },
 }
 
 impl MenuTrigger {
@@ -34,6 +37,10 @@ impl MenuTrigger {
 
     pub fn custom(view: impl Into<ViewFn>, label: impl Into<String>) -> Self {
         Self::Custom { view: view.into(), label: label.into() }
+    }
+
+    pub fn chevron(label: impl Into<String>, family: ButtonFamily) -> Self {
+        Self::Chevron { label: label.into(), family }
     }
 }
 
@@ -253,6 +260,23 @@ pub fn Menu(
                 on:keydown=on_trigger_key
             >
                 <Icon icon=icon />
+            </button>
+        }.into_any(),
+        MenuTrigger::Chevron { label: name, family } => view! {
+            <button
+                type="button"
+                node_ref=trigger_ref
+                class=button_classes(family, false, ButtonSize::Md, false, "menu__trigger menu__trigger--chevron")
+                aria-label=name.clone()
+                title=name
+                aria-haspopup="menu"
+                aria-expanded=expanded
+                aria-controls=controls
+                popovertarget=target
+                disabled=move || disabled.get()
+                on:keydown=on_trigger_key
+            >
+                <Icon icon=CHEVRON_DOWN class="menu__chevron" />
             </button>
         }.into_any(),
         MenuTrigger::Custom { view: content, label: name } => view! {

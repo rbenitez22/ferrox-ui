@@ -295,3 +295,85 @@ test.describe('Menu items', () => {
     }
   });
 });
+
+test.describe('SplitButton', () => {
+  const group = (page: Page, text: string) => page.locator('.split-button').filter({ has: page.getByRole('button', { name: text, exact: true }) });
+
+  test('two buttons with their own names; the chevron opens a menu', async ({ page }) => {
+    const save = group(page, 'Save');
+    await expect(save.getByRole('button')).toHaveCount(2);
+    await expect(save.getByRole('button', { name: 'Save', exact: true })).not.toHaveAttribute('aria-haspopup');
+    const chevron = save.getByRole('button', { name: 'More save options' });
+    await expect(chevron).toHaveAttribute('aria-haspopup', 'menu');
+    await expect(chevron.locator('svg.icon')).toHaveAttribute('data-icon', 'chevron-down');
+    await chevron.click();
+    await expect(items(page, 'More save options')).toHaveText(['Save as draft', 'Save and close']);
+    await expect(items(page, 'More save options').first()).toBeFocused();
+    await items(page, 'More save options').nth(1).click();
+    await expect(chosen(page)).toHaveText('save and close');
+    await expect(chevron).toBeFocused();
+  });
+
+  test('the main button runs its own action', async ({ page }) => {
+    await group(page, 'Save').getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(page.locator('[data-echo="saves"]')).toHaveText('1');
+    await expect(menu(page, 'More save options')).toBeHidden();
+  });
+
+  test('the menu hangs from the group’s end', async ({ page }) => {
+    const save = group(page, 'Save');
+    await save.getByRole('button', { name: 'More save options' }).click();
+    await expect(items(page, 'More save options').first()).toBeFocused();
+    const g = (await save.boundingBox())!;
+    const p = (await menu(page, 'More save options').locator('..').boundingBox())!;
+    // End-aligned with the group, unless that would cross the viewport's
+    // 8px margin, which wins.
+    expect(Math.abs(p.x - Math.max(8, g.x + g.width - p.width))).toBeLessThan(1.5);
+    expect(p.y).toBeGreaterThanOrEqual(g.y + g.height);
+    await page.keyboard.press('Escape');
+
+    // Publish sits far enough right for the right edges to meet.
+    const publish = group(page, 'Publish');
+    await publish.getByRole('button', { name: 'More publish options' }).click();
+    await expect(items(page, 'More publish options').first()).toBeFocused();
+    const h = (await publish.boundingBox())!;
+    const q = (await menu(page, 'More publish options').locator('..').boundingBox())!;
+    expect(h.x + h.width - q.width).toBeGreaterThan(8);
+    expect(Math.abs(q.x + q.width - (h.x + h.width))).toBeLessThan(1.5);
+  });
+
+  test('the halves join: no gap, one height, inner corners square', async ({ page }) => {
+    const save = group(page, 'Save');
+    const main = (await save.getByRole('button', { name: 'Save', exact: true }).boundingBox())!;
+    const chevron = (await save.getByRole('button', { name: 'More save options' }).boundingBox())!;
+    expect(Math.abs(chevron.x - (main.x + main.width))).toBeLessThan(0.5);
+    expect(Math.abs(chevron.y - main.y)).toBeLessThan(0.5);
+    expect(Math.abs(chevron.height - main.height)).toBeLessThan(0.5);
+    const radius = await save.getByRole('button', { name: 'Save', exact: true }).evaluate((el) => getComputedStyle(el).borderTopRightRadius);
+    expect(radius).toBe('0px');
+  });
+
+  test('family reaches both halves', async ({ page }) => {
+    const publish = group(page, 'Publish');
+    await expect(publish.getByRole('button', { name: 'Publish', exact: true })).toHaveClass(/btn--secondary/);
+    await expect(publish.getByRole('button', { name: 'More publish options' })).toHaveClass(/btn--secondary/);
+  });
+
+  test('saving: the main button sweeps and refuses clicks, the menu can’t open', async ({ page }) => {
+    const save = group(page, 'Save');
+    const main = save.getByRole('button', { name: 'Save', exact: true });
+    await main.click();
+    await expect(main).toHaveClass(/is-saving/);
+    await expect(save.getByRole('button', { name: 'More save options' })).toBeDisabled();
+    await expect(main).not.toHaveClass(/is-saving/);
+    await expect(save.getByRole('button', { name: 'More save options' })).toBeEnabled();
+    await expect(page.locator('[data-echo="saves"]')).toHaveText('1');
+  });
+
+  test('disabled: both halves', async ({ page }) => {
+    await page.getByRole('switch', { name: 'Saving locked' }).click();
+    const save = group(page, 'Save');
+    await expect(save.getByRole('button', { name: 'Save', exact: true })).toBeDisabled();
+    await expect(save.getByRole('button', { name: 'More save options' })).toBeDisabled();
+  });
+});

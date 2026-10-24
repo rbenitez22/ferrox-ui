@@ -67,9 +67,12 @@ const DATA: &[(&str, &str)] = &[
 #[cfg(not(feature = "data"))]
 const DATA: &[(&str, &str)] = &[];
 
-/// `menus`: the menu.
+/// `menus`: the menu, then the split button built on it.
 #[cfg(feature = "menus")]
-const MENUS: &[(&str, &str)] = &[("ferrox-ui-menu", include_str!("../style/menus/menu.css"))];
+const MENUS: &[(&str, &str)] = &[
+    ("ferrox-ui-menu", include_str!("../style/menus/menu.css")),
+    ("ferrox-ui-split-button", include_str!("../style/menus/split-button.css")),
+];
 #[cfg(not(feature = "menus"))]
 const MENUS: &[(&str, &str)] = &[];
 
