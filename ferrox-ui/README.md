@@ -37,7 +37,7 @@ call adds nothing.
 | `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
 | `layout` | `layout` | `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card` |
 | `data` | `data` | `DataView` (with infinite scroll), `DataLayout`, `CardSize`, `DataLayoutSwitch`, `DataLayoutLabels`, `Pagination`, `PaginationLabels`, `page_window`, `PageItem` |
-| `menus` | `menus` | `Menu`, `MenuTrigger`, `MenuAlign`, `MenuItem`, `MenuDivider` (item variants, `SplitButton` and `ContextMenu` under way) |
+| `menus` | `menus` | `Menu`, `MenuTrigger`, `MenuAlign`, `MenuItem`, `MenuLink`, `MenuDivider` (`SplitButton` and `ContextMenu` under way) |
 
 ### Conventions (every component)
 
@@ -1196,8 +1196,8 @@ view! {
 
 ## menus (feature `menus`)
 
-*Under way (`plans/menus.md`): item variants, `SplitButton`, `ContextMenu`,
-then the full section.*
+*Under way (`plans/menus.md`): `SplitButton`, `ContextMenu`, then the full
+section.*
 
 ### `Menu`
 
@@ -1222,9 +1222,10 @@ view! {
 | `label` | required | the menu's accessible name |
 | `trigger` | required | `MenuTrigger::button("Export")` (a secondary `.btn` with a chevron; `MenuTrigger::Button { text, family }` for another family), `MenuTrigger::icon(icon, label)` (an icon button named by `label`), `MenuTrigger::custom(view, label)` (the caller's view in a plain button) |
 | `align` | `MenuAlign::End` | which edge of the trigger the panel lines up with: `End` for a menu at a row's end, `Start` for one read from its button |
+| `header` | none | a view above the items, outside the menu itself (who is signed in) |
 | `disabled` | `false` | the trigger is disabled |
 | `class` | | extra classes on the `.menu` wrapper |
-| children | | `MenuItem`s and `MenuDivider`s |
+| children | | `MenuItem`s, `MenuLink`s and `MenuDivider`s |
 
 - **Opening:** a click, Enter or Space on the trigger opens it with the first
   item focused; ↓ opens on the first item, ↑ on the last.
@@ -1240,8 +1241,40 @@ view! {
   are built on first opening, then kept, so a long list of row menus costs
   little. On a phone, items are 44px tall.
 
-`MenuItem` (`on_select`, children) is a `<button role="menuitem">`;
-`MenuDivider` a `role="separator"` line.
+### Items
+
+```rust
+<MenuItem icon=EDIT on_select=move || edit()>"Edit"</MenuItem>
+<MenuItem on_select=move || archive() disabled=Signal::derive(move || !can_archive.get())>"Archive"</MenuItem>
+<MenuDivider />
+<MenuItem icon=DELETE danger=true on_select=move || ask_delete()>"Delete"</MenuItem>
+
+<MenuItem current=Signal::derive(move || book.get() == "Household") on_select=move || book.set("Household")>
+    "Household"
+</MenuItem>
+<MenuLink href="/settings">"Settings"</MenuLink>
+```
+
+| | | |
+|---|---|---|
+| `MenuItem` | `on_select` (required), `icon`, `danger`, `disabled`, `current` | a `<button role="menuitem">` |
+| `MenuLink` | `href` (required), `icon` | an `<a role="menuitem" href>`: inside a `<Router>` the router follows it, no page load. Space follows it too, as on a button |
+| `MenuDivider` | | a `role="separator"` line between groups |
+
+- **`icon`** is drawn before the text, muted.
+- **`danger`**: a destructive action, in the danger colour with a danger
+  tint on hover and focus.
+- **`disabled`**: still shown and reachable with the arrows and letters (ARIA
+  asks this of menu items), `aria-disabled`, faded; choosing it does
+  nothing and the menu stays open.
+- **`current`**: the one already in force (the open book). A check at the
+  end, the primary's text colour, `aria-current="true"`, and still
+  choosable: saying "you are here" isn't refusing to go there.
+
+Choosing a `MenuItem` closes the menu and returns focus to the trigger
+before `on_select` runs. Choosing a `MenuLink` closes the menu; the link
+then navigates. `menu_item_classes(danger, current)` returns an item's
+classes.
 
 ## Help (in `core`)
 
@@ -1484,7 +1517,7 @@ These are injected only when the `data` feature is on.
 
 | Sheet | Classes |
 |---|---|
-| `menu.css` | `.menu` (the wrapper), `.menu__trigger` (`[aria-expanded='true']`), `.menu__chevron`, `.menu__trigger--custom`, `.menu__panel` (the popover; `data-side`), `.menu__items` (`role="menu"`), `.menu__item`, `.menu__divider` |
+| `menu.css` | `.menu` (the wrapper), `.menu__trigger` (`[aria-expanded='true']`), `.menu__chevron`, `.menu__trigger--custom`, `.menu__panel` (the popover; `data-side`), `.menu__header`, `.menu__items` (`role="menu"`), `.menu__item` (`--danger`, `--current`, `[aria-disabled='true']`), `.menu__icon`, `.menu__label`, `.menu__check`, `.menu__divider` |
 
 These are injected only when the `menus` feature is on.
 

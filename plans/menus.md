@@ -21,6 +21,14 @@ Notes from piece 1 (done 2026-10-24):
 - `core::anchor` gained `Align::{Start, End}`.
 - e2e: 26 menu tests; full suite 512.
 
+Notes from piece 2 (done 2026-10-24):
+- A disabled item ignores the click and keeps the menu open. Playwright
+  treats `aria-disabled` as disabled, so its test clicks with `force`.
+- `MenuLink` closes the menu on click and lets the click reach the router;
+  Space is turned into a click.
+- `current` draws `CHECK` at the item's end; `menu_item_classes` is public.
+- e2e: 40 menu tests.
+
 ## Where it comes from
 
 - **conrad's `Menu`** (`ui/src/components/Menu.tsx`, 166 lines;

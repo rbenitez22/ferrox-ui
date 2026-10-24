@@ -83,6 +83,7 @@ fn items_of(menu: &Element) -> Vec<HtmlElement> {
 /// - **Closing:** choosing an item, Esc (focus goes back to the trigger,
 ///   and an enclosing dialog stays open), Tab (focus moves on), or a press
 ///   outside.
+/// - `header` sits above the items, outside the menu (who is signed in).
 /// - **The panel** is a popover in the top layer, under the trigger (above
 ///   when there's no room), lined up with its end or start (`align`), kept
 ///   inside the viewport, following the trigger while open. No `overflow`
@@ -102,10 +103,12 @@ pub fn Menu(
     /// What opens it.
     trigger: MenuTrigger,
     #[prop(optional)] align: MenuAlign,
+    /// Shown above the items, outside the menu itself: who is signed in.
+    #[prop(optional, into)] header: Option<ViewFn>,
     #[prop(optional, into)] disabled: Signal<bool>,
     /// Extra classes on the wrapper. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
-    /// `MenuItem`s and `MenuDivider`s.
+    /// `MenuItem`s, `MenuLink`s and `MenuDivider`s.
     children: ChildrenFn,
 ) -> impl IntoView {
     let panel_id = unique_id("ferrox-menu");
@@ -285,6 +288,7 @@ pub fn Menu(
                 on:keydown=on_menu_key
                 on:focusout=on_focus_out
             >
+                {header.map(|header| view! { <div class="menu__header">{header.run()}</div> })}
                 <div role="menu" id=menu_id class="menu__items" aria-label=move || label.get() node_ref=menu_ref>
                     <Show when=move || opened_once.get()>
                         {let children = children.clone(); view! { <Provider value=context>{children()}</Provider> }}

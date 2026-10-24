@@ -5,5 +5,5 @@ mod item;
 mod keys;
 mod menu;
 
-pub use item::{MenuDivider, MenuItem};
+pub use item::{menu_item_classes, MenuDivider, MenuItem, MenuLink};
 pub use menu::{Menu, MenuAlign, MenuTrigger};

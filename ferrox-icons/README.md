@@ -58,11 +58,12 @@ width="1em" height="1em" aria-hidden="true" focusable="false">`:
 | `CHEVRON_RIGHT` | `chevron-right` | | `MORE_VERTICAL` | `ellipsis-vertical` |
 | `CLOSE` | `x` | | `PLUS` | `plus` |
 | `DELETE` | `trash` | | `REFRESH` | `refresh-cw` |
-| `ERROR` | `circle-alert` | | `SEARCH` | `search` |
-| `EYE` | `eye` | | `SUCCESS` | `circle-check` |
-| `EYE_OFF` | `eye-off` | | `TAGS` | `tags` |
-| `GALLERY_HORIZONTAL` | `gallery-horizontal` | | `UNLOCK` | `lock-open` |
-| `HELP` | `circle-question-mark` | | `WARNING` | `triangle-alert` |
+| `EDIT` | `pencil` | | `SEARCH` | `search` |
+| `ERROR` | `circle-alert` | | `SUCCESS` | `circle-check` |
+| `EYE` | `eye` | | `TAGS` | `tags` |
+| `EYE_OFF` | `eye-off` | | `UNLOCK` | `lock-open` |
+| `GALLERY_HORIZONTAL` | `gallery-horizontal` | | `WARNING` | `triangle-alert` |
+| `HELP` | `circle-question-mark` | | | |
 
 `INFO`, `SUCCESS`, `WARNING` and `ERROR` are the severity marks (ferrox-ui's
 `Alert` draws them).

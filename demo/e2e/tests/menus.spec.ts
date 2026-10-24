@@ -203,3 +203,95 @@ test.describe('Menu', () => {
     await expect(dialog).toBeVisible();
   });
 });
+
+test.describe('Menu items', () => {
+  test('an icon before the text', async ({ page }) => {
+    await trigger(page, 'More actions').click();
+    await expect(items(page, 'Recipe actions').first().locator('svg.icon')).toHaveAttribute('data-icon', 'edit');
+    await expect(items(page, 'Recipe actions').last().locator('svg.icon')).toHaveAttribute('data-icon', 'delete');
+    await expect(items(page, 'Recipe actions').nth(1).locator('svg.icon')).toHaveCount(0);
+  });
+
+  test('danger: its own colour', async ({ page }) => {
+    await trigger(page, 'More actions').click();
+    const color = (n: number) => items(page, 'Recipe actions').nth(n).evaluate((el) => getComputedStyle(el).color);
+    expect(await color(3)).not.toBe(await color(0));
+    await expect(items(page, 'Recipe actions').nth(3)).toHaveClass(/menu__item--danger/);
+  });
+
+  test('disabled: reachable, announced, does nothing, keeps the menu open', async ({ page }) => {
+    await trigger(page, 'More actions').click();
+    const archive = items(page, 'Recipe actions').nth(2);
+    await expect(archive).toHaveAttribute('aria-disabled', 'true');
+    await expect(items(page, 'Recipe actions').first()).toBeFocused();
+    await page.keyboard.press('a');
+    await expect(archive).toBeFocused();
+    await page.keyboard.press('Enter');
+    // Playwright won't click an aria-disabled element unless forced; a user can.
+    await archive.click({ force: true });
+    await expect(menu(page, 'Recipe actions')).toBeVisible();
+    await expect(chosen(page)).toHaveText('');
+
+    await page.keyboard.press('Escape');
+    await page.getByRole('switch', { name: 'Archiving allowed' }).click();
+    await trigger(page, 'More actions').click();
+    await expect(archive).not.toHaveAttribute('aria-disabled');
+    await archive.click();
+    await expect(chosen(page)).toHaveText('archive');
+  });
+
+  test('current: marked with a check, moves when another is chosen, still choosable', async ({ page }) => {
+    await trigger(page, 'Book').click();
+    const household = items(page, 'Books').first();
+    await expect(household).toHaveAttribute('aria-current', 'true');
+    await expect(household.locator('svg[data-icon=check]')).toHaveCount(1);
+    await expect(items(page, 'Books').locator('[aria-current]')).toHaveCount(0);
+    await expect(menu(page, 'Books').locator('[aria-current=true]')).toHaveCount(1);
+    await items(page, 'Books').nth(1).click();
+    await expect(page.locator('[data-echo="book"]')).toHaveText('Business');
+    await trigger(page, 'Book').click();
+    await expect(items(page, 'Books').nth(1)).toHaveAttribute('aria-current', 'true');
+    await expect(household).not.toHaveAttribute('aria-current');
+    await items(page, 'Books').nth(1).click();
+    await expect(chosen(page)).toHaveText('book Business, book Business');
+  });
+
+  test('a link: a menuitem that the router follows (click, Enter, Space)', async ({ page }) => {
+    const mark = () => page.evaluate(() => ((window as any).__kept = true));
+    const kept = () => page.evaluate(() => (window as any).__kept === true);
+    await mark();
+    await trigger(page, 'Go to').click();
+    const layout = items(page, 'Go to').first();
+    await expect(layout).toHaveAttribute('href', '/layout');
+    await layout.click();
+    await expect(page).toHaveURL(/\/layout$/);
+    expect(await kept()).toBe(true);
+
+    for (const key of ['Enter', ' ']) {
+      await page.goBack();
+      await expect(page).toHaveURL(/\/menus$/);
+      await trigger(page, 'Go to').click();
+      await expect(items(page, 'Go to').first()).toBeFocused();
+      await page.keyboard.press('ArrowDown');
+      await page.keyboard.press(key);
+      await expect(page).toHaveURL(/\/data$/);
+      expect(await kept()).toBe(true);
+    }
+  });
+
+  test('a header above the items, outside the menu', async ({ page }) => {
+    await trigger(page, 'Account').click();
+    const header = page.locator('.menu__panel:popover-open .menu__header');
+    await expect(header).toHaveText('Signed in as ada@example.org');
+    await expect(menu(page, 'Account').getByText('Signed in as')).toHaveCount(0);
+    await expect(items(page, 'Account').first()).toBeFocused();
+  });
+
+  test('on a phone, items are 44px tall', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await trigger(page, 'More actions').click();
+    for (const b of await items(page, 'Recipe actions').evaluateAll((els) => els.map((el) => el.getBoundingClientRect().height))) {
+      expect(b).toBeGreaterThanOrEqual(44);
+    }
+  });
+});

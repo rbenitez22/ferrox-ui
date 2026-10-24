@@ -96,6 +96,66 @@
   background: var(--primary-tint);
 }
 
+/* Text-decoration off: a `MenuLink` is an `<a>`, and looks like the rest. */
+.menu__item {
+  text-decoration: none;
+}
+
+.menu__icon {
+  flex: none;
+  color: var(--text-muted);
+}
+
+.menu__label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* The one already in force: a check at the end, in the primary's text colour.
+   Still choosable. */
+.menu__item--current {
+  color: var(--primary-text);
+  font-weight: 600;
+}
+
+.menu__check {
+  flex: none;
+}
+
+/* Destructive: the danger colour, icon too, and a danger tint under it. */
+.menu__item--danger,
+.menu__item--danger > .menu__icon {
+  color: var(--danger-text);
+}
+
+.menu__item--danger:hover,
+.menu__item--danger:focus {
+  background: var(--danger-tint);
+}
+
+/* Unavailable: faded, no hover answer. Still focusable (ARIA asks it). */
+.menu__item[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.menu__item[aria-disabled='true']:hover {
+  background: none;
+}
+
+.menu__item[aria-disabled='true']:focus {
+  background: var(--surface-2);
+}
+
+/* Above the items, outside the menu: who is signed in. */
+.menu__header {
+  padding: var(--space-xs) var(--space-md) var(--space-sm);
+  margin-bottom: var(--space-xs);
+  border-bottom: 1px solid var(--line);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
 .menu__divider {
   margin: var(--space-xs) 0;
   border-top: 1px solid var(--line);
