@@ -1,12 +1,12 @@
 //! Layout: panels as a page's title and as sections, with their actions,
-//! permissions, help and variants; cards; and the page layout components
-//! (Stack, Cluster, PageGrid).
+//! permissions, help and variants; cards; the page layout components
+//! (Stack, Cluster, PageGrid); an app bar and a record's facts.
 
 use std::sync::LazyLock;
 
 use ferrox_icons::{Icon, DELETE, PLUS, SEARCH};
 use ferrox_ui::{
-    Align, Button, ButtonFamily, ButtonSize, Card, Cluster, Field, Gap, HeadingLevel, HelpTopic, IconButton, Input, Justify, PageGrid,
+    Align, AppBar, Fact, Facts, Button, ButtonFamily, ButtonSize, Card, Cluster, Field, Gap, HeadingLevel, HelpTopic, IconButton, Input, Justify, PageGrid,
     PageWidth, Panel, PanelTone, SidePosition, Stack, Switch,
 };
 use leptos::prelude::*;
@@ -26,6 +26,7 @@ pub fn LayoutPage() -> impl IntoView {
         <Collapsible />
         <Cards />
         <PageLayout />
+        <BarAndFacts />
     }
 }
 
@@ -223,6 +224,36 @@ fn PageLayout() -> impl IntoView {
                     <Card title="Article" compact=true><p>"A narrow page, its side at the start."</p></Card>
                 </PageGrid>
             </div>
+        </Section>
+    }
+}
+
+/// An AppBar (not sticky here: it sits in the page) with a start button, a
+/// linked name and an action; and Facts.
+#[component]
+fn BarAndFacts() -> impl IntoView {
+    let opened = RwSignal::new(0);
+    view! {
+        <Section title="App bar and facts">
+            <div class="demo-frame" data-demo="app-bar">
+                <AppBar
+                    title="Cookbook"
+                    href="/layout"
+                    sticky=false
+                    start=move || view! { <IconButton label="Open the menu" on_click=move || opened.update(|n| *n += 1)><Icon icon=SEARCH /></IconButton> }
+                >
+                    <Button family=ButtonFamily::Secondary size=ButtonSize::Sm>"Sign in"</Button>
+                </AppBar>
+            </div>
+            <p data-echo="opened">{move || opened.get().to_string()}</p>
+            <div data-demo="facts">
+                <Facts>
+                    <Fact label="Time">"30 minutes"</Fact>
+                    <Fact label="Serves">"4"</Fact>
+                    <Fact label="Source">"A long value that wraps onto more than one line when the column is narrow enough to need it."</Fact>
+                </Facts>
+            </div>
+            <p>"A plain link in the page: " <a href="/layout">"back to the top"</a></p>
         </Section>
     }
 }

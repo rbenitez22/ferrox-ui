@@ -1,0 +1,54 @@
+/* App bars (`.app-bar`): the app's top band, its menu button, name and
+   actions. Part of ferrox-ui `layout`. Tokens only and class-only. */
+
+.app-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  min-height: 3.5rem;
+  padding: var(--space-xs) var(--space-lg);
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+}
+
+/* Over the page as it scrolls under; below every popover and modal (those
+   are in the top layer). */
+.app-bar--sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.app-bar__start,
+.app-bar__end {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* The name takes the free space, so the actions sit at the end. */
+.app-bar__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--text);
+  text-decoration: none;
+}
+
+.app-bar__title:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+@media (max-width: 768px) {
+  .app-bar {
+    padding-inline: var(--space-md);
+  }
+}

@@ -31,6 +31,13 @@
 - Components with a label or a title take `help` (a `HelpTopic`): see
   [Help](help.md).
 
+## The page
+
+Put `class="ferrox-app"` on `<body>` (the starter does): the page takes
+the theme's background, text colour and body font, `<body>`'s margin goes,
+and plain links (an `<a>` with no class of its own) take the theme's link
+colour, underlined on hover. Components' own links keep their own look.
+
 ## The examples
 
 Every example in these pages is compiled (`tests/doc_examples.rs`, copied in

@@ -8,7 +8,9 @@ Which to use: [choosing.md](choosing.md#layout).
 
 ## Pages
 
+- [`AppBar`](app-bar.md)
 - [`PageGrid`](page-grid.md)
 - [`Stack` and `Cluster`](stack-cluster.md)
 - [`Panel`](panel.md)
 - [`Card`](card.md)
+- [`Facts`, `Fact`](facts.md)

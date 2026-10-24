@@ -400,6 +400,18 @@ The button that opens a [`SideMenu`](crate::SideMenu): an `IconButton` drawing `
 
 ## layout (feature `layout`)
 
+### `app_bar_classes` (function)
+`fn app_bar_classes(sticky: bool, extra: &str) -> String`: The class list for an `.app-bar`.
+
+### `AppBar` (component)
+The app's top band: what opens its menu, its name, and its actions (a user menu, a search).
+- `title: Signal<String>`
+- `href: MaybeProp<String>`, optional
+- `start: Option<ViewFnOnce>`, optional
+- `sticky: bool`, default `true`
+- `class: MaybeProp<String>`, optional
+- `children: Option<Children>`, optional
+
 ### `card_classes` (function)
 `fn card_classes(clickable: bool, compact: bool, extra: &str) -> String`: The class list for a `.card`.
 
@@ -411,6 +423,17 @@ A surface for one thing (a record, an item, a choice): an `<article>` with an op
 - `on_click: Option<UnsyncCallback<()>>`, optional
 - `actions: Option<ViewFnOnce>`, optional
 - `compact: bool`, optional
+- `class: MaybeProp<String>`, optional
+- `children: Children`
+
+### `Facts` (component)
+A record's facts, label beside value: a `<dl>` in two columns, labels muted, one under the other on a phone.
+- `class: MaybeProp<String>`, optional
+- `children: Children`
+
+### `Fact` (component)
+One line of [`Facts`]: its `label` (`<dt>`) and its value, the children (`<dd>`).
+- `label: Signal<String>`
 - `class: MaybeProp<String>`, optional
 - `children: Children`
 

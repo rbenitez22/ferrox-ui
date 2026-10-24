@@ -1,8 +1,8 @@
 /* ============================================================
    THE APP'S GROUND — `.ferrox-app`, on <body>
-   The page itself in the theme: its background, text colour and body
-   font. Opt-in, like every ferrox style: put class="ferrox-app" on
-   <body> (or on the app's root element). Width and padding are the
+   The page itself in the theme: its background, text colour, body font,
+   and plain links. Opt-in, like every ferrox style: put class="ferrox-app"
+   on <body> (or on the app's root element). Width and padding are the
    layout components' job, not this.
    ============================================================ */
 .ferrox-app {
@@ -12,4 +12,22 @@
   background: var(--background);
   color: var(--text);
   font-family: var(--font-body);
+}
+
+/* Plain links (an <a> with no class of its own) in the theme's link colour,
+   underlined on hover. `:where` keeps this at one class's weight, and
+   `:not([class])` keeps it off every component's own links. */
+.ferrox-app :where(a:not([class])) {
+  color: var(--primary-text);
+  text-decoration: none;
+}
+
+.ferrox-app :where(a:not([class])):hover {
+  text-decoration: underline;
+}
+
+.ferrox-app :where(a:not([class])):focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+  border-radius: 2px;
 }

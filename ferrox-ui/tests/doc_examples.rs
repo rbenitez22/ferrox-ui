@@ -558,6 +558,37 @@ mod navigation {
 mod layout {
     use super::*;
 
+    #[cfg(all(feature = "navigation", feature = "menus"))]
+    fn app_bar() -> impl IntoView {
+        let sign_out = noop;
+        // region: app-bar
+        use ferrox_ui::{AppBar, Menu, MenuItem, MenuTrigger, SideMenuButton};
+
+        let menu = RwSignal::new(false); // the SideMenu's, declared beside it
+
+        view! {
+            <AppBar title="Cookbook" href="/" start=move || view! { <SideMenuButton open=menu /> }>
+                <Menu label="Account" trigger=MenuTrigger::custom(|| view! { <span>"Ada Lovelace"</span> }, "Account")>
+                    <MenuItem on_select=move || sign_out()>"Sign out"</MenuItem>
+                </Menu>
+            </AppBar>
+        }
+        // endregion
+    }
+
+    fn facts() -> impl IntoView {
+        // region: facts
+        use ferrox_ui::{Fact, Facts};
+
+        view! {
+            <Facts>
+                <Fact label="Time">"30 minutes"</Fact>
+                <Fact label="Serves">"4"</Fact>
+            </Facts>
+        }
+        // endregion
+    }
+
     fn page_grid() -> impl IntoView {
         // region: page-grid
         use ferrox_ui::{HeadingLevel, PageGrid, PageWidth, Panel};

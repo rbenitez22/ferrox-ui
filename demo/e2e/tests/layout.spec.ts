@@ -404,3 +404,46 @@ test.describe('Page layout', () => {
     await expect(page.locator('[data-demo^=grid] main, [data-demo^=grid] aside')).toHaveCount(0);
   });
 });
+
+test.describe('App bar and facts', () => {
+  test('AppBar: a header band; start, the linked name taking the space, actions at the end', async ({ page }) => {
+    const bar = page.locator('[data-demo=app-bar] header.app-bar');
+    const b = await box(bar);
+    const start = await box(bar.getByRole('button', { name: 'Open the menu' }));
+    const name = bar.getByRole('link', { name: 'Cookbook' });
+    await expect(name).toHaveAttribute('href', '/layout');
+    const end = await box(bar.getByRole('button', { name: 'Sign in' }));
+    expect(Math.round(start.x - b.x)).toBe(24);
+    expect(Math.round(b.x + b.width - (end.x + end.width))).toBe(24);
+    expect((await box(name)).x).toBeGreaterThan(start.x + start.width);
+    expect(await css(bar, 'position')).toBe('static');
+    await bar.getByRole('button', { name: 'Open the menu' }).click();
+    await expect(page.locator('[data-echo="opened"]')).toHaveText('1');
+  });
+
+  test('Facts: a <dl>, labels beside values; on a phone, above them', async ({ page }) => {
+    const facts = page.locator('[data-demo=facts] dl.facts');
+    const label = facts.locator('dt', { hasText: 'Time' });
+    const value = facts.locator('dd', { hasText: '30 minutes' });
+    expect(Math.abs((await box(label)).y - (await box(value)).y)).toBeLessThan(2);
+    expect((await box(value)).x).toBeGreaterThan((await box(label)).x + (await box(label)).width);
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect((await box(value)).y).toBeGreaterThan((await box(label)).y + (await box(label)).height - 1);
+  });
+
+  test('a plain link takes the theme\'s link colour; a component\'s own link keeps its own', async ({ page }) => {
+    const plain = page.getByRole('link', { name: 'back to the top' });
+    const primaryText = await page.evaluate(() => {
+      const probe = document.createElement('span');
+      probe.style.color = getComputedStyle(document.documentElement).getPropertyValue('--primary-text');
+      document.body.append(probe);
+      const c = getComputedStyle(probe).color;
+      probe.remove();
+      return c;
+    });
+    expect(await css(plain, 'color')).toBe(primaryText);
+    expect(await css(plain, 'text-decoration-line')).toBe('none');
+    const cardLink = page.locator('.card__link').first();
+    expect(await css(cardLink, 'color')).not.toBe(primaryText);
+  });
+});

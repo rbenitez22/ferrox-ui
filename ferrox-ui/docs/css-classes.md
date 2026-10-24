@@ -58,6 +58,8 @@ These are injected only when the `navigation` feature is on.
 
 | Sheet | Classes |
 |---|---|
+| `app-bar.css` | `.app-bar`, `.app-bar--sticky`, `.app-bar__start`, `.app-bar__title`, `.app-bar__end` |
+| `facts.css` | `.facts` (the `<dl>`), `.facts__row`, `.facts__label` (`<dt>`), `.facts__value` (`<dd>`) |
 | `page-grid.css` | `.page-grid`, `.page-grid--{narrow,medium,wide,full}`, `.page-grid--side-{end,start}`, `.page-grid__main`, `.page-grid__side` |
 | `flow.css` | `.stack`, `.cluster`, `.stack--gap-{none,xs,sm,md,lg,xl}` (and `.cluster--gap-…`), `.stack--align-{stretch,start,center,end}` (and `.cluster--align-…`), `.cluster--justify-{start,center,end,between}` |
 | `panel.css` | `.panel`, `.panel--{compact,flush,warning,danger,collapsible}`, `.panel__header` (the band), `.panel__heading` (the title and its `?`), `.panel__title`, `.panel__actions`, `.panel__body`; collapsible: `.panel__toggle` (`[aria-expanded='true']`), `.panel__title-text`, `.panel__summary`, `.panel__chevron`, `.panel__body[hidden]` |

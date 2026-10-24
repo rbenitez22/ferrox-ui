@@ -49,9 +49,11 @@ One table per group. Each component's page has its props and example;
 
 | Use it for | Use |
 |---|---|
+| the app's top band: its menu button, its name, its actions | `AppBar` |
 | the page: its width, padding and `<main>`, and a side column (filters, a summary) that moves under it on a phone | `PageGrid` |
 | things one under another with even space: fields, panels, a card's lines | `Stack` |
-| things side by side, wrapping: a row of buttons, tags, a label and its value | `Cluster` |
+| things side by side, wrapping: a row of buttons, tags | `Cluster` |
+| a record's facts, label beside value (on a detail page, in a side column) | `Facts` with a `Fact` each |
 | a page's own title and content, or a titled section of a page, with its buttons (add, search) | `Panel` |
 | a section most users skip, or one that loads data only some need | `Panel collapsible=true` |
 | one thing in a list (a record, an item, a choice), as a whole a link or a button if it opens something | `Card` |
