@@ -36,6 +36,9 @@ From the names audit in `plans/agent-first.md` (piece 3).
   move values: `Menu`'s, `SplitButton`'s and `Panel`'s children
   (`Children`), `ContextMenu`'s `menu`, `Card`'s and `Panel`'s `actions`,
   `Menu`'s and `ContextMenu`'s `header` (`ViewFnOnce`).
+- `DataView` draws an item again when its value changed, so keying by id
+  is enough (a rename used to keep showing the old name). Items need
+  `PartialEq`.
 
 ### Added
 

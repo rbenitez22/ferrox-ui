@@ -419,7 +419,17 @@ Where the docs failed it (its own report, confirmed in its code):
   > `[build-dependencies]`, from the same tag webapp-lib uses; a mismatch fails
   > the build with a message saying so.
 
-## Piece 3: the names audit (approved 2026-10-24, all twelve)
+## Piece 3: the names audit (approved 2026-10-24, all twelve; done the same day)
+
+Done in five commits: A, renames and types (1–3, 6–9, 12; `0b446e8`);
+B, no DOM events in callbacks (4; `6d82a56`); C, overlays own their state
+(5; `76c431d`); D, content built once takes run-once closures (10;
+`b177217`), which also covers `Card`'s and `Panel`'s `actions` and the
+menus' `header` (the starter's card menu sits in `Card`'s `actions`, so
+the trap survived there otherwise); E, `DataView` redraws a changed item
+(11), by a generation per identity bumped when the value differs. The
+README's conventions state the rules; `CHANGELOG.md` lists every change.
+The starter lost both workarounds (its `StoredValue` and its id+name key).
 
 Every public component's props, read from the source (40 components). An
 agent generalises from one component to the next, so where the same idea

@@ -1092,8 +1092,8 @@ view! {
 
 | Prop | Default | |
 |---|---|---|
-| `items` | required | `Signal<Vec<T>>`; `T: Clone + Send + Sync + 'static` |
-| `key_of` | required | a stable key per item |
+| `items` | required | `Signal<Vec<T>>`; `T: Clone + PartialEq + Send + Sync + 'static` |
+| `key_of` | required | the item's identity, a `String` (an id, as text) |
 | `item` | required | renders one item: a `Card` in a grid, a row in a list |
 | `label` | required | the list's accessible name |
 | `layout` | `Grid(CardSize::Md)` | `DataLayout::Grid(CardSize::{Sm,Md,Lg})` (columns at least 10 / 14 / 20rem, as many as fit), `List` (full-width rows, a hairline between), `Row` (a sideways strip that snaps), `Wrap` (content-sized, wrapping: tags, chips). May be reactive |
@@ -1131,11 +1131,11 @@ items.
 />
 ```
 
-The `<For>` is keyed and rendered once: an item whose key stays keeps its DOM
-node and state (a loaded image, typed text) through updates, appends,
-re-orders and layout changes, and is not rendered again. To show a record
-that changed, give it a key that changes with it (an id plus a version), or
-have the template read signals. It doesn't fetch, sort or filter.
+The `<For>` is keyed by `key_of`. An item whose key and value stay keeps its
+DOM node and state (a loaded image, typed text) through updates, appends,
+re-orders and layout changes. An item whose value changed (by `PartialEq`)
+is drawn again in its place, and the others are left alone, so key by id
+and edits show. It doesn't fetch, sort or filter.
 `data_view_classes(layout, extra)` returns the class list.
 
 ### `DataLayoutSwitch`

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use leptos::html;
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
@@ -23,12 +25,12 @@ pub fn data_view_classes(layout: DataLayout, extra: &str) -> String {
 /// screen needs: a grid of cards, a list of rows, a sideways strip, or
 /// wrapping chips (`layout`).
 ///
-/// - **Keyed, rendered once:** a `<ul>` with one `<li>` per item from a keyed
-///   `<For>`. An item whose key stays keeps its DOM node and its state (an
-///   image that has loaded, text being typed) across updates, appends,
-///   re-orders and layout changes. It is not rendered again either: to show
-///   a record that changed, give it a key that changes with it (an id plus a
-///   version), or have the template read signals.
+/// - **Keyed:** a `<ul>` with one `<li>` per item from a keyed `<For>`.
+///   `key_of` is the item's identity (an id). An item whose key and value
+///   stay keeps its DOM node and its state (an image that has loaded, text
+///   being typed) across updates, appends, re-orders and layout changes. An
+///   item whose value changed (compared with `PartialEq`) is drawn again in
+///   its place; the others are left alone.
 /// - **States beside the list, never instead of items:** the first load (no
 ///   items yet) shows a spinner; a refresh keeps the items and marks the list
 ///   `aria-busy`. An error is an `Alert` above the list, with Retry when
@@ -87,10 +89,11 @@ pub fn DataView<T, IV>(
     #[prop(optional, into)] class: MaybeProp<String>,
 ) -> impl IntoView
 where
-    T: Clone + Send + Sync + 'static,
+    T: Clone + PartialEq + Send + Sync + 'static,
     IV: IntoView + 'static,
 {
     let has_items = Memo::new(move |_| items.with(|items| !items.is_empty()));
+    let drawn = draw_keys(items, key_of);
     let first_load = move || loading.get() && !has_items.get();
     let is_empty = move || !loading.get() && error.get().is_none() && !has_items.get();
 
@@ -137,14 +140,59 @@ where
                 aria-busy=move || (loading.get() && has_items.get()).then_some("true")
                 hidden=move || !has_items.get()
             >
-                <For each=move || items.get() key=key_of let:record>
-                    <li class="data-view__item">{item(record)}</li>
+                <For each=move || drawn.get() key=|(key, _)| key.clone() let:entry>
+                    <li class="data-view__item">{item(entry.1)}</li>
                 </For>
                 {more}
             </ul>
             {empty_state}
         </div>
     }
+}
+
+/// What the keyed `<For>` draws: each item with a key made of its identity
+/// (`key_of`) and a generation, which goes up when the item's value differs
+/// from the last one drawn under that identity. So an unchanged item keeps
+/// its node, and a changed one is drawn again.
+fn draw_keys<T>(items: Signal<Vec<T>>, key_of: impl Fn(&T) -> String + Send + Sync + 'static) -> Memo<Vec<(String, T)>>
+where
+    T: Clone + PartialEq + Send + Sync + 'static,
+{
+    // The last value and generation drawn under each identity.
+    let seen = StoredValue::new(HashMap::<String, (T, u64)>::new());
+    Memo::new(move |_| {
+        items.with(|items| {
+            seen.try_update_value(|seen| {
+                let mut next = HashMap::with_capacity(items.len());
+                let drawn = items
+                    .iter()
+                    .map(|item| {
+                        let id = key_of(item);
+                        let generation = next_generation(seen.get(&id), item);
+                        next.insert(id.clone(), (item.clone(), generation));
+                        (draw_key(&id, generation), item.clone())
+                    })
+                    .collect();
+                *seen = next;
+                drawn
+            })
+            .unwrap_or_default()
+        })
+    })
+}
+
+/// An item's generation: the same while its value is, one more when it changed.
+pub(crate) fn next_generation<T: PartialEq>(last: Option<&(T, u64)>, item: &T) -> u64 {
+    match last {
+        Some((value, generation)) if value == item => *generation,
+        Some((_, generation)) => generation + 1,
+        None => 0,
+    }
+}
+
+/// The `<For>` key for an identity at a generation.
+pub(crate) fn draw_key(id: &str, generation: u64) -> String {
+    format!("{id}\u{1f}{generation}")
 }
 
 /// Infinite scroll: an `IntersectionObserver` on the end marker. Each
@@ -223,6 +271,14 @@ mod tests {
         assert_eq!(data_view_classes(DataLayout::default(), ""), "data-view data-view--grid-md");
         assert_eq!(data_view_classes(DataLayout::Grid(CardSize::Sm), "recipes"), "data-view data-view--grid-sm recipes");
         assert_eq!(data_view_classes(DataLayout::Wrap, ""), "data-view data-view--wrap");
+    }
+
+    #[test]
+    fn an_item_is_redrawn_only_when_its_value_changed() {
+        assert_eq!(next_generation::<&str>(None, &"a"), 0);
+        assert_eq!(next_generation(Some(&("a", 3)), &"a"), 3);
+        assert_eq!(next_generation(Some(&("a", 3)), &"b"), 4);
+        assert_ne!(draw_key("7", 0), draw_key("7", 1));
     }
 
     #[test]

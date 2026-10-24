@@ -107,9 +107,7 @@ pub fn App() -> impl IntoView {
         >
             <DataView
                 items=items
-                // DataView redraws an item only when its key changes: a key
-                // that includes the name redraws a renamed card.
-                key_of=|item: &Item| format!("{}:{}", item.id, item.name)
+                key_of=|item: &Item| item.id.to_string()
                 item=card
                 label="Items"
                 loading=loading

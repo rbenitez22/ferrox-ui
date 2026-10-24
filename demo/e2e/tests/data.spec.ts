@@ -53,6 +53,18 @@ test.describe('DataView', () => {
     await expect(pierogi.getByRole('textbox')).toHaveValue('with dill');
   });
 
+  test('a changed record is drawn again in place; the others keep their nodes', async ({ page }) => {
+    const first = () => items(page).nth(0);
+    const second = items(page).filter({ hasText: 'Ribollita' });
+    await second.evaluate((el) => el.setAttribute('data-mark', 'kept'));
+    await second.getByRole('textbox').fill('with beans');
+    await press(page, 'Rename first');
+    await expect(first().getByRole('heading')).toHaveText('Shakshuka (renamed)');
+    await expect(items(page)).toHaveCount(8);
+    await expect(second).toHaveAttribute('data-mark', 'kept');
+    await expect(second.getByRole('textbox')).toHaveValue('with beans');
+  });
+
   test('Grid: as many columns as fit, fewer as the card size grows', async ({ page }) => {
     const counts: number[] = [];
     for (const [name, size, min] of [['Small grid', 'sm', 160], ['Grid', 'md', 224], ['Large grid', 'lg', 320]] as const) {

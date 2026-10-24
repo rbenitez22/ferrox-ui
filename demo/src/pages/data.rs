@@ -75,6 +75,11 @@ fn Recipes() -> impl IntoView {
         items.update(|list| list.push(Recipe { id, name: format!("New recipe {id}") }));
     };
     let reverse = move || items.update(|list| list.reverse());
+    let rename_first = move || items.update(|list| {
+        if let Some(first) = list.first_mut() {
+            first.name.push_str(" (renamed)");
+        }
+    });
     let empty_out = move || items.set(Vec::new());
     let restore = move || items.set(recipes());
 
@@ -88,6 +93,7 @@ fn Recipes() -> impl IntoView {
                 <Button family=ButtonFamily::Secondary on_click=update>"Update"</Button>
                 <Button family=ButtonFamily::Secondary on_click=append>"Append"</Button>
                 <Button family=ButtonFamily::Secondary on_click=reverse>"Reverse"</Button>
+                <Button family=ButtonFamily::Secondary on_click=rename_first>"Rename first"</Button>
                 <Button family=ButtonFamily::Secondary on_click=empty_out>"Empty"</Button>
                 <Button family=ButtonFamily::Secondary on_click=restore>"Restore"</Button>
             </div>
