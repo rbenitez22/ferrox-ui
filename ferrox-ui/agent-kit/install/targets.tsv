@@ -1,7 +1,15 @@
-# What each adapter installs into an app: adapter, source (in the kit), destination (in the app), tab-separated.
-# A source folder is copied file by file (its tests/ left out); install.spec.md says how.
-generic	core	.ferrox/core
-generic	check	.ferrox/check
-generic	kit.tsv	.ferrox/kit.tsv
-generic	VERSION	.ferrox/VERSION
-generic	BOOTSTRAP.md	.ferrox/BOOTSTRAP.md
+# What each adapter installs into an app: adapter, source (in the kit), destination (in the app), how; tab-separated.
+# how: copy (the file, or a folder file by file without its tests/), each:<kinds> (the template once per kit.tsv row of those
+# kinds; {{ID}} in the destination), block:<kinds> (the template per row, as one marked block in the file). See install.spec.md.
+generic	core	.ferrox/core	copy
+generic	check	.ferrox/check	copy
+generic	kit.tsv	.ferrox/kit.tsv	copy
+generic	VERSION	.ferrox/VERSION	copy
+generic	BOOTSTRAP.md	.ferrox/BOOTSTRAP.md	copy
+claude	adapters/claude/skill.md	.claude/skills/ferrox-{{ID}}/SKILL.md	each:task
+claude	adapters/claude/command.md	.claude/commands/ferrox-{{ID}}.md	each:task
+claude	adapters/claude/agent.md	.claude/agents/ferrox-{{ID}}.md	each:role
+claude	adapters/claude/entry.md	CLAUDE.md	block:entry
+copilot	adapters/copilot/prompt.md	.github/prompts/ferrox-{{ID}}.prompt.md	each:task,role
+copilot	adapters/copilot/entry.md	.github/copilot-instructions.md	block:entry
+agents-md	adapters/agents-md/entry.md	AGENTS.md	block:entry,task,role

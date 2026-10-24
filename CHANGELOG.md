@@ -51,7 +51,11 @@ From the names audit in `plans/agent-first.md` (piece 3).
   (the entry point, its rules and component table rendered from their
   sources), four task procedures and a reviewer's brief, `kit.tsv`,
   `BOOTSTRAP.md` (any agent), `ADAPTING.md` (writing an adapter), and the
-  installer (`install --generic`) in bash and PowerShell with its spec.
+  installer in bash and PowerShell with its spec.
+- The kit's adapters: `--claude` (skills, commands, the reviewer as a
+  sub-agent, a `CLAUDE.md` block), `--copilot` (prompt files, an
+  instructions block), `--agents-md` (an `AGENTS.md` block), generated from
+  templates and `kit.tsv`; `--update` lists and applies only what changed.
 - The drift check (`ferrox-ui/agent-kit/check/`): `ferrox-check` lists
   where an app drifts from ferrox-ui, with the fix; `ferrox-docs` prints
   the docs of the ferrox-ui an app builds against. Each in bash and

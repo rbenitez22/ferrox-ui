@@ -52,14 +52,14 @@ starter's files. Copy each part into yours:
 
 …and `style/ferrox/` in `.gitignore` ([`starter/.gitignore`](starter/.gitignore)): it's generated.
 
-**With an agent:** install the agent kit into your app, then paste one
-paragraph into your agent's instructions for the project:
+**With an agent:** install the agent kit into your app:
 
 ```sh
-ferrox-ui/agent-kit/install/install.sh --generic path/to/app   # install.ps1 on Windows
+ferrox-ui/agent-kit/install/install.sh --claude path/to/app   # or --copilot, --agents-md, --generic; install.ps1 on Windows
 ```
 
-The paragraph is in `path/to/app/.ferrox/BOOTSTRAP.md`. From then on,
+With an adapter flag the agent finds the kit by itself; with `--generic`,
+paste the paragraph in `path/to/app/.ferrox/BOOTSTRAP.md`. From then on,
 "use ferrox-ui" is the whole UI directive: the kit tells the agent how to
 set up, build screens from recipes, pick components, and check its work.
 The kit works with any agent that reads files and runs commands; see

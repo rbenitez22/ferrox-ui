@@ -196,7 +196,8 @@ fn install_dry_run_writes_nothing_and_an_old_kit_is_kept() {
 fn install_refuses_what_it_does_not_understand() {
     let app = scratch("usage");
     for shell in shells() {
-        for args in [vec![], vec!["--claude"], vec!["--generic", "--nope"]] {
+        // No adapter; an unknown flag; --update with nothing installed.
+        for args in [vec![], vec!["--generic", "--nope"], vec!["--update"]] {
             let (_, code) = install(shell, &args, &app);
             assert_eq!(code, 2, "{shell} {args:?}");
         }
@@ -241,4 +242,128 @@ fn kit_tsv_lists_files_that_exist_and_version_is_the_crates() {
     }
     let version = std::fs::read_to_string(kit_root().join("VERSION")).unwrap();
     assert_eq!(version.trim(), env!("CARGO_PKG_VERSION"), "agent-kit/VERSION differs from the crate's version");
+}
+
+/// Installs with `args` from every shell into fresh apps (each starting with
+/// the same `CLAUDE.md` of the app's own), checks they agree, and returns
+/// one app's files and the output.
+fn install_everywhere(name: &str, args: &[&str]) -> (PathBuf, String) {
+    let mut results: Vec<(PathBuf, String, Vec<(String, Vec<u8>)>)> = Vec::new();
+    for shell in shells() {
+        let app = scratch(&format!("{name}-{shell}"));
+        std::fs::write(app.join("CLAUDE.md"), "# My app\n\nMy own rules.").unwrap();
+        let (out, code) = install(shell, args, &app);
+        assert_eq!(code, 0, "{shell}: {out}");
+        let files = tree(&app);
+        results.push((app, out, files));
+    }
+    if let [(_, out_a, tree_a), (_, out_b, tree_b)] = results.as_slice() {
+        assert_eq!(out_a, out_b, "the installers print differently");
+        assert!(tree_a == tree_b, "the installers write different files");
+    }
+    let (app, out, _) = results.swap_remove(0);
+    (app, out)
+}
+
+fn kit_rows() -> Vec<Vec<String>> {
+    std::fs::read_to_string(kit_root().join("kit.tsv"))
+        .unwrap()
+        .lines()
+        .filter(|l| !l.is_empty() && !l.starts_with('#'))
+        .map(|l| l.split('\t').map(str::to_string).collect())
+        .collect()
+}
+
+#[test]
+fn every_adapter_wraps_every_piece() {
+    let (app, out) = install_everywhere("adapters", &["--claude", "--copilot", "--agents-md"]);
+    assert!(out.ends_with("ferrox-kit: installed 0.1.0 (generic, claude, copilot, agents-md) into .ferrox\n"), "{out}");
+    let read = |p: &str| std::fs::read_to_string(app.join(p)).unwrap_or_else(|_| panic!("{p} is missing"));
+    for row in kit_rows() {
+        let (kind, id, path, purpose) = (&row[0], &row[1], &row[2], &row[3]);
+        let pointer = format!("`.ferrox/{path}`");
+        if kind == "task" {
+            for file in [format!(".claude/skills/ferrox-{id}/SKILL.md"), format!(".claude/commands/ferrox-{id}.md")] {
+                let text = read(&file);
+                assert!(text.contains(&pointer) && text.contains(purpose.as_str()), "{file}");
+            }
+        }
+        if kind == "role" {
+            assert!(read(&format!(".claude/agents/ferrox-{id}.md")).contains(&pointer), "the {id} sub-agent");
+        }
+        if kind == "task" || kind == "role" {
+            assert!(read(&format!(".github/prompts/ferrox-{id}.prompt.md")).contains(&pointer), "the {id} prompt");
+        }
+        assert!(read("AGENTS.md").contains(&pointer), "AGENTS.md lacks {path}");
+    }
+    for file in ["CLAUDE.md", ".github/copilot-instructions.md"] {
+        assert!(read(file).contains("`.ferrox/core/AGENTS.md`"), "{file} doesn't point to the entry");
+    }
+    assert_eq!(read(".ferrox/INSTALLED"), "generic\nclaude\ncopilot\nagents-md\n");
+    std::fs::remove_dir_all(&app).unwrap();
+}
+
+#[test]
+fn a_block_keeps_the_apps_own_text_and_is_replaced_not_repeated() {
+    let (app, _) = install_everywhere("block", &["--claude"]);
+    for shell in shells() {
+        let (_, code) = install(shell, &["--claude"], &app);
+        assert_eq!(code, 0);
+    }
+    let text = std::fs::read_to_string(app.join("CLAUDE.md")).unwrap();
+    assert!(text.starts_with("# My app\n\nMy own rules.\n\n<!-- ferrox-kit"), "{text}");
+    assert_eq!(text.matches("<!-- ferrox-kit").count(), 1, "{text}");
+    assert!(text.ends_with("<!-- /ferrox-kit -->\n"), "{text}");
+    std::fs::remove_dir_all(&app).unwrap();
+}
+
+#[test]
+fn update_changes_adds_and_removes_only_what_differs() {
+    for shell in shells() {
+        let app = scratch(&format!("update-{shell}"));
+        install(shell, &["--claude"], &app);
+        std::fs::write(app.join(".ferrox/core/tasks/check.md"), "edited\n").unwrap();
+        std::fs::write(app.join(".ferrox/core/old.md"), "stale\n").unwrap();
+        std::fs::remove_file(app.join(".claude/agents/ferrox-reviewer.md")).unwrap();
+
+        let (out, code) = install(shell, &["--update", "--dry-run"], &app);
+        assert_eq!(code, 0);
+        assert_eq!(
+            out,
+            "would change .ferrox/core/tasks/check.md\nwould add .claude/agents/ferrox-reviewer.md\n\
+             would remove .ferrox/core/old.md\nferrox-kit: dry run, 3 change(s), nothing written\n",
+            "{shell}"
+        );
+        assert!(app.join(".ferrox/core/old.md").exists(), "{shell}: a dry run removed a file");
+
+        let (out, _) = install(shell, &["--update"], &app);
+        assert!(out.ends_with("ferrox-kit: updated to 0.1.0 (generic, claude); 3 change(s)\n"), "{shell}: {out}");
+        assert!(!app.join(".ferrox/core/old.md").exists());
+        let (out, _) = install(shell, &["--update"], &app);
+        assert_eq!(out, "ferrox-kit: updated to 0.1.0 (generic, claude); 0 change(s)\n", "{shell}");
+        std::fs::remove_dir_all(&app).unwrap();
+    }
+}
+
+/// An adapter's templates point; they don't guide. What's left of one once
+/// its placeholders, its front matter and its pointer are taken out must be
+/// a few words at most.
+#[test]
+fn the_adapters_templates_carry_nothing_of_their_own() {
+    let mut dirs = vec![kit_root().join("adapters")];
+    while let Some(dir) = dirs.pop() {
+        for entry in std::fs::read_dir(dir).unwrap() {
+            let path = entry.unwrap().path();
+            if path.is_dir() {
+                dirs.push(path);
+                continue;
+            }
+            let mut text = std::fs::read_to_string(&path).unwrap();
+            for token in ["{{ID}}", "{{KIND}}", "{{PATH}}", "{{PURPOSE}}", "{{KIT}}", "$ARGUMENTS", "name:", "description:", "---", "ferrox-", "Follow"] {
+                text = text.replace(token, " ");
+            }
+            let words = text.split(|c: char| !c.is_alphanumeric()).filter(|w| !w.is_empty()).count();
+            assert!(words <= 6, "{} carries {words} words of its own: put guidance in core/, not in an adapter", path.display());
+        }
+    }
 }

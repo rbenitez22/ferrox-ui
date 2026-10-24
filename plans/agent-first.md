@@ -572,6 +572,25 @@ a CHANGELOG started with the renames.
 - The root README's "With an agent" is now: install `--generic`, paste
   the paragraph.
 
+## Notes from piece 9 (adapters, 2026-10-24)
+
+- `targets.tsv` gained a fourth column, *how*: `copy`, `each:<kinds>`
+  (a template per `kit.tsv` row, `{{ID}}` in the path) and `block:<kinds>`
+  (the rows' rendered templates as one marked block in a file the app owns,
+  replaced on reinstall, the rest untouched). Templates are only an agent's
+  boilerplate and placeholders (`{{ID}}`, `{{KIND}}`, `{{PATH}}`,
+  `{{PURPOSE}}`, `{{KIT}}`); a test caps their own words at six.
+- Claude: a skill and a command per task, the reviewer as a sub-agent, a
+  `CLAUDE.md` block. Copilot: a prompt file per task and role, a
+  `copilot-instructions.md` block. AGENTS.md: a block listing every piece.
+  Every adapter installs the generic kit; `.ferrox/INSTALLED` records them.
+- `--update` (with the recorded adapters, or new flags) prints `added`,
+  `changed`, `removed` only, and removes kit files no longer in the plan.
+- Both installers agree on every path tried (all adapters, generic, dry
+  run, update, a `CLAUDE.md` without a final line ending). The PowerShell
+  one uses ordinal string comparisons (.NET's defaults are
+  culture-sensitive). The bash one needs bash 4 (associative arrays).
+
 ## Pieces
 
 Each is small and reviewed on its own.
