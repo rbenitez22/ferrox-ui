@@ -1,9 +1,8 @@
 /* ============================================================
    THEME — CLASSIC
-   webapp-lib 0.x's indigo palette (its `vars.css`), restated in the token
-   contract so apps moving off webapp-lib 0.x can keep their look.
+   An indigo theme: a cool lavender-grey ground, an indigo primary.
 
-   Old variable → token:
+   Source value → token:
      --background  #eeeff4  → --background
      .main bg      #fbfbfe  → --surface-0
      --primary     #2f27ce  → --primary-base / --primary-fill

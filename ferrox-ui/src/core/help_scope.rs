@@ -12,9 +12,8 @@ use super::help_request::HelpRequest;
 /// fixed list, or a closure that follows the page.
 ///
 /// Keys are free-form. Recommended: `domain`, `screen`, `section`, `entity`,
-/// `<entity>_id` (they map straight onto memory tags for an assistant), and
-/// `mcp_server` / `mcp_tool` as routing hints for an assistant with MCP
-/// tools. Hints only: a page never decides which tools a model may call.
+/// `<entity>_id`. An app may add its own (routing hints for its assistant,
+/// say); they are hints only: a page never decides what a model may do.
 #[derive(Clone, Copy)]
 pub struct HelpContext(Signal<Vec<(String, String)>>);
 

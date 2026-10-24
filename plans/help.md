@@ -47,6 +47,9 @@ Notes from piece 1:
   markup is unchanged.
 - A dialog's `component` in the request is `"alertdialog"` when `alert` is
   set (so `ConfirmDialog` reads as one).
+- (2026-10-24: the `mcp_server` / `mcp_tool` keys and the Patina mapping
+  left ferrox-ui's docs for webapp-lib's assistant adapter;
+  `plans/generalise.md` piece 3.)
 - Recommended context keys, including `mcp_server` / `mcp_tool` as routing
   hints, are in the README (added at the user's request).
 

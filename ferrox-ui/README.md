@@ -480,7 +480,7 @@ view! {
 | `value` | required | `RwSignal<String>` |
 | `autocomplete` | `"current-password"` | `"new-password"` when setting one, so a password manager offers to generate it |
 | `strength` | `false` | a meter under the field while it has text: a four-step bar and a word. The field is described by its hint and the meter together |
-| `min_bits` | `80.0` | the entropy that counts as `Strong` (webapp-lib's `min_password_entropy`) |
+| `min_bits` | `80.0` | the entropy, in bits, that counts as `Strong` |
 | `strength_labels` | English | `StrengthLabels::new("Très faible", "Faible", "Moyen", "Fort")`, for another language |
 | `show_label` | `"Show password"` | the button's label |
 | `placeholder`, `name`, `required`, `disabled`, `autofocus`, `class` | | `class` goes on the input |
@@ -1085,7 +1085,7 @@ Declare what an assistant should know where you know it. Scopes nest; a
 request gathers them outermost first. A scope reaches only its own children.
 
 ```rust
-<HelpScope context=[("mcp_server", "conrad"), ("domain", "bookkeeping")]>
+<HelpScope context=[("domain", "bookkeeping")]>
     <HelpScope context=[("screen", "reconcile")]>
         <HelpScope context=move || vec![
             ("entity".into(), "account".into()),
@@ -1102,7 +1102,7 @@ context that follows the page. It's read when the user asks, so it's always
 current.
 
 **Recommended keys.** The keys are free-form; these names let an assistant
-(and a memory store such as Patina) rely on them:
+rely on them:
 
 | Key | Meaning | Example |
 |---|---|---|
@@ -1111,16 +1111,17 @@ current.
 | `section` | a part of that screen | `splits` |
 | `entity` | the kind of thing in view | `transaction` |
 | `<entity>_id` | its id, so a tool can fetch it | `transaction_id` |
-| `mcp_server` | the MCP server that knows about this area | `conrad` |
-| `mcp_tool` | the tool best placed to answer here | `conrad_get_transaction` |
 
-Put `mcp_server` in a scope at the app's root, and `mcp_tool` and ids at the
-screen or section that knows them. Stable mappings can live in the app's
-`on_ask` handler instead. A rule of thumb: the page declares what only the
-page knows, such as the current entity's id. MCP keys are **hints**: which
-tools a model may call is decided by the client, never by the page, and the
-model may pick a better tool. `domain`, `screen` and `entity` map onto
-memory tags (Patina's `recall_tagged`).
+Put `domain` in a scope at the app's root, and `screen`, `section` and ids
+where they are known. Stable mappings can live in the app's `on_ask`
+handler instead. A rule of thumb: the page declares what only the page
+knows, such as the current entity's id.
+
+Because the keys are free-form, an app (or the adapter that connects it to
+its assistant) can add its own, such as routing hints for which tools an
+assistant should try. Document those with the app or adapter, not here.
+Treat any such key as a **hint**: what a model may do is decided by the
+assistant's client, never by the page.
 
 ### `HelpAssistant` and `HelpRequest`
 

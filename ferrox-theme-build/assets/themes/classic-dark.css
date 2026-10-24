@@ -1,9 +1,8 @@
 /* ============================================================
    THEME — CLASSIC DARK
-   The dark half of Classic: webapp-lib 0.x's `.main[data-theme="dark"]` block,
-   restated in the token contract.
+   The dark half of Classic: indigo on a near-black ground.
 
-   Old variable → token:
+   Source value → token:
      --background #010104 → --background
      --text       #ebe9fc → --text
      --primary    #3a31d8 → --primary-fill

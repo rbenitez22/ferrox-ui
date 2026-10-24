@@ -12,7 +12,10 @@ demo puts its `+` in `actions` (behind its own `Show` for the permission).
 Piece 2 done (2026-10-24): Combobox `on_create` / `create_label` (a
 "Create “…”" button under the list, in a popover that now wraps the
 listbox), Select `on_create` / `create_label` (a `+` after refresh). Piece 3
-(docs) next.
+done (2026-10-24): Help's MCP / Patina keys out of the README and
+`HelpScope`'s docs, Classic and `min_bits` reworded, `plans/forms.md`
+updated. Plan closed. webapp-lib's assistant-adapter docs take the MCP keys
+in its piece 2.
 
 ## The audit
 

@@ -55,7 +55,7 @@ Notes from piece 1:
 | `CheckBox { id, value, on_change, style }` | `mod.rs:305` | `Checkbox` |
 | `render_options` / `SelectMenu`'s `<select>`: rebuilt on every change (Q9), `<span>` refresh (H13), inline styles | `mod.rs:121, 745` | `Select`. `SelectMenu` (loading from the API) stays in webapp-lib as an adapter over it |
 | `AutocompleteInput<T>`: no combobox semantics (H13), inline styles | `autocomplete.rs` | `Combobox<T>`. `AutocompleteInputModel` (fetching) stays in webapp-lib |
-| conrad `Autocomplete` (574 lines: groups, create-new, clear, chevron, refresh, multi) | `Autocomplete.tsx`, `components.css:1791-1965` | `Combobox`: the core now, the rest later (open point 4) |
+| conrad `Autocomplete` (574 lines: groups, create-new, clear, chevron, refresh, multi) | `Autocomplete.tsx`, `components.css:1791-1965` | `Combobox`: the core now, the rest later (open point 4); create-new done (`on_create`, 2026-10-24, `plans/generalise.md` piece 2) |
 
 Review items covered: H12 (ids), H13 (real buttons, combobox ARIA), Q6 (one
 password control), Q9 (`Select` renders once), S2 (no inline styles), X3, X4,
@@ -244,6 +244,6 @@ All as recommended:
 2. `Switch` is added in piece 3.
 3. The Combobox list goes in the top layer (`popover` + fixed positioning).
 4. Combobox core now; groups, create-new, multi-select and search-start come
-   later.
+   later. (Create-new done 2026-10-24, as opt-in `on_create`.)
 5. The new-password + confirm pair stays in webapp-lib.
 6. New names: `.field`, `.form-input`, `.combobox`.
