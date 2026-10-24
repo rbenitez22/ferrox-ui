@@ -2,14 +2,16 @@
 
 A one-line text field (`.form-input`).
 
+<!-- example: input -->
 ```rust
-use ferrox_ui::{Input, InputKind};
+use ferrox_ui::{Field, Input, InputKind};
 
 view! {
     <Field label="Name"><Input value=name autofocus=true /></Field>
     <Input value=query kind=InputKind::Search placeholder="Search accounts" />
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

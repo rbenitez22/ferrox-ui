@@ -17,15 +17,17 @@ Every spinner is transparent until `--loading-delay` (400ms), so work that
 finishes faster never shows one. Under `prefers-reduced-motion` the spin slows
 to 2.4s but doesn't stop; a still spinner reads as "hung".
 
+<!-- example: spinner -->
 ```rust
 use ferrox_ui::{LoadingOverlay, Spinner, SpinnerKind};
 
 view! {
-    <Spinner label="Loading accounts"/>
-    <Spinner kind=SpinnerKind::Inline label="Deleting the row"/>
-    {move || signing_in.get().then(|| view! { <LoadingOverlay label="Signing in…"/> })}
+    <Spinner label="Loading accounts" />
+    <Spinner kind=SpinnerKind::Inline label="Deleting the row" />
+    {move || signing_in.get().then(|| view! { <LoadingOverlay label="Signing in…" /> })}
 }
 ```
+<!-- /example -->
 
 - `Spinner`: `label` (required; read out by screen readers, not shown),
   `kind` (`Region` by default, `Inline` or `Field`), `class`. It renders

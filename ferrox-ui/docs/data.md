@@ -7,6 +7,7 @@ to reach the rest of a long list.
 
 Putting them together:
 
+<!-- example: data -->
 ```rust
 use ferrox_ui::{Card, DataLayout, DataLayoutSwitch, DataView, Pagination, Panel};
 
@@ -18,7 +19,7 @@ view! {
         <DataView
             items=Signal::derive(move || recipes_on(page.get()))
             key_of=|r: &Recipe| r.id.clone()
-            item=|r: Recipe| view! { <Card title=r.name.clone() href=format!("/recipes/{}", r.id)>…</Card> }
+            item=|r: Recipe| view! { <Card title=r.name.clone() href=format!("/recipes/{}", r.id)>"…"</Card> }
             label="Recipes"
             layout=layout
             loading=loading
@@ -29,6 +30,7 @@ view! {
     </Panel>
 }
 ```
+<!-- /example -->
 
 **Pages or infinite scroll?** The app's choice, per list. Pages
 (`Pagination`) where users come back to a place: admin lists, search

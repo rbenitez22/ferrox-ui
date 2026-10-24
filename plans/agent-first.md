@@ -487,6 +487,30 @@ a CHANGELOG started with the renames.
   left as it is: the demo is a showcase, the recipes (piece 6) are what
   agents copy.
 
+## Notes from piece 5 (reference split, 2026-10-24)
+
+- **Changed from the design:** examples aren't doctests through
+  `include_str!`. Rustdoc compiles an example only with hidden `# setup`
+  lines, which GitHub's Markdown shows literally (an agent would copy
+  them). Instead every example is a region of `tests/doc_examples.rs`,
+  compiled with every feature, and `tests/docs_current.rs` copies it into
+  its page between `<!-- example: <name> -->` markers. It fails on a stale
+  copy, a marker naming no region, a region no page shows, and any Rust
+  block in `docs/` outside the markers. The app's own functions are stubbed
+  outside the regions; no crate-wide import, so a region's `use` lines are
+  complete or it doesn't compile.
+- The same test generates `docs/index.md` from the source with `syn`
+  (every public component with its props, types, defaults; every other
+  public item with its first doc line); `FERROX_BLESS=1` rewrites both.
+- Compiling the old README's examples found one that never worked: a
+  closure parameter typed `|a: Option<Account>|` inside `view!` breaks the
+  macro's parser. The example now lets the type be inferred.
+- Pages: one per component or small family (32), one per group (shared
+  behaviour), `choosing.md` (the groups' tables, plus new core and forms
+  ones), `conventions.md`, `css-classes.md`, `help.md`, `index.md`. The
+  crate README is a 90-line overview; the webapp-lib line left it.
+- Eight public enums had no doc comment; they do now (the index showed it).
+
 ## Pieces
 
 Each is small and reviewed on its own.

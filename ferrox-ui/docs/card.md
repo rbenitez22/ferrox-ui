@@ -3,6 +3,7 @@
 A surface for one thing: an `<article>` with an optional heading, its own
 buttons, and the body. It's the item template for a list or a grid of cards.
 
+<!-- example: card -->
 ```rust
 use ferrox_icons::{Icon, DELETE};
 use ferrox_ui::{Card, IconButton};
@@ -18,10 +19,11 @@ view! {
         <p>{employee.role.clone()}</p>
     </Card>
 
-    <Card title="Groceries" on_click=move || open_list()>…</Card>   // the whole card is a button
-    <Card title="Note" compact=true>…</Card>                         // just a surface
+    <Card title="Groceries" on_click=move || open_list()>"…"</Card> // the whole card is a button
+    <Card title="Note" compact=true>"…"</Card> // just a surface
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

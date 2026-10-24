@@ -18,18 +18,21 @@ The explanation, as structured data (not Markdown or HTML, so nothing parses
 a string or trusts tags in one). The app owns the wording and its
 translation. It's cheap to clone.
 
+<!-- example: help-topic -->
 ```rust
 use std::sync::LazyLock;
+
 use ferrox_ui::HelpTopic;
 
 static SPLIT_AMOUNT: LazyLock<HelpTopic> = LazyLock::new(|| {
-    HelpTopic::new("split-amount", "Amounts on a split")          // id, title
+    HelpTopic::new("split-amount", "Amounts on a split") // id, title
         .paragraph("Each line moves money into or out of one account.")
         .list(["Positive: money comes in", "Negative: money goes out"])
         .table(["Sign", "Means"], [["+", "in"], ["-", "out"]])
-        .guide("/help#split-amount")                             // "Full guide"
+        .guide("/help#split-amount") // "Full guide"
 });
 ```
+<!-- /example -->
 
 The `id` is stable: an assistant and a guide find the topic by it. The
 `title` names the `?`.
@@ -46,11 +49,17 @@ The `id` is stable: an assistant and a guide find the topic by it. The
 | `SideMenu` | in the title bar, just before the × | a request names it as a `sheet` |
 | `Panel` | right after the title (after the toggle, on a collapsible panel) | |
 
+<!-- example: help-prop -->
 ```rust
-<Field label="Amount" help=SPLIT_AMOUNT.clone()>
-    <Input value=amount />
-</Field>
+use ferrox_ui::{Field, Input};
+
+view! {
+    <Field label="Amount" help=SPLIT_AMOUNT.clone()>
+        <Input value=amount />
+    </Field>
+}
 ```
+<!-- /example -->
 
 `help` takes a `MaybeHelp`, which converts from a `HelpTopic` or an
 `Option<HelpTopic>`. `help_skip_tab` keeps the `?` out of the Tab order for a
@@ -61,9 +70,15 @@ field in a row (it stays clickable and reachable by a screen reader).
 The `?` on its own, for anywhere else: beside a heading, in a table header.
 The components above place one for you.
 
+<!-- example: help-button -->
 ```rust
-<h2>"Statement balance" <HelpButton topic=STATEMENT_BALANCE.clone() /></h2>
+use ferrox_ui::HelpButton;
+
+view! {
+    <h2>"Statement balance" <HelpButton topic=STATEMENT_BALANCE.clone() /></h2>
+}
 ```
+<!-- /example -->
 
 - **It names what it explains:** "Help: {title}", as its label and tooltip,
   so a screen reader knows which `?` it landed on.
@@ -82,18 +97,26 @@ The components above place one for you.
 Declare what an assistant should know where you know it. Scopes nest; a
 request gathers them outermost first. A scope reaches only its own children.
 
+<!-- example: help-scope -->
 ```rust
-<HelpScope context=[("domain", "bookkeeping")]>
-    <HelpScope context=[("screen", "reconcile")]>
-        <HelpScope context=move || vec![
-            ("entity".into(), "account".into()),
-            ("account_id".into(), account.get()),
-        ]>
-            <Field label="Statement balance" help=STATEMENT_BALANCE.clone()> … </Field>
+use ferrox_ui::{Field, HelpScope, Input};
+
+view! {
+    <HelpScope context=[("domain", "bookkeeping")]>
+        <HelpScope context=[("screen", "reconcile")]>
+            <HelpScope context=move || vec![
+                ("entity".to_string(), "account".to_string()),
+                ("account_id".to_string(), account.get()),
+            ]>
+                <Field label="Statement balance" help=STATEMENT_BALANCE.clone()>
+                    <Input value=balance />
+                </Field>
+            </HelpScope>
         </HelpScope>
     </HelpScope>
-</HelpScope>
+}
 ```
+<!-- /example -->
 
 `context` is an array or a `Vec` of pairs, or a closure returning them for
 context that follows the page. It's read when the user asks, so it's always
@@ -126,15 +149,17 @@ assistant's client, never by the page.
 Wrap the app (or a part of it). Every help popover inside offers "Ask about
 this".
 
+<!-- example: help-assistant -->
 ```rust
 use ferrox_ui::{HelpAssistant, HelpRequest};
 
 view! {
-    <HelpAssistant on_ask=move |request: HelpRequest| chat.ask(request)>
-        <Router>…</Router>
+    <HelpAssistant on_ask=move |request: HelpRequest| ask_assistant(request)>
+        <p>"The app: every help popover inside offers \"Ask about this\"."</p>
     </HelpAssistant>
 }
 ```
+<!-- /example -->
 
 | `HelpRequest` field | |
 |---|---|

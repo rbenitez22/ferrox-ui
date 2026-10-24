@@ -6,8 +6,11 @@ are leptos_router's `<A>`, so every component here goes inside a
 brings in leptos_router. It's the only group that does.
 
 
+<!-- example: navigation -->
 ```rust
 use ferrox_ui::{NavGroup, NavLink, SideMenu, SideMenuButton};
+use leptos_router::components::{Route, Router, Routes};
+use leptos_router::path;
 
 let menu = RwSignal::new(false);
 
@@ -30,10 +33,13 @@ view! {
                 <NavLink href="/logout">"Logout"</NavLink>
             </NavGroup>
         </SideMenu>
-        <Routes fallback=|| "Not found">…</Routes>
+        <Routes fallback=|| "Not found">
+            <Route path=path!("/") view=|| "Lists" />
+        </Routes>
     </Router>
 }
 ```
+<!-- /example -->
 
 Put the `SideMenu` outside `<Routes>`, beside the header, so it stays
 mounted while the user moves between pages.

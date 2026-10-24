@@ -36,5 +36,6 @@ web-sys = { workspace = true, features = ["Window", "Document", "Element", "Html
 
 # tests/docs_current.rs parses the source to check docs/ is current.
 [dev-dependencies]
+leptos_router = { workspace = true }
 quote = "1"
 syn = { version = "2", features = ["full", "extra-traits"] }

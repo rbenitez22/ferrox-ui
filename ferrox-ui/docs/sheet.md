@@ -6,16 +6,19 @@ and closing never waits on an animation. A click on the backdrop closes it,
 but only if the press also started there, so a text selection dragged out of
 the sheet doesn't close it.
 
+<!-- example: sheet -->
 ```rust
-use ferrox_ui::{Sheet, SheetSide};
+use ferrox_icons::{Icon, MENU};
+use ferrox_ui::{IconButton, Sheet};
 
 view! {
-    <IconButton label="Menu" on_click=move || menu.set(true)><Icon icon=MENU/></IconButton>
+    <IconButton label="Menu" on_click=move || menu.set(true)><Icon icon=MENU /></IconButton>
     <Sheet open=menu title="Menu">
-        <nav>…</nav>
+        <nav>"The app's links"</nav>
     </Sheet>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

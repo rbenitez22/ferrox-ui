@@ -3,8 +3,9 @@
 A dropdown of fixed choices: the native `<select>` (`.form-select`) with the
 theme's own caret. `value` is the chosen option's `value`, or empty for none.
 
+<!-- example: select -->
 ```rust
-use ferrox_ui::{Select, SelectOption};
+use ferrox_ui::{Field, Select, SelectOption};
 
 let currencies = Signal::derive(|| vec![
     SelectOption::new("EUR", "Euro"),
@@ -29,6 +30,7 @@ view! {
     </Field>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

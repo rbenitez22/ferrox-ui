@@ -5,17 +5,25 @@ Lets the user pick a `DataView`'s layout: a group (`role="group"`, named
 (`aria-pressed`). It sits wherever the app wants, typically a `Panel`'s
 actions.
 
+<!-- example: data-layout-switch -->
 ```rust
-use ferrox_ui::{DataLayout, DataLayoutSwitch, DataView, Panel};
+use ferrox_ui::{Card, DataLayout, DataLayoutSwitch, DataView, Panel};
 
 let layout = RwSignal::new(DataLayout::default());
 
 view! {
     <Panel title="Recipes" actions=move || view! { <DataLayoutSwitch layout=layout /> }>
-        <DataView items=recipes key_of=… item=… label="Recipes" layout=layout />
+        <DataView
+            items=recipes
+            key_of=|r: &Recipe| r.id.clone()
+            item=|r: Recipe| view! { <Card title=r.name>"…"</Card> }
+            label="Recipes"
+            layout=layout
+        />
     </Panel>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

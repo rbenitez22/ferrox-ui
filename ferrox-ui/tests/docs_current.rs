@@ -1,9 +1,17 @@
-//! The docs are current. `docs/index.md` is generated from the source: every
-//! public component with its props, and every other public item, with the
-//! first line of its doc comment. This test fails when the committed index
-//! differs from what the source says; run it with `FERROX_BLESS=1` to
-//! rewrite the file instead.
+//! The docs are current.
+//!
+//! - `docs/index.md` is generated from the source: every public component
+//!   with its props, and every other public item, with the first line of
+//!   its doc comment.
+//! - Every Rust example in `docs/` is a compiled region of
+//!   `tests/doc_examples.rs`, copied between `<!-- example: <name> -->` and
+//!   `<!-- /example -->`. A Rust block without the markers, a marker naming
+//!   no region, and a region no page shows all fail.
+//!
+//! When the docs differ from what they're made from, the test fails; run it
+//! with `FERROX_BLESS=1` to rewrite them instead.
 
+use std::collections::BTreeMap;
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -28,6 +36,87 @@ fn crate_dir() -> PathBuf {
 #[test]
 fn the_index_matches_the_source() {
     check_or_bless(&crate_dir().join("docs/index.md"), &render_index());
+}
+
+#[test]
+fn every_example_is_its_compiled_region() {
+    let regions = regions(&fs::read_to_string(crate_dir().join("tests/doc_examples.rs")).unwrap());
+    let mut shown = Vec::new();
+    for page in doc_pages() {
+        let text = fs::read_to_string(&page).unwrap();
+        let (rendered, names) = render_examples(&text, &regions)
+            .unwrap_or_else(|e| panic!("{}: {e}", page.display()));
+        shown.extend(names);
+        check_or_bless(&page, &rendered);
+    }
+    let unused: Vec<&String> = regions.keys().filter(|name| !shown.contains(name)).collect();
+    assert!(unused.is_empty(), "regions no page shows: {unused:?}");
+}
+
+/// Every `docs/*.md` page, sorted.
+fn doc_pages() -> Vec<PathBuf> {
+    let mut pages: Vec<PathBuf> = fs::read_dir(crate_dir().join("docs"))
+        .unwrap()
+        .map(|e| e.unwrap().path())
+        .filter(|p| p.extension().is_some_and(|e| e == "md"))
+        .collect();
+    pages.sort();
+    pages
+}
+
+/// `// region: <name>` … `// endregion` blocks, dedented.
+fn regions(source: &str) -> BTreeMap<String, String> {
+    let mut found = BTreeMap::new();
+    let mut open: Option<(String, Vec<&str>)> = None;
+    for line in source.lines() {
+        let trimmed = line.trim();
+        if let Some(name) = trimmed.strip_prefix("// region: ") {
+            open = Some((name.trim().to_string(), Vec::new()));
+        } else if trimmed == "// endregion" {
+            let (name, lines) = open.take().expect("an endregion without a region");
+            assert!(found.insert(name.clone(), dedent(&lines)).is_none(), "region {name} twice");
+        } else if let Some((_, lines)) = open.as_mut() {
+            lines.push(line);
+        }
+    }
+    assert!(open.is_none(), "a region without an endregion");
+    found
+}
+
+fn dedent(lines: &[&str]) -> String {
+    let indent = lines.iter().filter(|l| !l.trim().is_empty()).map(|l| l.len() - l.trim_start().len()).min().unwrap_or(0);
+    let body: Vec<&str> = lines.iter().map(|l| if l.len() >= indent { &l[indent..] } else { l.trim_start() }).collect();
+    body.join("\n").trim_matches('\n').to_string()
+}
+
+/// The page with each example block replaced by its region, and the names
+/// of the regions it shows.
+fn render_examples(text: &str, regions: &BTreeMap<String, String>) -> Result<(String, Vec<String>), String> {
+    const OPEN: &str = "<!-- example: ";
+    let mut out = String::new();
+    let mut names = Vec::new();
+    let mut rest = text;
+    while let Some(at) = rest.find(OPEN) {
+        out.push_str(&rest[..at]);
+        let after = &rest[at + OPEN.len()..];
+        let name_end = after.find(" -->").ok_or("an unclosed example marker")?;
+        let name = after[..name_end].trim().to_string();
+        let close = after.find("<!-- /example -->").ok_or(format!("example {name} has no <!-- /example -->"))?;
+        let code = regions.get(&name).ok_or(format!("example {name} names no region in tests/doc_examples.rs"))?;
+        out.push_str(&format!("{OPEN}{name} -->\n```rust\n{code}\n```\n<!-- /example -->"));
+        names.push(name);
+        rest = &after[close + "<!-- /example -->".len()..];
+    }
+    out.push_str(rest);
+    // Outside the markers, no Rust block: every example is compiled.
+    let mut outside = out.clone();
+    while let (Some(a), Some(b)) = (outside.find(OPEN), outside.find("<!-- /example -->")) {
+        outside.replace_range(a..b + "<!-- /example -->".len(), "");
+    }
+    if outside.contains("```rust") {
+        return Err("a ```rust block outside <!-- example --> markers: make it a region of tests/doc_examples.rs".into());
+    }
+    Ok((out, names))
 }
 
 /// Compares `path` with `wanted`, or writes it under `FERROX_BLESS=1`.

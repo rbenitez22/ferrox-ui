@@ -4,6 +4,7 @@ A checkbox and its words as one `<label>`, so the words are part of the
 target. **A checkbox states an intention that a later Save carries out.**
 For a setting that takes effect the moment it flips, use a `Switch`.
 
+<!-- example: checkbox -->
 ```rust
 use ferrox_ui::Checkbox;
 
@@ -12,6 +13,7 @@ view! {
     <Checkbox checked=agreed label="I accept the terms" error=terms_error required=true />
 }
 ```
+<!-- /example -->
 
 | Prop | | |
 |---|---|---|

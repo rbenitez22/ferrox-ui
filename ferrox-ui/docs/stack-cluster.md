@@ -1,7 +1,8 @@
 # `Stack` and `Cluster`
 
+<!-- example: stack-cluster -->
 ```rust
-use ferrox_ui::{Align, Button, ButtonFamily, Cluster, Gap, Justify, Stack};
+use ferrox_ui::{Button, ButtonFamily, Cluster, Field, Gap, Input, InputKind, Justify, Stack};
 
 view! {
     <Stack gap=Gap::Lg>
@@ -14,6 +15,7 @@ view! {
     </Stack>
 }
 ```
+<!-- /example -->
 
 | | `Stack` | `Cluster` |
 |---|---|---|

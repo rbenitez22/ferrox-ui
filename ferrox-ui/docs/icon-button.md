@@ -3,16 +3,18 @@
 A compact icon-only button (`.icon-btn`): 1.75rem square, no border. It
 answers hover and press in colour, not size.
 
+<!-- example: icon-button -->
 ```rust
 use ferrox_icons::{Icon, CAMERA, DELETE, SEARCH};
 use ferrox_ui::IconButton;
 
 view! {
-    <IconButton label="Search" on_click=move || open_search()><Icon icon=SEARCH/></IconButton>
-    <IconButton label="Camera" pressed=camera on_click=move || camera.update(|c| *c = !*c)><Icon icon=CAMERA/></IconButton>
-    <IconButton label="Remove line" danger=true on_click=move || remove()><Icon icon=DELETE/></IconButton>
+    <IconButton label="Search" on_click=move || open_search()><Icon icon=SEARCH /></IconButton>
+    <IconButton label="Camera" pressed=camera on_click=move || camera.update(|c| *c = !*c)><Icon icon=CAMERA /></IconButton>
+    <IconButton label="Remove line" danger=true on_click=move || remove()><Icon icon=DELETE /></IconButton>
 }
 ```
+<!-- /example -->
 
 | Prop | |
 |---|---|

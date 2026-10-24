@@ -3,6 +3,7 @@
 A record list rendered through one item template and laid out as the screen
 needs, with its loading, error and empty states beside it.
 
+<!-- example: data-view -->
 ```rust
 use ferrox_ui::{Card, DataLayout, DataView};
 
@@ -10,7 +11,7 @@ view! {
     <DataView
         items=recipes
         key_of=|r: &Recipe| r.id.clone()
-        item=|r: Recipe| view! { <Card title=r.name.clone() href=format!("/recipes/{}", r.id)>…</Card> }
+        item=|r: Recipe| view! { <Card title=r.name.clone() href=format!("/recipes/{}", r.id)>"…"</Card> }
         label="Recipes"
         layout=DataLayout::default()
         loading=loading
@@ -20,6 +21,7 @@ view! {
     />
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|
@@ -49,18 +51,24 @@ the viewport only). The observer is disconnected when the view unmounts.
 The first page is the app's to load; `on_more` only extends a list that has
 items.
 
+<!-- example: data-view-more -->
 ```rust
-<DataView
-    items=entries
-    key_of=|e: &Entry| e.id.clone()
-    item=entry_row
-    label="Activity"
-    layout=DataLayout::List
-    on_more=move || load_next_page()
-    has_more=has_more
-    loading_more=loading_more
-/>
+use ferrox_ui::{DataLayout, DataView};
+
+view! {
+    <DataView
+        items=entries
+        key_of=|e: &Entry| e.id.clone()
+        item=entry_row
+        label="Activity"
+        layout=DataLayout::List
+        on_more=move || load_next_page()
+        has_more=has_more
+        loading_more=loading_more
+    />
+}
 ```
+<!-- /example -->
 
 The `<For>` is keyed by `key_of`. An item whose key and value stay keeps its
 DOM node and state (a loaded image, typed text) through updates, appends,

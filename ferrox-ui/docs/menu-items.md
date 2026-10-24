@@ -1,16 +1,27 @@
 # Items
 
+<!-- example: menu-items -->
 ```rust
-<MenuItem icon=EDIT on_select=move || edit()>"Edit"</MenuItem>
-<MenuItem on_select=move || archive() disabled=Signal::derive(move || !can_archive.get())>"Archive"</MenuItem>
-<MenuDivider />
-<MenuItem icon=DELETE danger=true on_select=move || ask_delete()>"Delete"</MenuItem>
+use ferrox_icons::{DELETE, EDIT, MORE_VERTICAL};
+use ferrox_ui::{Menu, MenuDivider, MenuItem, MenuLink, MenuTrigger};
 
-<MenuItem current=Signal::derive(move || book.get() == "Household") on_select=move || book.set("Household")>
-    "Household"
-</MenuItem>
-<MenuLink href="/settings">"Settings"</MenuLink>
+view! {
+    <Menu label="Actions" trigger=MenuTrigger::icon(MORE_VERTICAL, "More actions")>
+        <MenuItem icon=EDIT on_select=move || edit()>"Edit"</MenuItem>
+        <MenuItem on_select=move || archive() disabled=Signal::derive(move || !can_archive.get())>"Archive"</MenuItem>
+        <MenuDivider />
+        <MenuItem icon=DELETE danger=true on_select=move || ask_delete()>"Delete"</MenuItem>
+    </Menu>
+
+    <Menu label="Books" trigger=MenuTrigger::button("Book")>
+        <MenuItem current=Signal::derive(move || book.get() == "Household") on_select=move || book.set("Household")>
+            "Household"
+        </MenuItem>
+        <MenuLink href="/settings">"Settings"</MenuLink>
+    </Menu>
+}
 ```
+<!-- /example -->
 
 | | | |
 |---|---|---|

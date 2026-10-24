@@ -53,7 +53,9 @@ starter's files. Copy each part into yours:
 …and `style/ferrox/` in `.gitignore` ([`starter/.gitignore`](starter/.gitignore)): it's generated.
 
 **With an agent:** tell it "use ferrox-ui from `<this clone>`: take the
-setup from `starter/`, the components from `ferrox-ui/README.md`". A kit
+setup from `starter/`; pick components with `ferrox-ui/docs/choosing.md`,
+look them up in `ferrox-ui/docs/index.md`, and read a component's page in
+`ferrox-ui/docs/` before using it". A kit
 made for agents (an entry point, task instructions, a drift check, an
 installer, for any agent) is being built: [`plans/agent-first.md`](plans/agent-first.md).
 

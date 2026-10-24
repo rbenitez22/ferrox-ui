@@ -3,18 +3,21 @@
 The same panel, items and keyboard as `Menu`, opened from an area (a row,
 a card) instead of a trigger.
 
+<!-- example: context-menu -->
 ```rust
-use ferrox_ui::{ContextMenu, MenuItem};
+use ferrox_icons::{DELETE, EDIT};
+use ferrox_ui::{Card, ContextMenu, MenuItem};
 
 view! {
     <ContextMenu label="Recipe actions" menu=move || view! {
         <MenuItem icon=EDIT on_select=move || edit()>"Edit"</MenuItem>
         <MenuItem icon=DELETE danger=true on_select=move || ask_delete()>"Delete"</MenuItem>
     }>
-        <Card title=recipe.name.clone() href=…>…</Card>
+        <Card title=recipe.name.clone() href=format!("/recipes/{}", recipe.id)>"…"</Card>
     </ContextMenu>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

@@ -3,6 +3,7 @@
 A padded button (`.btn`). The **family** is what the button means. **Quiet**
 is a separate axis: how heavy it looks.
 
+<!-- example: button -->
 ```rust
 use ferrox_ui::{Button, ButtonFamily, ButtonSize};
 
@@ -13,6 +14,7 @@ view! {
     <Button saving=saving button_type="submit">"Create"</Button>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

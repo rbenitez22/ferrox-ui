@@ -3,18 +3,26 @@
 Links that belong together, under a heading that names them. A screen reader
 hears "Product database, list, 3 items".
 
+<!-- example: nav-group -->
 ```rust
-use ferrox_ui::NavGroup;
+use ferrox_ui::{NavGroup, NavLink};
 
-let remember = RwSignal::new(false);   // store it wherever the app keeps preferences
+let remember = RwSignal::new(false); // store it wherever the app keeps preferences
 
 view! {
-    <NavGroup label="Account">…</NavGroup>                                   // plain
-    <NavGroup label="Product database" collapsible=true>…</NavGroup>         // starts collapsed
-    <NavGroup label="Reports" collapsible=true start_expanded=true>…</NavGroup>
-    <NavGroup label="Admin" collapsible=true expanded=remember>…</NavGroup>   // the app owns it
+    <NavGroup label="Account"><NavLink href="/account">"Account"</NavLink></NavGroup> // plain
+    <NavGroup label="Product database" collapsible=true> // starts collapsed
+        <NavLink href="/units">"Units"</NavLink>
+    </NavGroup>
+    <NavGroup label="Reports" collapsible=true start_expanded=true>
+        <NavLink href="/reports">"Reports"</NavLink>
+    </NavGroup>
+    <NavGroup label="Admin" collapsible=true expanded=remember> // the app owns it
+        <NavLink href="/admin">"Admin"</NavLink>
+    </NavGroup>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

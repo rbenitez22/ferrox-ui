@@ -1,15 +1,17 @@
 # `PageGrid`
 
+<!-- example: page-grid -->
 ```rust
-use ferrox_ui::{PageGrid, PageWidth, Panel, HeadingLevel};
+use ferrox_ui::{HeadingLevel, PageGrid, PageWidth, Panel};
 
 view! {
-    <PageGrid width=PageWidth::Wide side=move || view! { <Panel title="Filters">…</Panel> }>
-        <Panel title="Recipes" heading_level=HeadingLevel::H1>…</Panel>
-        <Panel title="Recently made">…</Panel>
+    <PageGrid width=PageWidth::Wide side=move || view! { <Panel title="Filters">"…"</Panel> }>
+        <Panel title="Recipes" heading_level=HeadingLevel::H1>"…"</Panel>
+        <Panel title="Recently made">"…"</Panel>
     </PageGrid>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

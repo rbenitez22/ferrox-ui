@@ -30,3 +30,10 @@
   (`on_*`) can always run many times.
 - Components with a label or a title take `help` (a `HelpTopic`): see
   [Help](help.md).
+
+## The examples
+
+Every example in these pages is compiled (`tests/doc_examples.rs`, copied in
+by `tests/docs_current.rs`), so it matches the code. Each assumes
+`use leptos::prelude::*;` and names its own ferrox imports. Names like
+`save()`, `reload()` or `recipes` stand for the app's own functions and data.

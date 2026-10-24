@@ -4,8 +4,9 @@ A title bar with the ×, the body, and a footer band. **The footer isn't a
 slot.** Pass the actions and the component fixes the order: cancel,
 alternate, affirm, with the heaviest button last.
 
+<!-- example: dialog -->
 ```rust
-use ferrox_ui::{Dialog, DialogAction, DialogSize};
+use ferrox_ui::{Button, Dialog, DialogAction};
 
 let editing = RwSignal::new(false);
 let saving = RwSignal::new(false);
@@ -22,6 +23,7 @@ view! {
     </Dialog>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

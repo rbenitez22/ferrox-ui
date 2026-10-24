@@ -5,13 +5,11 @@ combobox pattern (`role="combobox"`, a `listbox` of `option`s,
 `aria-activedescendant` for the active one). Use it when a `Select` would be
 too long to scan.
 
+<!-- example: combobox -->
 ```rust
 use ferrox_ui::{Combobox, Field};
 
-#[derive(Clone)]
-struct Account { id: String, name: String }
-
-// `accounts: Signal<Vec<Account>>` is loaded by the caller.
+// `accounts: Signal<Vec<Account>>` is loaded by the app.
 let account_text = RwSignal::new(String::new());
 let chosen = RwSignal::new(None::<Account>);
 
@@ -22,7 +20,7 @@ view! {
             key_of=|a: &Account| a.id.clone()
             label_of=|a: &Account| a.name.clone()
             text=account_text
-            on_select=move |a: Option<Account>| chosen.set(a)
+            on_select=move |a| chosen.set(a)
             placeholder="Type to search"
             on_refresh=move || reload_accounts()
             refreshing=accounts_refreshing
@@ -31,6 +29,7 @@ view! {
     </Field>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

@@ -3,6 +3,7 @@
 A labelled `<nav>` landmark holding a `<ul>`, one `<li>` per link, so a
 screen reader hears the landmark's name and how many links it holds.
 
+<!-- example: nav-list -->
 ```rust
 use ferrox_icons::SEARCH;
 use ferrox_ui::{NavLink, NavList};
@@ -14,6 +15,7 @@ view! {
     </NavList>
 }
 ```
+<!-- /example -->
 
 - `NavList`: `label` (required, the landmark's name), `class`, children
   (`NavLink`s and `NavGroup`s).

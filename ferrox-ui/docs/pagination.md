@@ -6,17 +6,24 @@ Moves through pages of anything: a `DataView`, a table, search results.
 ‹  1  …  5  [6]  7  …  20  ›
 ```
 
+<!-- example: pagination -->
 ```rust
-use ferrox_ui::Pagination;
+use ferrox_ui::{Card, DataView, Pagination};
 
 let page = RwSignal::new(1);
 let page_count = Signal::derive(move || total.get().div_ceil(20));
 
 view! {
-    <DataView items=Signal::derive(move || slice(page.get())) … />
+    <DataView
+        items=Signal::derive(move || slice(page.get()))
+        key_of=|r: &Recipe| r.id.clone()
+        item=|r: Recipe| view! { <Card title=r.name>"…"</Card> }
+        label="Recipes"
+    />
     <Pagination page=page page_count=page_count />
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

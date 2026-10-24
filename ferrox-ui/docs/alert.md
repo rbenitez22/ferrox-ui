@@ -5,6 +5,7 @@ failed, a server refusal no single field owns. Messages that go away by
 themselves are toasts (planned, `overlay`). Anything the user must act on is
 an alert.
 
+<!-- example: alert -->
 ```rust
 use ferrox_ui::{Alert, AlertSeverity};
 
@@ -16,6 +17,7 @@ view! {
     })}
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

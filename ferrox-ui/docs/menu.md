@@ -2,6 +2,7 @@
 
 A list of actions behind a trigger, as ARIA's menu button has it.
 
+<!-- example: menu -->
 ```rust
 use ferrox_icons::MORE_VERTICAL;
 use ferrox_ui::{Menu, MenuDivider, MenuItem, MenuTrigger};
@@ -15,6 +16,7 @@ view! {
     </Menu>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

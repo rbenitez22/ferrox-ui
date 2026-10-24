@@ -2,6 +2,7 @@
 
 A main action and, joined to it, a chevron that opens related actions.
 
+<!-- example: split-button -->
 ```rust
 use ferrox_ui::{MenuItem, SplitButton};
 
@@ -12,6 +13,7 @@ view! {
     </SplitButton>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

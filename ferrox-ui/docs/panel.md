@@ -4,13 +4,14 @@ A `<section>` named by a real heading: a header band with the title on the
 left and the actions on the right, then the body. One component serves a
 page's own title (`H1`) and a section inside a page (`H2`, the default).
 
+<!-- example: panel -->
 ```rust
 use ferrox_icons::{Icon, PLUS, SEARCH};
-use ferrox_ui::{HeadingLevel, IconButton, Panel, PanelTone};
+use ferrox_ui::{HeadingLevel, IconButton, Panel};
 
 view! {
     <Panel title="Shopping Lists" heading_level=HeadingLevel::H1>
-        …
+        "…"
     </Panel>
 
     <Panel
@@ -23,13 +24,14 @@ view! {
             </Show>
         }
     >
-        …
+        "…"
     </Panel>
 
-    <Panel title="Load Data" heading_level=HeadingLevel::H1>…</Panel>   // a bar with no buttons
-    <Panel title="Transactions" flush=true>…</Panel>                     // a table runs to the edges
+    <Panel title="Load Data" heading_level=HeadingLevel::H1>"…"</Panel> // a bar with no buttons
+    <Panel title="Transactions" flush=true>"…"</Panel> // a table runs to the edges
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|
@@ -51,16 +53,20 @@ returns the class list.
 **Collapsible.** The title becomes a button inside the heading, so the page's
 outline keeps the heading and the whole band is the target.
 
+<!-- example: panel-collapsible -->
 ```rust
+use ferrox_ui::{Panel, PanelTone};
+
 view! {
     <Panel title="Danger zone" tone=PanelTone::Danger collapsible=true summary="Delete this book">
-        …
+        "…"
     </Panel>
     <Panel title="Notes" collapsible=true expanded=notes_open summary=Signal::derive(move || format!("{} notes", count.get()))>
-        …
+        "…"
     </Panel>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|

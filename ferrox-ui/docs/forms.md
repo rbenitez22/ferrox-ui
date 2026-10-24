@@ -11,6 +11,7 @@ goes in an `Alert` at the top of the form. A problem never goes in both. A
 field shows a hint *or* an error, never both: once the field is wrong, the
 message under it says what's wrong.
 
+<!-- example: forms -->
 ```rust
 use ferrox_ui::{Alert, AlertSeverity, Field, Input, InputKind};
 
@@ -27,6 +28,7 @@ view! {
     </Field>
 }
 ```
+<!-- /example -->
 
 **The wiring is automatic.** The control inside a `Field` takes the field's
 id (so the `<label for>` names it), `aria-describedby` (the message, while

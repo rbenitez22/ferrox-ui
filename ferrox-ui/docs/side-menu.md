@@ -3,8 +3,9 @@
 A `Sheet` holding a `NavList` of the children, with an optional footer
 pinned to the bottom. It shares an `open` signal with its button.
 
+<!-- example: side-menu -->
 ```rust
-use ferrox_ui::{SideMenu, SideMenuButton};
+use ferrox_ui::{NavLink, SideMenu, SideMenuButton};
 
 view! {
     <SideMenuButton open=menu />
@@ -14,10 +15,11 @@ view! {
         help=MENU_HELP.clone()
         footer=|| view! { <span>"Version 1.4"</span> }
     >
-        …
+        <NavLink href="/" exact=true>"Lists"</NavLink>
     </SideMenu>
 }
 ```
+<!-- /example -->
 
 **It closes itself**, like every modal, and also on its own:
 

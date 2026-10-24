@@ -5,8 +5,9 @@ button at its right end. The button is a real `<button>` with one label
 ("Show password"); `aria-pressed` says whether the password is showing, and
 the eye is crossed out while it is.
 
+<!-- example: password-input -->
 ```rust
-use ferrox_ui::PasswordInput;
+use ferrox_ui::{Field, PasswordInput};
 
 view! {
     <Field label="Password"><PasswordInput value=password /></Field>
@@ -16,6 +17,7 @@ view! {
     </Field>
 }
 ```
+<!-- /example -->
 
 | Prop | Default | |
 |---|---|---|
@@ -33,12 +35,14 @@ inside a `Field` with `help_shares_value`.
 
 The calculation is public, for checking a password on submit:
 
+<!-- example: password-strength -->
 ```rust
 use ferrox_ui::{password_strength, StrengthLevel};
 
-let strength = password_strength(&new_password.get(), 80.0);  // PasswordStrength { bits, level }
+let strength = password_strength(&new_password.get(), 80.0); // PasswordStrength { bits, level }
 if strength.level != StrengthLevel::Strong { /* say so under the field */ }
 ```
+<!-- /example -->
 
 - `password_entropy(&str) -> f64`: length × log2 of the size of the
   character sets used. It counts characters, not bytes ("é" is one).

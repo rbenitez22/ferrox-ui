@@ -5,6 +5,7 @@ button is always in the danger family and comes last. Its label is the verb
 ("Delete", "Void", "Archive"), not "OK". The body names exactly what is about
 to be lost. Focus opens on the ×, never on the confirm button.
 
+<!-- example: confirm-dialog -->
 ```rust
 use ferrox_ui::ConfirmDialog;
 
@@ -14,12 +15,13 @@ view! {
         title="Delete account?"
         confirm_label="Delete"
         saving=deleting
-        on_confirm=move || delete_account()     // set `deleting`, close when done
+        on_confirm=move || delete_account() // set `deleting`, then `confirming` false when done
     >
         <p>"This deletes “Groceries” and its 214 transactions."</p>
     </ConfirmDialog>
 }
 ```
+<!-- /example -->
 
 Props: `open` (`RwSignal<bool>`; Cancel, the × and Esc close it), `title`,
 `confirm_label`, `on_confirm` (set `open` false when the action is done),

@@ -1,7 +1,8 @@
 # `Field`
 
+<!-- example: field -->
 ```rust
-use ferrox_ui::Field;
+use ferrox_ui::{Field, Input};
 
 view! {
     <Field label="Name" hint="As it appears on statements" error=name_error help=NAME_HELP.clone()>
@@ -9,6 +10,7 @@ view! {
     </Field>
 }
 ```
+<!-- /example -->
 
 | Prop | | |
 |---|---|---|
