@@ -3,8 +3,8 @@
 
 use std::sync::LazyLock;
 
-use ferrox_icons::{Icon, SEARCH};
-use ferrox_ui::{Button, ButtonFamily, ButtonSize, Field, HeadingLevel, HelpTopic, IconButton, Input, Panel, PanelTone, Switch};
+use ferrox_icons::{Icon, DELETE, SEARCH};
+use ferrox_ui::{Button, ButtonFamily, ButtonSize, Card, Field, HeadingLevel, HelpTopic, IconButton, Input, Panel, PanelTone, Switch};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -20,6 +20,7 @@ pub fn LayoutPage() -> impl IntoView {
         <SectionPanels />
         <Variants />
         <Collapsible />
+        <Cards />
     }
 }
 
@@ -143,4 +144,36 @@ fn Collapsible() -> impl IntoView {
 #[component]
 fn CountsBuilds(builds: RwSignal<u32>) -> impl IntoView {
     builds.update(|n| *n += 1);
+}
+
+/// Cards in a grid: one that is a link, one that is a button, each with a
+/// remove action of its own; a plain one; a compact one.
+#[component]
+fn Cards() -> impl IntoView {
+    let removed = RwSignal::new(0);
+    let opened = RwSignal::new(0);
+    let remove = move || view! {
+        <IconButton title="Remove" danger=true on_click=move |_| removed.update(|n| *n += 1)>
+            <Icon icon=DELETE />
+        </IconButton>
+    };
+    view! {
+        <Section title="Cards">
+            <p>{move || format!("Removed {} times; opened Grace {} times", removed.get(), opened.get())}</p>
+            <div class="demo-card-grid">
+                <Card title="Ada Lovelace" href="/navigation/details" actions=remove>
+                    <p>"Analyst. The whole card is a link."</p>
+                </Card>
+                <Card title="Grace Hopper" on_click=move || opened.update(|n| *n += 1) actions=remove>
+                    <p>"Admiral. The whole card is a button."</p>
+                </Card>
+                <Card title="Plain card">
+                    <p>"Not a link, not a button."</p>
+                </Card>
+                <Card title="Compact card" compact=true>
+                    <p>"For dense lists."</p>
+                </Card>
+            </div>
+        </Section>
+    }
 }

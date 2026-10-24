@@ -248,3 +248,98 @@ test.describe('Panel, collapsible', () => {
     expect((await box(toggle(page, 'Notes'))).height).toBeGreaterThanOrEqual(44);
   });
 });
+
+test.describe('Card', () => {
+  /** The card whose heading is `title`. */
+  function card(page: Page, title: string): Locator {
+    return page.getByRole('article').filter({ has: page.getByRole('heading', { name: title, exact: true }) });
+  }
+
+  test('is an article with its heading at the level asked for', async ({ page }) => {
+    const plain = card(page, 'Plain card');
+    await expect(plain).toHaveClass(/\bcard\b/);
+    await expect(plain.getByRole('heading', { level: 3, name: 'Plain card' })).toBeVisible();
+  });
+
+  test('href: the title is the link, and a click anywhere on the card follows it in the router', async ({ page }) => {
+    const ada = card(page, 'Ada Lovelace');
+    const link = ada.getByRole('link');
+    await expect(link).toHaveCount(1);
+    await expect(link).toHaveAccessibleName('Ada Lovelace');
+    await expect(ada).toHaveClass(/\bcard--clickable\b/);
+
+    // A marker that a full page load would wipe: the router must handle it.
+    await page.evaluate(() => ((window as unknown as { marker: number }).marker = 1));
+    await ada.scrollIntoViewIfNeeded();
+    const b = await box(ada);
+    await page.mouse.click(b.x + b.width / 2, b.y + b.height - 10);
+    await expect(page).toHaveURL(/\/navigation\/details$/);
+    expect(await page.evaluate(() => (window as unknown as { marker?: number }).marker)).toBe(1);
+  });
+
+  test('on_click: the title is a button; a click anywhere, Enter and Space each run it once', async ({ page }) => {
+    const grace = card(page, 'Grace Hopper');
+    const button = grace.getByRole('button', { name: 'Grace Hopper' });
+    await expect(button).toBeVisible();
+
+    await grace.scrollIntoViewIfNeeded();
+    const b = await box(grace);
+    await page.mouse.click(b.x + 20, b.y + b.height - 10);
+    await expect(page.getByText('opened Grace 1 times')).toBeVisible();
+
+    await button.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('opened Grace 2 times')).toBeVisible();
+    await page.keyboard.press('Space');
+    await expect(page.getByText('opened Grace 3 times')).toBeVisible();
+  });
+
+  test('an action is its own target: it never follows the card', async ({ page }) => {
+    await card(page, 'Ada Lovelace').getByRole('button', { name: 'Remove' }).click();
+    await card(page, 'Grace Hopper').getByRole('button', { name: 'Remove' }).click();
+    await expect(page.getByText('Removed 2 times; opened Grace 0 times')).toBeVisible();
+    await expect(page).toHaveURL(/\/layout$/);
+  });
+
+  test('hover and press change colour only, not size', async ({ page }) => {
+    const ada = card(page, 'Ada Lovelace');
+    await ada.scrollIntoViewIfNeeded();
+    const before = await box(ada);
+    const restingBorder = await css(ada, 'border-top-color');
+    // The mouse, not hover(): the stretched link covers the body on purpose.
+    await page.mouse.move(before.x + before.width / 2, before.y + before.height - 10);
+    await expect.poll(() => css(ada, 'border-top-color')).not.toBe(restingBorder);
+    expect(await box(ada)).toEqual(before);
+
+    const hovered = await css(ada, 'background-color');
+    await page.mouse.down();
+    await expect.poll(() => css(ada, 'background-color')).not.toBe(hovered);
+    expect(await box(ada)).toEqual(before);
+    // Released off the card, so no click follows the link.
+    await page.mouse.move(0, 0);
+    await page.mouse.up();
+  });
+
+  test('the focus ring goes round the whole card', async ({ page }) => {
+    const grace = card(page, 'Grace Hopper');
+    await card(page, 'Ada Lovelace').getByRole('link').focus();
+    await page.keyboard.press('Tab');
+    await page.keyboard.press('Tab');
+    await expect(grace.getByRole('button', { name: 'Grace Hopper' })).toBeFocused();
+    expect(await css(grace, 'outline-style')).toBe('solid');
+  });
+
+  test('a plain card has no link, no button and no pointer', async ({ page }) => {
+    const plain = card(page, 'Plain card');
+    await expect(plain.getByRole('link')).toHaveCount(0);
+    await expect(plain.getByRole('button')).toHaveCount(0);
+    await expect(plain).not.toHaveClass(/card--clickable/);
+    expect(await css(plain.locator('.card__body'), 'cursor')).not.toBe('pointer');
+  });
+
+  test('compact tightens the padding', async ({ page }) => {
+    const compact = card(page, 'Compact card');
+    await expect(compact).toHaveClass(/\bcard--compact\b/);
+    expect(parseFloat(await css(compact, 'padding-top'))).toBeLessThan(parseFloat(await css(card(page, 'Plain card'), 'padding-top')));
+  });
+});

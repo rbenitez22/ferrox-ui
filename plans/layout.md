@@ -7,8 +7,8 @@ actions and its body. It adds a `Card`, the item template for `data`'s
 `CollapsiblePanel` (`ui/src/components/CollapsiblePanel.tsx`,
 `theme/components.css:616-770`).
 
-Status: approved (2026-10-23), all open points as recommended. Pieces 1–2
-done (2026-10-23); piece 3 (Card) next.
+Status: approved (2026-10-23), all open points as recommended. Pieces 1–3
+done (2026-10-23); piece 4 (docs) next.
 
 Notes from piece 1:
 - `HeadingLevel` lives in `layout/heading.rs`, with a crate-private
@@ -37,6 +37,18 @@ Notes from piece 2:
 - The toggle takes the band's left padding, so the target reaches the
   band's left edge; hovering it tints the whole band (`:has`).
 - Release check: 400 e2e tests.
+
+Notes from piece 3:
+- `Card`'s stretched target is the title's `::after` (`inset: 0` against the
+  card's `position: relative`); `.card__actions` sit above it with
+  `z-index: 1`. Hover, press and the focus ring are on the card through
+  `:has(.card__link:…)`.
+- A clickable card with no `title` logs a warning: there would be nothing to
+  name its link or button.
+- e2e trap: raw `page.mouse` clicks need the element scrolled into view
+  first, and Playwright's `hover()` on a card's body refuses, because the
+  stretched link covers it (by design). Move the mouse instead.
+- Release check: 416 e2e tests.
 
 ## Sources
 

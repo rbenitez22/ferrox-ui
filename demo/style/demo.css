@@ -42,6 +42,13 @@
     text-decoration: underline;
 }
 
+/* A grid of cards, as many columns as fit. */
+.demo-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+    gap: var(--space-md);
+}
+
 /* A narrow column, so a link list reads as a menu would. */
 .demo-nav-column {
     max-width: 16rem;

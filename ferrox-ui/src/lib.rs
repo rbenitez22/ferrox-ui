@@ -7,7 +7,8 @@
 //! `overlay`: `Dialog`, `ConfirmDialog`, `Sheet`. Feature `forms`: `Field`,
 //! `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`,
 //! `Combobox`. Feature `navigation`: `NavList`, `NavLink`,
-//! `NavGroup`, `SideMenu`, `SideMenuButton`. Feature `layout`: `Panel` (also collapsible).
+//! `NavGroup`, `SideMenu`, `SideMenuButton`. Feature `layout`: `Panel` (also collapsible),
+//! `Card`.
 //! Further groups (`data`, `menus`) arrive as they
 //! are built.
 //!
