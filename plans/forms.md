@@ -6,7 +6,7 @@ conrad's `FormField.tsx`, `Autocomplete.tsx` and its `.form-*` rules, and
 replaces webapp-lib's form primitives. The data-loading halves stay in
 webapp-lib as adapters.
 
-Status: approved (2026-10-23). Pieces 1–4 done (2026-10-23); piece 5 (docs) next.
+Status: done (2026-10-23). All five pieces done; piece 5 is the forms section of `ferrox-ui/README.md`.
 
 Notes from piece 1:
 - `Field` hands its wiring down through `<Provider>`, not `provide_context`.

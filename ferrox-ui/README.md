@@ -13,7 +13,7 @@ it as `webapp_lib::ui` and don't list it themselves.
 
 ```toml
 [dependencies]
-ferrox-ui = { git = "https://github.com/rbenitez22/ferrox-ui", tag = "v0.1.0", features = ["overlay"] }
+ferrox-ui = { git = "https://github.com/rbenitez22/ferrox-ui", tag = "v0.1.0", features = ["overlay", "forms"] }
 ```
 
 ```rust
@@ -33,7 +33,7 @@ call adds nothing.
 |---|---|---|
 | `core` | always on | `Button`, `IconButton`, `Toolbar`, `ToolbarGroup`, `Spinner`, `LoadingOverlay`, `Alert`; help: `HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`, `HelpRequest` |
 | `overlay` | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
-| `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select` (documented with the group's last piece; see the rustdoc meanwhile) |
+| `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
 | `menus`, `navigation`, `layout`, `data` | one each, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)
@@ -341,6 +341,329 @@ view! {
 
 `sheet_classes(side, extra)` returns the class list.
 
+## forms (feature `forms`)
+
+A `Field` puts a label, one control and at most one message together. Each
+control is bound two-way to an `RwSignal` (`String` for text, `bool` for a
+checkbox or switch): the control writes what the user does, and setting the
+signal from code updates the control.
+
+**Where a message goes.** A problem one field can fix goes under that field
+(`error`). Anything cross-field, or a server refusal no single field owns,
+goes in an `Alert` at the top of the form. A problem never goes in both. A
+field shows a hint *or* an error, never both: once the field is wrong, the
+message under it says what's wrong.
+
+```rust
+use ferrox_ui::{Alert, AlertSeverity, Field, Input, InputKind};
+
+let email = RwSignal::new(String::new());
+let email_error = Signal::derive(move || {
+    let e = email.get();
+    (!e.is_empty() && !e.contains('@')).then(|| "Enter an email address, like name@example.com".to_string())
+});
+
+view! {
+    {move || refused.get().map(|why| view! { <Alert severity=AlertSeverity::Error>{why}</Alert> })}
+    <Field label="Email" hint="Where receipts go" error=email_error>
+        <Input value=email kind=InputKind::Email autocomplete="email" />
+    </Field>
+}
+```
+
+**The wiring is automatic.** The control inside a `Field` takes the field's
+id (so the `<label for>` names it), `aria-describedby` (the message, while
+there is one) and, while there's an error, `aria-invalid` and `.is-invalid`.
+Call sites pass no ids, and every field on a page gets a unique one. Put
+**one control per field**. Only the field's own children see its wiring: a
+control after the field, or outside any field, generates its own id and has
+no description.
+
+`Input`, `Textarea`, `PasswordInput`, `Select` and `Combobox` go inside a
+`Field`. `Checkbox` and `Switch` carry their own label and don't.
+
+| Component | Use it for |
+|---|---|
+| `Input` | one line of text: a name, an email, a search |
+| `Textarea` | text that may run to several lines |
+| `PasswordInput` | a password, to sign in or to set one (with a strength meter) |
+| `Checkbox` | a yes/no that a later Save sends |
+| `Switch` | an on/off that takes effect as it flips: a filter, a preference written straight back |
+| `Select` | a short, fixed list of choices |
+| `Combobox` | a long list, filtered by typing |
+
+### `Field`
+
+```rust
+use ferrox_ui::Field;
+
+view! {
+    <Field label="Name" hint="As it appears on statements" error=name_error help=NAME_HELP.clone()>
+        <Input value=name autofocus=true />
+    </Field>
+}
+```
+
+| Prop | | |
+|---|---|---|
+| `label` | required | the `<label>`, pointing at the control |
+| `hint` | none | guidance while the field is fine; hidden while there's an error |
+| `error` | none | the field's problem. Present and not empty means invalid |
+| `help`, `help_skip_tab`, `help_shares_value` | | a `?` after the label (see [the `help` prop](#the-help-prop)) |
+| `class` | | appended to `.field` |
+| children | | the one control |
+
+The message is tied to the control by `aria-describedby`, so a screen reader
+reads it with the control. An error never times out; it clears when the
+field is right. `field_classes(extra)` returns the class list.
+
+### `Input`
+
+A one-line text field (`.form-input`).
+
+```rust
+use ferrox_ui::{Input, InputKind};
+
+view! {
+    <Field label="Name"><Input value=name autofocus=true /></Field>
+    <Input value=query kind=InputKind::Search placeholder="Search accounts" />
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `value` | required | `RwSignal<String>` |
+| `kind` | `Text` | `Text`, `Email`, `Search`, `Tel`, `Url`, `Number` (the `type`). Passwords are `PasswordInput` |
+| `placeholder`, `name`, `autocomplete` | none | `autocomplete` is the browser hint (`"email"`, `"off"`, …) |
+| `required` | `false` | |
+| `readonly`, `disabled` | `false` | may be signals |
+| `autofocus` | `false` | where a `Dialog` puts focus when it opens |
+| `class` | | |
+
+### `Textarea`
+
+A multi-line text field (`.form-textarea`). It's resized by hand
+(vertically), and Enter is a newline: a `Dialog` never submits from it.
+
+```rust
+use ferrox_ui::Textarea;
+
+view! { <Field label="Notes"><Textarea value=notes rows=6 /></Field> }
+```
+
+Props: `value` (required), `rows` (4), `placeholder`, `name`, `required`,
+`readonly`, `disabled`, `autofocus`, `class`.
+
+### `PasswordInput`
+
+A password field (`.form-input` inside `.password-input`) with a show/hide
+button at its right end. The button is a real `<button>` with one label
+("Show password"); `aria-pressed` says whether the password is showing, and
+the eye is crossed out while it is.
+
+```rust
+use ferrox_ui::PasswordInput;
+
+view! {
+    <Field label="Password"><PasswordInput value=password /></Field>
+
+    <Field label="New password" hint="At least four words, or a long mix">
+        <PasswordInput value=new_password autocomplete="new-password" strength=true min_bits=70.0 />
+    </Field>
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `value` | required | `RwSignal<String>` |
+| `autocomplete` | `"current-password"` | `"new-password"` when setting one, so a password manager offers to generate it |
+| `strength` | `false` | a meter under the field while it has text: a four-step bar and a word. The field is described by its hint and the meter together |
+| `min_bits` | `80.0` | the entropy that counts as `Strong` (webapp-lib's `min_password_entropy`) |
+| `strength_labels` | English | `StrengthLabels::new("Très faible", "Faible", "Moyen", "Fort")`, for another language |
+| `show_label` | `"Show password"` | the button's label |
+| `placeholder`, `name`, `required`, `disabled`, `autofocus`, `class` | | `class` goes on the input |
+
+The meter's colours come from its level's class, and the bits are on
+`data-bits`, not in the text. A help request never carries a password, even
+inside a `Field` with `help_shares_value`.
+
+The calculation is public, for checking a password on submit:
+
+```rust
+use ferrox_ui::{password_strength, StrengthLevel};
+
+let strength = password_strength(&new_password.get(), 80.0);  // PasswordStrength { bits, level }
+if strength.level != StrengthLevel::Strong { /* say so under the field */ }
+```
+
+- `password_entropy(&str) -> f64`: length × log2 of the size of the
+  character sets used. It counts characters, not bytes ("é" is one).
+- `strength_level(bits, min_bits) -> StrengthLevel`: `VeryWeak` under 25
+  bits, `Weak` under 40, `Fair` under `min_bits`, then `Strong`.
+  `StrengthLevel::class()` is its meter class.
+- `password_strength(&str, min_bits) -> PasswordStrength`: both.
+
+The new-password and confirm pair stays in webapp-lib, built from two
+`PasswordInput`s.
+
+### `Checkbox`
+
+A checkbox and its words as one `<label>`, so the words are part of the
+target. **A checkbox states an intention that a later Save carries out.**
+For a setting that takes effect the moment it flips, use a `Switch`.
+
+```rust
+use ferrox_ui::Checkbox;
+
+view! {
+    <Checkbox checked=recurring label="Repeat every month" hint="On the same day each month" />
+    <Checkbox checked=agreed label="I accept the terms" error=terms_error required=true />
+}
+```
+
+| Prop | | |
+|---|---|---|
+| `checked` | required | `RwSignal<bool>` |
+| `label` | required | the words beside the box |
+| `hint`, `error` | none | one message under it, as a `Field`'s (never both); an error also marks the box |
+| `help`, `help_skip_tab`, `help_shares_value` | | a `?` after the words, outside the `<label>`, so clicking it never ticks the box. A shared value is `"true"` / `"false"` |
+| `name`, `required`, `disabled`, `class` | | |
+
+It's the native checkbox, coloured with `accent-color` and showing the
+theme's focus ring. Space ticks it. `checkbox_classes(invalid, extra)`
+returns the class list.
+
+### `Switch`
+
+An on/off that **is** the act: a filter over what the screen shows, or a
+preference written straight back. A field that a dialog's Save sends stays a
+`Checkbox`. It's a `<button role="switch" aria-checked>` with a track, a knob
+and the words inside, so the words name it and are part of the target.
+
+```rust
+use ferrox_ui::Switch;
+
+view! { <Switch checked=show_archived label="Show archived accounts" /> }
+```
+
+Props: `checked` (required, `RwSignal<bool>`), `label` (required), `disabled`
+(off and unusable: still loading, or not this user's to change), `help` and
+`help_skip_tab` (a `?` beside the switch, not inside it), `class`. A click or
+Space flips it, and the knob slides across. `switch_classes(extra)` returns
+the class list.
+
+### `Select`
+
+A dropdown of fixed choices: the native `<select>` (`.form-select`) with the
+theme's own caret. `value` is the chosen option's `value`, or empty for none.
+
+```rust
+use ferrox_ui::{Select, SelectOption};
+
+let currencies = Signal::derive(|| vec![
+    SelectOption::new("EUR", "Euro"),
+    SelectOption::new("USD", "US dollar"),
+]);
+
+view! {
+    <Field label="Currency">
+        <Select value=currency options=currencies placeholder="Choose a currency" />
+    </Field>
+
+    <Field label="Category">
+        <Select
+            value=category
+            options=categories
+            loading=categories_loading
+            on_refresh=move || reload_categories()
+            refreshing=categories_refreshing
+        />
+    </Field>
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `value` | required | `RwSignal<String>` |
+| `options` | required | `Signal<Vec<SelectOption>>`; `SelectOption::new(value, label)` |
+| `placeholder` | `"Select…"` | the first entry: shown while `value` is empty, and can't be chosen |
+| `loading` | `false` | the options are on their way: disabled, `aria-busy`, and the placeholder reads `loading_label` (`"Loading…"`) |
+| `on_refresh` | none | adds a refresh button beside the select (`refresh_label`, `"Refresh"`) |
+| `refreshing` | `false` | a spinner takes the refresh icon's place, labelled `refreshing_label` (`"Refreshing…"`); the button stays put and refuses clicks |
+| `name`, `required`, `disabled`, `class` | | `class` goes on the `<select>` |
+
+The `<select>` is rendered once. Only its options and which one is selected
+react, so it keeps focus and its choice when the options change. Loading the
+options is the caller's job; webapp-lib's `SelectMenu` is an adapter that
+fetches them.
+
+### `Combobox<T>`
+
+A text field that filters a list and lets one item be chosen: the ARIA
+combobox pattern (`role="combobox"`, a `listbox` of `option`s,
+`aria-activedescendant` for the active one). Use it when a `Select` would be
+too long to scan.
+
+```rust
+use ferrox_ui::{Combobox, Field};
+
+#[derive(Clone)]
+struct Account { id: String, name: String }
+
+// `accounts: Signal<Vec<Account>>` is loaded by the caller.
+let account_text = RwSignal::new(String::new());
+let chosen = RwSignal::new(None::<Account>);
+
+view! {
+    <Field label="Account" error=account_error>
+        <Combobox
+            items=accounts
+            key_of=|a: &Account| a.id.clone()
+            label_of=|a: &Account| a.name.clone()
+            text=account_text
+            on_select=move |a: Option<Account>| chosen.set(a)
+            placeholder="Type to search"
+            on_refresh=move || reload_accounts()
+            refreshing=accounts_refreshing
+        />
+    </Field>
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `items` | required | `Signal<Vec<T>>`, owned by whatever loaded them; `T: Clone + Send + Sync + 'static` |
+| `key_of` | required | a stable id per item (`data-key` on its option) |
+| `label_of` | required | the text shown, and the text matched against |
+| `text` | required | `RwSignal<String>`: what's in the field. Choosing an item sets it to the item's label |
+| `on_select` | required | `Some(item)` when one is chosen; `None` when the text is cleared, or the field is left with text that names no item |
+| `placeholder`, `name`, `required`, `disabled`, `autofocus`, `class` | | `class` goes on the input |
+| `clearable` | `true` | a × that clears the text and the choice (`clear_label`, `"Clear"`) |
+| `toggleable` | `true` | a chevron that shows and hides the whole list (`toggle_label`, `"Show all"`) |
+| `on_refresh` | none | adds a refresh control (`refresh_label`, `"Refresh"`) |
+| `refreshing` | `false` | a spinner in the refresh control's place (`refreshing_label`, `"Refreshing…"`) |
+| `empty_label` | `"No matches"` | shown in the open list when nothing matches |
+
+How it behaves:
+
+- **Typing** filters by `label_of`, case-insensitive "contains"
+  (`matches_text(label, text)` is that test, public).
+- **Keys:** ↓ / ↑ move the active option, opening the list if it's closed,
+  and stop at the ends. Enter chooses the active option. Tab chooses it and
+  moves on. Esc closes the list, or clears the text if it's already closed.
+  Inside a `Dialog`, Enter on an option chooses it without submitting, and
+  Esc closes the list without closing the dialog.
+- **A click** on an option chooses it.
+- **Its controls** (clear, the chevron, refresh) are buttons out of the Tab
+  order, so a row of comboboxes costs no extra keystrokes. Pressing one
+  doesn't take focus from the field.
+- **The list is in the top layer** (a popover), placed under the field and
+  as wide as it, and it follows the field as the page scrolls. A `Dialog`
+  body or any `overflow` parent can't clip it.
+
+It doesn't fetch. webapp-lib's `AutocompleteInputModel` is the adapter that
+loads `items`. Groups, create-new and multi-select are planned.
+
 ## Help (in `core`)
 
 Any component with a label or a title can carry help. Give it a topic and a
@@ -532,6 +855,21 @@ selected by class only.
 
 These are injected only when the `overlay` feature is on.
 
+## CSS classes (forms)
+
+| Sheet | Classes |
+|---|---|
+| `field.css` | `.field`, `.field__label`, `.field__label-row` (a label with its `?`), `.field__hint`, `.field__error` (also under a `Checkbox`) |
+| `controls.css` | `.form-input`, `.form-textarea`, `.form-select`, `.is-invalid` on each (the danger border); `.select` (a select and its refresh button) |
+| `password.css` | `.password-input`, `.password-input__toggle`; `.password-strength`, `.password-strength--{very-weak,weak,fair,strong}`, `.password-strength__bar`, `.password-strength__fill` |
+| `choices.css` | `.checkbox`, `.checkbox.is-invalid`, `.checkbox__row` (the `<label>`), `.checkbox__input`, `.checkbox__label`, `.checkbox__line` (the row with its `?`); `.switch`, `[aria-checked='true']`, `.switch__track`, `.switch__knob`, `.switch-line` (the switch with its `?`) |
+| `combobox.css` | `.combobox`, `.combobox__controls`, `.combobox__control`, `.combobox__list`, `.combobox__option`, `.combobox__option.is-active`, `.combobox__empty` |
+
+No rule touches a bare `input`, `select` or `label`: an app's own unclassed
+controls are left alone. On a phone (≤ 768px) the controls' text is at least
+16px, so iOS doesn't zoom in when one takes focus. These are injected only
+when the `forms` feature is on.
+
 A unit test (`css.rs`) fails if any shipped selector doesn't start with a
 class.
 
@@ -545,7 +883,7 @@ class.
 - `overlay`: a browser with `<dialog>`/`showModal()` and `@starting-style`
   (Chrome 117+, Firefox 129+, Safari 17.5+). Without `@starting-style` a
   sheet just appears instead of sliding.
-- Help: a browser with the Popover API (`popover`, `popovertarget`; Chrome
+- Help and `Combobox`: a browser with the Popover API (`popover`, `popovertarget`; Chrome
   114+, Firefox 125+, Safari 17+).
 
 ## Testing
@@ -560,13 +898,15 @@ class.
 ## Planned
 
 From `plans/ferrox-ui.md`, one group per piece, each with a demo page and e2e
-tests: `forms` (Combobox, then its docs), `navigation` (Side
-menu, on `Sheet`), `layout` (Panel), `data` (Data grid). `core` later gains
+tests: `navigation` (Side menu, on `Sheet`), `layout` (Panel), `data` (Data grid). `core` later gains
 Skeleton, Badge, Card and a theme toggle. `overlay` later gains
-`TypeToConfirmDialog` (after `forms`), Toast, Popover and Tooltip, and the
+`TypeToConfirmDialog`, Toast, Popover and Tooltip, and the
 phone variants of Dialog (a bottom sheet, full screen) when an app needs them.
 Help later gains a topic registry (checked `related` links, a `/help` guide
 rendered from the same topics) and `help` on new components as they land.
+`forms` later gains Combobox groups, create-new and multi-select, and
+NumberInput, DateInput, Radio and the rest of the inventory when an app needs
+them.
 
 ## Licence
 
