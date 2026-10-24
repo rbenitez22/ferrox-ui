@@ -10,7 +10,12 @@ Status: approved (2026-10-23), all open points as recommended. Piece 1 done
 `/data`. Markup as built: the root is a `<div class="data-view
 data-view--grid-md">` holding the states and the `<ul class="data-view__list">`
 (hidden while there are no items); a `loading_label` and `retry_label` were
-added. Piece 2 (infinite scroll) next.
+added. Piece 2 done (2026-10-24): `on_more`, `has_more`, `loading_more`
+(+ `loading_more_label`); the marker is an `<li role="none">`. A call happens
+only on an observer report, and the marker is re-observed when the item count
+changes, which forces a fresh report: acting on the last known "in sight"
+when a page lands asked for one page too many. Piece 3 (DataLayoutSwitch)
+next.
 
 ## Where it comes from
 

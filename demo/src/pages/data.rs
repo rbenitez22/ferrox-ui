@@ -1,6 +1,9 @@
 //! Data: a DataView of recipes driven by buttons and switches (update,
-//! append, re-order, layouts, loading, error), a tag cloud, and a view whose
-//! empty state is a view.
+//! append, re-order, layouts, loading, error), a tag cloud, a view whose
+//! empty state is a view, and two infinite feeds (in a scroll box, and at
+//! the page's foot, scrolled by the window).
+
+use std::time::Duration;
 
 use ferrox_ui::{Button, ButtonFamily, Card, CardSize, DataLayout, DataView, Switch};
 use leptos::prelude::*;
@@ -39,6 +42,8 @@ pub fn DataPage() -> impl IntoView {
         <Recipes />
         <Tags />
         <Lists />
+        <Feed title="Feed in a box" name="box" page=2 total=20 layout=DataLayout::List boxed=true />
+        <Feed title="Feed" name="page" page=6 total=24 layout=DataLayout::List boxed=false />
     }
 }
 
@@ -149,6 +154,47 @@ fn Lists() -> impl IntoView {
                     <Button on_click=add>"Add a list"</Button>
                 }
             />
+        </Section>
+    }
+}
+
+/// An infinite feed of numbered entries: `page` at a time, `total` in all,
+/// each page arriving 300ms after it is asked for. `boxed` puts it in a
+/// scrolling box. Echoes how often it was asked for more.
+#[component]
+fn Feed(title: &'static str, name: &'static str, page: usize, total: usize, layout: DataLayout, boxed: bool) -> impl IntoView {
+    let entries = RwSignal::new((1..=page).collect::<Vec<usize>>());
+    let loading_more = RwSignal::new(false);
+    let calls = RwSignal::new(0_u32);
+    let has_more = Signal::derive(move || entries.with(Vec::len) < total);
+    let more = move || {
+        calls.update(|n| *n += 1);
+        loading_more.set(true);
+        set_timeout(move || {
+            entries.update(|e| {
+                let from = e.len() + 1;
+                e.extend(from..(from + page).min(total + 1));
+            });
+            loading_more.set(false);
+        }, Duration::from_millis(300));
+    };
+    view! {
+        <Section title=title>
+            <div class=if boxed { "demo-feed-box" } else { "" } data-feed=name>
+                <DataView
+                    items=entries
+                    key_of=|n: &usize| n.to_string()
+                    item=|n: usize| view! { <Card title=format!("Entry {n}") compact=true><p>"One more."</p></Card> }
+                    label=title
+                    layout=layout
+                    on_more=more
+                    has_more=has_more
+                    loading_more=loading_more
+                />
+            </div>
+            <dl class="demo-echo">
+                <dt>"calls"</dt><dd data-echo=format!("{name}-calls")>{move || calls.get().to_string()}</dd>
+            </dl>
         </Section>
     }
 }

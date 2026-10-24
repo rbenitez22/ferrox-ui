@@ -88,6 +88,23 @@
   gap: var(--space-xs);
 }
 
+/* ── The end marker (infinite scroll): a whole row, a spinner while a page
+   is on its way. In a strip it is one more stop at the end. ── */
+
+.data-view__more {
+  display: flex;
+  justify-content: center;
+  min-height: 1px;
+  grid-column: 1 / -1;
+  flex-basis: 100%;
+}
+
+.data-view--row > .data-view__list > .data-view__more {
+  flex: 0 0 auto;
+  align-self: center;
+  min-width: 1px;
+}
+
 /* ── States ── */
 
 .data-view__error .alert__body {

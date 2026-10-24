@@ -36,7 +36,7 @@ call adds nothing.
 | `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
 | `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
 | `layout` | `layout` | `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card` |
-| `data` | `data` | `DataView`, `DataLayout`, `CardSize` (infinite scroll, `DataLayoutSwitch` and `Pagination` under way) |
+| `data` | `data` | `DataView` (with infinite scroll), `DataLayout`, `CardSize` (`DataLayoutSwitch` and `Pagination` under way) |
 | `menus` | `menus`, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)
@@ -1003,8 +1003,8 @@ extra)` returns the class list.
 
 ## data (feature `data`)
 
-*Under way (`plans/data.md`): infinite scroll, `DataLayoutSwitch` and
-`Pagination` come next, then the full section.*
+*Under way (`plans/data.md`): `DataLayoutSwitch` and `Pagination` come
+next, then the full section.*
 
 ### `DataView<T>`
 
@@ -1041,7 +1041,34 @@ view! {
 | `on_retry` | none | adds Retry to the error (`retry_label`, `"Retry"`) |
 | `empty` | `"Nothing here yet."` | shown when there are no items, no error and no loading |
 | `empty_view` | none | a view shown instead of `empty`, e.g. a line and an Add button |
+| `on_more` | none | infinite scroll: called when the end of the list comes within 300px of the viewport and `has_more` |
+| `has_more` | `false` | there are more pages to fetch |
+| `loading_more` | `false` | a page is on its way: a spinner at the end (`loading_more_label`, `"Loading more…"`), and no new calls |
 | `class` | | extra classes on the root |
+
+**Infinite scroll.** With `on_more`, a marker (`<li role="none">`) follows
+the last item, watched by an `IntersectionObserver`. Each sighting asks for
+at most one page, and never while `loading` or `loading_more`. When a page
+lands and the marker is still in sight (a page too short to fill the
+screen), it asks again, until the screen is full or `has_more` is false. It
+works whatever scrolls: the window, or an `overflow: auto` box (there it
+counts once the marker shows in the box; the 300px head start applies to
+the viewport only). The observer is disconnected when the view unmounts.
+The first page is the app's to load; `on_more` only extends a list that has
+items.
+
+```rust
+<DataView
+    items=entries
+    key_of=|e: &Entry| e.id.clone()
+    item=entry_row
+    label="Activity"
+    layout=DataLayout::List
+    on_more=move || load_next_page()
+    has_more=has_more
+    loading_more=loading_more
+/>
+```
 
 The `<For>` is keyed and rendered once: an item whose key stays keeps its DOM
 node and state (a loaded image, typed text) through updates, appends,
@@ -1281,7 +1308,7 @@ These are injected only when the `layout` feature is on.
 
 | Sheet | Classes |
 |---|---|
-| `data-view.css` | `.data-view`, `.data-view--{grid-sm,grid-md,grid-lg,list,row,wrap}`, `.data-view__list` (`[hidden]` while there are no items), `.data-view__item`, `.data-view__error`, `.data-view__empty` |
+| `data-view.css` | `.data-view`, `.data-view--{grid-sm,grid-md,grid-lg,list,row,wrap}`, `.data-view__list` (`[hidden]` while there are no items), `.data-view__item`, `.data-view__more` (the end marker), `.data-view__error`, `.data-view__empty` |
 
 These are injected only when the `data` feature is on.
 

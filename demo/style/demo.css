@@ -263,3 +263,12 @@
     background: var(--surface-1);
     font-size: 0.875rem;
 }
+
+/* ── The /data feed that scrolls inside its own box ── */
+.demo-feed-box {
+    height: 300px;
+    overflow: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    padding: var(--space-sm);
+}
