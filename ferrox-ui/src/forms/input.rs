@@ -3,6 +3,8 @@ use leptos::{component, view, IntoView};
 
 use super::field::{control_classes, offer_value, wiring};
 
+/// An [`Input`]'s `type`: what it holds, which sets the keyboard on a phone
+/// and the browser's own checks.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum InputKind {

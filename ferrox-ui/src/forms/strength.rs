@@ -1,6 +1,7 @@
 //! How strong a password is: its entropy in bits, from its length and the
 //! kinds of character it uses, sorted into four levels.
 
+/// How strong a password is, in four levels, from its entropy.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum StrengthLevel {

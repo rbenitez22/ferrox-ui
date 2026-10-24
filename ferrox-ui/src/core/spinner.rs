@@ -9,6 +9,7 @@ use leptos::{component, view, IntoView};
 // `Button saving=…`.
 // ---------------------------------------------------------------------------
 
+/// Where a [`Spinner`] sits, which sets its size and spacing.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum SpinnerKind {

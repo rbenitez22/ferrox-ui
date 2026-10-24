@@ -12,6 +12,8 @@ use super::IconButton;
 // stop a submit, it is an `Error`.
 // ---------------------------------------------------------------------------
 
+/// How serious an [`Alert`] is: its colour, its icon, and its role (`status`
+/// for info and success, `alert` for warning and error).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum AlertSeverity {

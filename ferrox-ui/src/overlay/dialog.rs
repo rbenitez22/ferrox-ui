@@ -13,6 +13,7 @@ use crate::{Button, ButtonFamily, IconButton, MaybeHelp};
 // DialogSize / DialogAction
 // ---------------------------------------------------------------------------
 
+/// How wide a [`Dialog`] is.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum DialogSize {

@@ -10,6 +10,8 @@ use web_sys::MouseEvent;
 // action rendered quietly, not a family of its own.
 // ---------------------------------------------------------------------------
 
+/// What a [`Button`] does, which sets its look: affirmative, committing,
+/// dismissive or destructive.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum ButtonFamily {
@@ -35,6 +37,7 @@ impl ButtonFamily {
     }
 }
 
+/// A [`Button`]'s size: `Sm`, `Md` (the default), `Lg`.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum ButtonSize {

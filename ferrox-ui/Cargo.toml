@@ -33,3 +33,8 @@ leptos_router = { workspace = true, optional = true }
 wasm-bindgen = { workspace = true }
 js-sys = { workspace = true }
 web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent", "DomTokenList", "Event", "EventTarget", "HtmlDialogElement", "HtmlElement", "KeyboardEvent", "DomRect", "ScrollIntoViewOptions", "ScrollLogicalPosition", "IntersectionObserver", "IntersectionObserverEntry", "IntersectionObserverInit", "FocusEvent", "NodeList", "TouchEvent", "TouchList", "Touch"] }
+
+# tests/docs_current.rs parses the source to check docs/ is current.
+[dev-dependencies]
+quote = "1"
+syn = { version = "2", features = ["full", "extra-traits"] }

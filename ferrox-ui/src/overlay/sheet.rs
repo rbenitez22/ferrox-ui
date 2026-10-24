@@ -13,6 +13,7 @@ use crate::{IconButton, MaybeHelp};
 // SheetSide
 // ---------------------------------------------------------------------------
 
+/// Which edge a [`Sheet`] slides in from.
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 #[non_exhaustive]
 pub enum SheetSide {
