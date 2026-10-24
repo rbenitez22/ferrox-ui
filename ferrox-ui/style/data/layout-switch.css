@@ -1,0 +1,9 @@
+/* The layout switch (`.data-layout-switch`): a group of icon buttons, the
+   current layout's pressed. Part of ferrox-ui `data`. Tokens only and
+   class-only. */
+
+.data-layout-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}

@@ -5,7 +5,7 @@
 
 use std::time::Duration;
 
-use ferrox_ui::{Button, ButtonFamily, Card, CardSize, DataLayout, DataView, Switch};
+use ferrox_ui::{Button, ButtonFamily, Card, CardSize, DataLayout, DataLayoutSwitch, DataView, Switch};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -26,14 +26,14 @@ fn recipes() -> Vec<Recipe> {
     RECIPE_NAMES.iter().enumerate().map(|(i, name)| Recipe { id: i as u32 + 1, name: name.to_string() }).collect()
 }
 
-/// The layouts the demo offers, with their button labels.
-const LAYOUTS: [(&str, DataLayout); 6] = [
-    ("Grid S", DataLayout::Grid(CardSize::Sm)),
-    ("Grid M", DataLayout::Grid(CardSize::Md)),
-    ("Grid L", DataLayout::Grid(CardSize::Lg)),
-    ("List", DataLayout::List),
-    ("Row", DataLayout::Row),
-    ("Wrap", DataLayout::Wrap),
+/// Every layout, for the recipes' switch.
+const LAYOUTS: [DataLayout; 6] = [
+    DataLayout::Grid(CardSize::Sm),
+    DataLayout::Grid(CardSize::Md),
+    DataLayout::Grid(CardSize::Lg),
+    DataLayout::List,
+    DataLayout::Row,
+    DataLayout::Wrap,
 ];
 
 #[component]
@@ -79,10 +79,9 @@ fn Recipes() -> impl IntoView {
 
     view! {
         <Section title="Data view">
-            <div class="demo-row" role="group" aria-label="Layout">
-                {LAYOUTS.into_iter().map(|(name, choice)| view! {
-                    <Button family=ButtonFamily::Secondary on_click=move |_| layout.set(choice)>{name}</Button>
-                }).collect_view()}
+            <div class="demo-row">
+                <DataLayoutSwitch layout=layout choices=LAYOUTS.to_vec() />
+                <Button family=ButtonFamily::Secondary on_click=move |_| layout.set(DataLayout::List)>"Choose List from code"</Button>
             </div>
             <div class="demo-row">
                 <Button family=ButtonFamily::Secondary on_click=update>"Update"</Button>
@@ -160,9 +159,11 @@ fn Lists() -> impl IntoView {
 
 /// An infinite feed of numbered entries: `page` at a time, `total` in all,
 /// each page arriving 300ms after it is asked for. `boxed` puts it in a
-/// scrolling box. Echoes how often it was asked for more.
+/// scrolling box. Echoes how often it was asked for more. Its layout switch
+/// offers the default choices.
 #[component]
 fn Feed(title: &'static str, name: &'static str, page: usize, total: usize, layout: DataLayout, boxed: bool) -> impl IntoView {
+    let layout = RwSignal::new(layout);
     let entries = RwSignal::new((1..=page).collect::<Vec<usize>>());
     let loading_more = RwSignal::new(false);
     let calls = RwSignal::new(0_u32);
@@ -180,6 +181,7 @@ fn Feed(title: &'static str, name: &'static str, page: usize, total: usize, layo
     };
     view! {
         <Section title=title>
+            <DataLayoutSwitch layout=layout />
             <div class=if boxed { "demo-feed-box" } else { "" } data-feed=name>
                 <DataView
                     items=entries

@@ -55,9 +55,9 @@ test.describe('DataView', () => {
 
   test('Grid: as many columns as fit, fewer as the card size grows', async ({ page }) => {
     const counts: number[] = [];
-    for (const [name, min] of [['Grid S', 160], ['Grid M', 224], ['Grid L', 320]] as const) {
+    for (const [name, size, min] of [['Small grid', 'sm', 160], ['Grid', 'md', 224], ['Large grid', 'lg', 320]] as const) {
       await press(page, name);
-      await expect(page.locator('.data-view').first()).toHaveClass(new RegExp(`data-view--grid-${name.at(-1)!.toLowerCase()}`));
+      await expect(page.locator('.data-view').first()).toHaveClass(new RegExp(`data-view--grid-${size}`));
       counts.push(await columns(page));
       for (const b of await boxes(items(page))) expect(b.width).toBeGreaterThanOrEqual(min - 1);
     }
@@ -80,7 +80,7 @@ test.describe('DataView', () => {
   });
 
   test('Row: one strip that scrolls sideways', async ({ page }) => {
-    await press(page, 'Row');
+    await press(page, 'Strip');
     const all = await boxes(items(page));
     for (const b of all) expect(Math.abs(b.y - all[0].y)).toBeLessThan(1);
     const sideways = await recipes(page).evaluate((el) => el.scrollWidth > el.clientWidth && getComputedStyle(el).overflowX === 'auto');
@@ -136,5 +136,43 @@ test.describe('DataView', () => {
     await empty.getByRole('button', { name: 'Add a list' }).click();
     await expect(empty.getByRole('list', { name: 'Shopping lists' }).getByRole('listitem')).toHaveText(['List 1']);
     await expect(empty.getByText('No shopping lists yet.')).toHaveCount(0);
+  });
+});
+
+test.describe('DataLayoutSwitch', () => {
+  const group = (page: Page, title: string) => section(page, title).getByRole('group', { name: 'Layout' });
+
+  test('a labelled group of buttons, the current layout pressed', async ({ page }) => {
+    const buttons = group(page, 'Data view').getByRole('button');
+    await expect(buttons).toHaveCount(6);
+    expect(await buttons.evaluateAll((els) => els.map((el) => el.getAttribute('aria-label')))).toEqual([
+      'Small grid', 'Grid', 'Large grid', 'List', 'Strip', 'Cloud',
+    ]);
+    expect(await buttons.evaluateAll((els) => els.map((el) => el.querySelector('svg')?.getAttribute('data-icon')))).toEqual([
+      'layout-grid', 'layout-grid', 'layout-grid', 'list', 'gallery-horizontal', 'tags',
+    ]);
+    await expect(group(page, 'Data view').locator('[aria-pressed=true]')).toHaveAttribute('aria-label', 'Grid');
+    await expect(group(page, 'Data view').locator('[aria-pressed=false]')).toHaveCount(5);
+  });
+
+  test('choosing one re-lays the view and moves the press', async ({ page }) => {
+    await group(page, 'Data view').getByRole('button', { name: 'Cloud' }).click();
+    await expect(page.locator('.data-view').first()).toHaveClass(/data-view--wrap/);
+    await expect(group(page, 'Data view').getByRole('button', { name: 'Cloud' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(group(page, 'Data view').getByRole('button', { name: 'Grid', exact: true })).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  test('two-way: setting the layout from code moves the press', async ({ page }) => {
+    await press(page, 'Choose List from code');
+    await expect(group(page, 'Data view').getByRole('button', { name: 'List' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(echo(page, 'layout')).toHaveText('List');
+  });
+
+  test('by default it offers Grid and List', async ({ page }) => {
+    const buttons = group(page, 'Feed in a box').getByRole('button');
+    expect(await buttons.evaluateAll((els) => els.map((el) => el.getAttribute('aria-label')))).toEqual(['Grid', 'List']);
+    await expect(buttons.nth(1)).toHaveAttribute('aria-pressed', 'true');
+    await buttons.nth(0).click();
+    await expect(section(page, 'Feed in a box').locator('.data-view')).toHaveClass(/data-view--grid-md/);
   });
 });

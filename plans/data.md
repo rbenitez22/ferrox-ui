@@ -14,8 +14,11 @@ added. Piece 2 done (2026-10-24): `on_more`, `has_more`, `loading_more`
 (+ `loading_more_label`); the marker is an `<li role="none">`. A call happens
 only on an observer report, and the marker is re-observed when the item count
 changes, which forces a fresh report: acting on the last known "in sight"
-when a page lands asked for one page too many. Piece 3 (DataLayoutSwitch)
-next.
+when a page lands asked for one page too many. Piece 3 done (2026-10-24):
+`DataLayoutSwitch`, `DataLayoutLabels` (group "Layout"; "Small grid",
+"Grid", "Large grid", "List", "Strip", "Cloud"), `layout_icon`; icons
+`LAYOUT_GRID`, `LIST`, `GALLERY_HORIZONTAL`, `TAGS`; `layout-switch.css`.
+Piece 4 (Pagination) next.
 
 ## Where it comes from
 

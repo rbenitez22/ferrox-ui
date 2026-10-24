@@ -50,17 +50,18 @@ width="1em" height="1em" aria-hidden="true" focusable="false">`:
 
 | Const | Lucide | | Const | Lucide |
 |---|---|---|---|---|
-| `BAN` | `ban` | | `LOCK` | `lock` |
-| `CAMERA` | `camera` | | `MENU` | `menu` |
-| `CHECK` | `check` | | `PLUS` | `plus` |
-| `CHEVRON_DOWN` | `chevron-down` | | `REFRESH` | `refresh-cw` |
-| `CHEVRON_RIGHT` | `chevron-right` | | `SEARCH` | `search` |
-| `CLOSE` | `x` | | `SUCCESS` | `circle-check` |
-| `DELETE` | `trash` | | `UNLOCK` | `lock-open` |
-| `ERROR` | `circle-alert` | | `WARNING` | `triangle-alert` |
-| `EYE` | `eye` | | `EYE_OFF` | `eye-off` |
-| `HELP` | `circle-question-mark` | | | |
-| `INFO` | `info` | | | |
+| `BAN` | `ban` | | `INFO` | `info` |
+| `CAMERA` | `camera` | | `LAYOUT_GRID` | `layout-grid` |
+| `CHECK` | `check` | | `LIST` | `list` |
+| `CHEVRON_DOWN` | `chevron-down` | | `LOCK` | `lock` |
+| `CHEVRON_RIGHT` | `chevron-right` | | `MENU` | `menu` |
+| `CLOSE` | `x` | | `PLUS` | `plus` |
+| `DELETE` | `trash` | | `REFRESH` | `refresh-cw` |
+| `ERROR` | `circle-alert` | | `SEARCH` | `search` |
+| `EYE` | `eye` | | `SUCCESS` | `circle-check` |
+| `EYE_OFF` | `eye-off` | | `TAGS` | `tags` |
+| `GALLERY_HORIZONTAL` | `gallery-horizontal` | | `UNLOCK` | `lock-open` |
+| `HELP` | `circle-question-mark` | | `WARNING` | `triangle-alert` |
 
 `INFO`, `SUCCESS`, `WARNING` and `ERROR` are the severity marks (ferrox-ui's
 `Alert` draws them).

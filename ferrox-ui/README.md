@@ -36,7 +36,7 @@ call adds nothing.
 | `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
 | `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
 | `layout` | `layout` | `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card` |
-| `data` | `data` | `DataView` (with infinite scroll), `DataLayout`, `CardSize` (`DataLayoutSwitch` and `Pagination` under way) |
+| `data` | `data` | `DataView` (with infinite scroll), `DataLayout`, `CardSize`, `DataLayoutSwitch`, `DataLayoutLabels` (`Pagination` under way) |
 | `menus` | `menus`, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)
@@ -1003,8 +1003,8 @@ extra)` returns the class list.
 
 ## data (feature `data`)
 
-*Under way (`plans/data.md`): `DataLayoutSwitch` and `Pagination` come
-next, then the full section.*
+*Under way (`plans/data.md`): `Pagination` comes next, then the full
+section.*
 
 ### `DataView<T>`
 
@@ -1076,6 +1076,35 @@ re-orders and layout changes, and is not rendered again. To show a record
 that changed, give it a key that changes with it (an id plus a version), or
 have the template read signals. It doesn't fetch, sort or filter.
 `data_view_classes(layout, extra)` returns the class list.
+
+### `DataLayoutSwitch`
+
+Lets the user pick a `DataView`'s layout: a group (`role="group"`, named
+"Layout") of `IconButton`s, one per choice, the current one pressed
+(`aria-pressed`). It sits wherever the app wants, typically a `Panel`'s
+actions.
+
+```rust
+use ferrox_ui::{DataLayout, DataLayoutSwitch, DataView, Panel};
+
+let layout = RwSignal::new(DataLayout::default());
+
+view! {
+    <Panel title="Recipes" actions=move || view! { <DataLayoutSwitch layout=layout /> }>
+        <DataView items=recipes key_of=… item=… label="Recipes" layout=layout />
+    </Panel>
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `layout` | required | `RwSignal<DataLayout>`, two-way: the app owns it, so remembering the choice is the app's |
+| `choices` | `[Grid(Md), List]` | the layouts offered, in order |
+| `labels` | `DataLayoutLabels::default()` | the group's name ("Layout") and each layout's: "Small grid", "Grid", "Large grid", "List", "Strip", "Cloud". Change some with `DataLayoutLabels { list: "Rows".into(), ..Default::default() }` |
+| `class` | | extra classes on the group |
+
+Icons (`layout_icon(layout)`): `LAYOUT_GRID` for every grid size, `LIST`,
+`GALLERY_HORIZONTAL` (Row), `TAGS` (Wrap).
 
 ## Help (in `core`)
 
@@ -1309,6 +1338,7 @@ These are injected only when the `layout` feature is on.
 | Sheet | Classes |
 |---|---|
 | `data-view.css` | `.data-view`, `.data-view--{grid-sm,grid-md,grid-lg,list,row,wrap}`, `.data-view__list` (`[hidden]` while there are no items), `.data-view__item`, `.data-view__more` (the end marker), `.data-view__error`, `.data-view__empty` |
+| `layout-switch.css` | `.data-layout-switch` |
 
 These are injected only when the `data` feature is on.
 
