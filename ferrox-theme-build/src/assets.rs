@@ -3,7 +3,7 @@
 use std::fs;
 use std::path::Path;
 
-use crate::builtin::{FONTS_CSS, FONT_FILES, LOADING_CSS, THEMES, TOKENS_CSS};
+use crate::builtin::{APP_CSS, FONTS_CSS, FONT_FILES, LOADING_CSS, THEMES, TOKENS_CSS};
 use crate::embed::{discover, ThemeSource};
 use crate::VERSION;
 
@@ -76,6 +76,8 @@ pub(crate) fn stylesheet(app_themes: &[ThemeSource]) -> String {
     }
     css.push('\n');
     css.push_str(LOADING_CSS);
+    css.push('\n');
+    css.push_str(APP_CSS);
     css
 }
 
@@ -108,13 +110,14 @@ mod tests {
     }
 
     #[test]
-    fn stylesheet_has_fonts_tokens_every_theme_and_loading_in_order() {
+    fn stylesheet_has_fonts_tokens_every_theme_loading_and_the_app_ground_in_order() {
         let css = stylesheet(&[app_theme("harbor")]);
         let at = |needle: &str| css.find(needle).unwrap_or_else(|| panic!("missing {needle}"));
         assert!(at("@font-face") < at(":root {"));
         assert!(at(":root {") < at(":root[data-theme='jamaica-dark']"));
         assert!(at(":root[data-theme='jamaica-dark']") < at(":root[data-theme='harbor']"));
         assert!(at(":root[data-theme='harbor']") < at(".ferrox-loading {"));
+        assert!(at(".ferrox-loading {") < at(".ferrox-app {"));
     }
 
     #[test]

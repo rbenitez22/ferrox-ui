@@ -1,0 +1,13 @@
+/* ============================================================
+   THE APP'S GROUND — `.ferrox-app`, on <body>
+   The page itself in the theme: its background, text colour and body
+   font. Opt-in, like every ferrox style: put class="ferrox-app" on
+   <body> (or on the app's root element). Width and padding are the
+   layout components' job, not this.
+   ============================================================ */
+.ferrox-app {
+  min-height: 100vh;
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font-body);
+}

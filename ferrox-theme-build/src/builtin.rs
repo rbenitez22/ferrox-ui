@@ -13,6 +13,9 @@ pub(crate) const FONTS_CSS: &str = include_str!("../assets/fonts.css");
 /// The pre-mount loading screen (`.ferrox-loading`).
 pub(crate) const LOADING_CSS: &str = include_str!("../assets/loading.css");
 
+/// `.ferrox-app`: the page's ground (background, text colour, body font).
+pub(crate) const APP_CSS: &str = include_str!("../assets/app.css");
+
 /// Built-in theme files: `(file name, css)`, sorted by name.
 pub(crate) const THEMES: &[(&str, &str)] = &[
     ("classic.css", include_str!("../assets/themes/classic.css")),
