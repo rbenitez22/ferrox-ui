@@ -27,8 +27,8 @@ impl HeadingLevel {
     }
 }
 
-/// A heading of `level` with this class and id, holding `children`.
-pub(crate) fn heading(level: HeadingLevel, class: &'static str, id: String, children: AnyView) -> AnyView {
+/// A heading of `level` with this class (and id, if any), holding `children`.
+pub(crate) fn heading(level: HeadingLevel, class: &'static str, id: Option<String>, children: AnyView) -> AnyView {
     match level {
         HeadingLevel::H1 => view! { <h1 class=class id=id>{children}</h1> }.into_any(),
         HeadingLevel::H2 => view! { <h2 class=class id=id>{children}</h2> }.into_any(),

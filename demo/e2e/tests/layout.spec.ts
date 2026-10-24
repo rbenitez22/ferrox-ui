@@ -135,3 +135,116 @@ test.describe('Panel', () => {
     expect(addBox.height).toBe(44);
   });
 });
+
+test.describe('Panel, collapsible', () => {
+  /** The toggle of the collapsible panel named `title`. */
+  function toggle(page: Page, title: string): Locator {
+    return panel(page, title).locator('.panel__toggle');
+  }
+
+  /** The body a toggle controls (by id, so also while it's hidden). */
+  async function body(page: Page, title: string): Promise<Locator> {
+    const id = await toggle(page, title).getAttribute('aria-controls');
+    if (!id) throw new Error('toggle has no aria-controls');
+    return page.locator(`[id="${id}"]`);
+  }
+
+  test('the toggle is a button inside the heading, and the region is named by the title alone', async ({ page }) => {
+    const notes = panel(page, 'Notes');
+    await expect(notes).toBeVisible();
+    const heading = notes.getByRole('heading', { level: 2 });
+    const button = heading.getByRole('button');
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
+    await expect(button).toHaveClass(/\bpanel__toggle\b/);
+    await expect(notes).toHaveClass(/\bpanel--collapsible\b/);
+  });
+
+  test('starts shut, with no body built until it is first opened', async ({ page }) => {
+    const notesBody = await body(page, 'Notes');
+    await expect(notesBody).toBeHidden();
+    await expect(notesBody.locator('input')).toHaveCount(0);
+    await expect(page.getByText('Notes body built 0 times')).toBeVisible();
+
+    await toggle(page, 'Notes').click();
+    await expect(toggle(page, 'Notes')).toHaveAttribute('aria-expanded', 'true');
+    await expect(notesBody).toBeVisible();
+    await expect(page.getByText('Notes body built 1 times')).toBeVisible();
+  });
+
+  test('shutting hides the body; typed text survives reopening, and the body is built once', async ({ page }) => {
+    await toggle(page, 'Notes').click();
+    const notesBody = await body(page, 'Notes');
+    await notesBody.getByRole('textbox', { name: 'Note' }).fill('milk');
+
+    await toggle(page, 'Notes').click();
+    await expect(notesBody).toBeHidden();
+    await toggle(page, 'Notes').click();
+    await expect(notesBody.getByRole('textbox', { name: 'Note' })).toHaveValue('milk');
+    await expect(page.getByText('Notes body built 1 times')).toBeVisible();
+  });
+
+  test('the summary shows only while shut', async ({ page }) => {
+    const summary = panel(page, 'Notes').locator('.panel__summary');
+    await expect(summary).toHaveText('2 notes');
+    await toggle(page, 'Notes').click();
+    await expect(summary).toHaveCount(0);
+    await toggle(page, 'Notes').click();
+    await expect(summary).toHaveText('2 notes');
+  });
+
+  test('Enter and Space toggle it, and the chevron turns', async ({ page }) => {
+    const button = toggle(page, 'Notes');
+    const chevron = button.locator('svg.panel__chevron');
+    await expect(chevron).toHaveCSS('transform', 'none');
+    await button.focus();
+    await page.keyboard.press('Enter');
+    await expect(button).toHaveAttribute('aria-expanded', 'true');
+    await expect(chevron).not.toHaveCSS('transform', 'none');
+    await page.keyboard.press('Space');
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  test('the actions and the + show only while open, outside the toggle', async ({ page }) => {
+    const notes = panel(page, 'Notes');
+    const add = notes.getByRole('button', { name: 'Add note' });
+    await expect(add).toBeHidden();
+    // The ? stays: help is there to explain a shut panel too.
+    await expect(notes.getByRole('button', { name: 'Help: Items' })).toBeVisible();
+
+    await toggle(page, 'Notes').click();
+    await expect(add).toBeVisible();
+    await expect(toggle(page, 'Notes').getByRole('button')).toHaveCount(0);
+    await add.click();
+    await expect(page.getByText('added 1 times')).toBeVisible();
+    await expect(toggle(page, 'Notes')).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  test('start_expanded starts it open', async ({ page }) => {
+    await expect(toggle(page, 'Opens expanded')).toHaveAttribute('aria-expanded', 'true');
+    await expect(await body(page, 'Opens expanded')).toBeVisible();
+  });
+
+  test('an owned state is two-way', async ({ page }) => {
+    const button = toggle(page, 'Owned by the page');
+    await expect(button).toHaveAttribute('aria-expanded', 'false');
+    await page.getByRole('button', { name: 'Toggle the owned panel' }).click();
+    await expect(button).toHaveAttribute('aria-expanded', 'true');
+    await button.click();
+    await expect(page.getByText('Owned panel: shut')).toBeVisible();
+  });
+
+  test('a shut panel draws one line at its bottom, not two', async ({ page }) => {
+    const header = panel(page, 'Danger zone').locator('.panel__header');
+    expect(await css(header, 'border-bottom-width')).toBe('0px');
+  });
+
+  test('the toggle reaches the band\'s left edge, and is 44px tall on a phone', async ({ page }) => {
+    for (const title of ['Notes', 'Compact collapsible']) {
+      const bandBox = await box(panel(page, title).locator('.panel__header'));
+      const toggleBox = await box(toggle(page, title));
+      expect(toggleBox.x - bandBox.x).toBeLessThan(2);
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect((await box(toggle(page, 'Notes'))).height).toBeGreaterThanOrEqual(44);
+  });
+});

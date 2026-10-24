@@ -7,8 +7,8 @@ actions and its body. It adds a `Card`, the item template for `data`'s
 `CollapsiblePanel` (`ui/src/components/CollapsiblePanel.tsx`,
 `theme/components.css:616-770`).
 
-Status: approved (2026-10-23), all open points as recommended. Piece 1 done
-(2026-10-23); piece 2 (collapsible) next.
+Status: approved (2026-10-23), all open points as recommended. Pieces 1–2
+done (2026-10-23); piece 3 (Card) next.
 
 Notes from piece 1:
 - `HeadingLevel` lives in `layout/heading.rs`, with a crate-private
@@ -22,6 +22,21 @@ Notes from piece 1:
   the signature. `actions` is `Option<ViewFn>`, as `SideMenu`'s `footer`.
 - A help request names a panel as `panel`.
 - Release check: 16 feature combinations, 380 e2e tests.
+
+Notes from piece 2:
+- The collapsible title is `<hN><button class="panel__toggle"
+  aria-expanded aria-controls>` holding the title text, the summary while
+  shut, and the chevron. The section is labelled by the title text's own
+  `<span>`, so the summary never joins the region's name.
+- The body is built once, by a `Memo` that latches true on first opening
+  (`opened_once`) behind a `<Show>`; after that it's only `hidden`.
+- The actions (and the `+`) are `hidden` while shut. The `?` stays, after
+  the toggle: help explains a shut panel too.
+- The line under the band moved to the body's top edge, so a shut panel
+  draws one line at its bottom, not two.
+- The toggle takes the band's left padding, so the target reaches the
+  band's left edge; hovering it tints the whole band (`:has`).
+- Release check: 400 e2e tests.
 
 ## Sources
 

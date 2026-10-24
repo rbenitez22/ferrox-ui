@@ -4,7 +4,7 @@
 use std::sync::LazyLock;
 
 use ferrox_icons::{Icon, SEARCH};
-use ferrox_ui::{HeadingLevel, HelpTopic, IconButton, Panel, PanelTone, Switch};
+use ferrox_ui::{Button, ButtonFamily, ButtonSize, Field, HeadingLevel, HelpTopic, IconButton, Input, Panel, PanelTone, Switch};
 use leptos::prelude::*;
 
 use crate::section::Section;
@@ -19,6 +19,7 @@ pub fn LayoutPage() -> impl IntoView {
         <PagePanel />
         <SectionPanels />
         <Variants />
+        <Collapsible />
     }
 }
 
@@ -90,4 +91,56 @@ fn Variants() -> impl IntoView {
             </div>
         </Section>
     }
+}
+
+/// Collapsible panels: a summary while shut, a body built on first opening
+/// (counted), actions only while open, and the state owned by the page.
+#[component]
+fn Collapsible() -> impl IntoView {
+    let builds = RwSignal::new(0);
+    let note = RwSignal::new(String::new());
+    let added = RwSignal::new(0);
+    let owned = RwSignal::new(false);
+    view! {
+        <Section title="Collapsible">
+            <div class="demo-stack">
+                <p>{move || format!("Notes body built {} times; added {} times", builds.get(), added.get())}</p>
+                <Panel
+                    title="Notes"
+                    collapsible=true
+                    summary="2 notes"
+                    help=ITEMS_HELP.clone()
+                    on_add=move || added.update(|n| *n += 1)
+                    add_label="Add note"
+                >
+                    <CountsBuilds builds=builds />
+                    <Field label="Note"><Input value=note /></Field>
+                </Panel>
+                <Panel title="Danger zone" tone=PanelTone::Danger collapsible=true summary="Delete this book">
+                    <p>"Deleting a book can't be undone."</p>
+                </Panel>
+                <Panel title="Opens expanded" collapsible=true start_expanded=true>
+                    <p>"Open on arrival."</p>
+                </Panel>
+                <Panel title="Compact collapsible" compact=true collapsible=true summary="One line">
+                    <p>"A slimmer band."</p>
+                </Panel>
+                <Panel title="Owned by the page" collapsible=true expanded=owned>
+                    <p>"The page holds this state."</p>
+                </Panel>
+                <div class="demo-row">
+                    <Button family=ButtonFamily::Secondary size=ButtonSize::Sm on_click=move |_| owned.update(|o| *o = !*o)>
+                        "Toggle the owned panel"
+                    </Button>
+                    <span>{move || if owned.get() { "Owned panel: open" } else { "Owned panel: shut" }}</span>
+                </div>
+            </div>
+        </Section>
+    }
+}
+
+/// Counts how many times the body it sits in is built.
+#[component]
+fn CountsBuilds(builds: RwSignal<u32>) -> impl IntoView {
+    builds.update(|n| *n += 1);
 }

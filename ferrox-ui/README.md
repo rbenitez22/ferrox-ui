@@ -35,7 +35,7 @@ call adds nothing.
 | `overlay` | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
 | `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
 | `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
-| `layout` | `layout` | `Panel`, `PanelTone`, `HeadingLevel`; collapsible panels and `Card` coming (`plans/layout.md`; documented with the group's last piece, see the rustdoc meanwhile) |
+| `layout` | `layout` | `Panel` (also collapsible), `PanelTone`, `HeadingLevel`; `Card` coming (`plans/layout.md`; documented with the group's last piece, see the rustdoc meanwhile) |
 | `data`, `menus` | one each, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)
