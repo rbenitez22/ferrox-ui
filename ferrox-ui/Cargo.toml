@@ -19,6 +19,8 @@ forms = []
 # NavList, NavLink, then the side menu (on `Sheet`). The only group that
 # needs leptos_router.
 navigation = ["overlay", "dep:leptos_router"]
+# Panel (and, later, Card): boxes that title and hold content.
+layout = []
 
 [dependencies]
 ferrox-icons = { path = "../ferrox-icons" }

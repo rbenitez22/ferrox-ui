@@ -12,6 +12,7 @@ const ROUTES = [
   { path: '/help', heading: 'Help topics' },
   { path: '/navigation', heading: 'Link list' },
   { path: '/navigation/details', heading: 'Link list' },
+  { path: '/layout', heading: 'Page panel' },
 ];
 
 for (const { path, heading } of ROUTES) {

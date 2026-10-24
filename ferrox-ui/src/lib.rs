@@ -7,8 +7,8 @@
 //! `overlay`: `Dialog`, `ConfirmDialog`, `Sheet`. Feature `forms`: `Field`,
 //! `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`,
 //! `Combobox`. Feature `navigation`: `NavList`, `NavLink`,
-//! `NavGroup`, `SideMenu`, `SideMenuButton`.
-//! Further groups (`menus`, `layout`, `data`) arrive as they
+//! `NavGroup`, `SideMenu`, `SideMenuButton`. Feature `layout`: `Panel`.
+//! Further groups (`data`, `menus`) arrive as they
 //! are built.
 //!
 //! Call [`init`] once at startup, before mounting, to add the components'
@@ -25,6 +25,8 @@ mod css;
 #[cfg(feature = "forms")]
 mod forms;
 mod ids;
+#[cfg(feature = "layout")]
+mod layout;
 #[cfg(feature = "navigation")]
 mod navigation;
 #[cfg(feature = "overlay")]
@@ -33,6 +35,8 @@ mod overlay;
 pub use core::*;
 #[cfg(feature = "forms")]
 pub use forms::*;
+#[cfg(feature = "layout")]
+pub use layout::*;
 #[cfg(feature = "navigation")]
 pub use navigation::*;
 #[cfg(feature = "overlay")]

@@ -32,6 +32,7 @@ pub fn DemoMenu(open: RwSignal<bool>) -> impl IntoView {
                 <NavLink href="/overlay">"Overlay"</NavLink>
                 <NavLink href="/forms">"Forms"</NavLink>
                 <NavLink href="/help">"Help"</NavLink>
+                <NavLink href="/layout">"Layout"</NavLink>
             </NavGroup>
             <NavGroup label="Navigation pages" collapsible=true>
                 <NavLink href="/navigation" exact=true>"Navigation"</NavLink>

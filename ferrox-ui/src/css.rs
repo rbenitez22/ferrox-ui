@@ -48,9 +48,17 @@ const NAVIGATION: &[(&str, &str)] = &[
 #[cfg(not(feature = "navigation"))]
 const NAVIGATION: &[(&str, &str)] = &[];
 
+/// `layout`: the panel.
+#[cfg(feature = "layout")]
+const LAYOUT: &[(&str, &str)] = &[
+    ("ferrox-ui-panel", include_str!("../style/layout/panel.css")),
+];
+#[cfg(not(feature = "layout"))]
+const LAYOUT: &[(&str, &str)] = &[];
+
 /// Every stylesheet of the compiled groups, in injection order.
 pub(crate) fn sheets() -> Vec<(&'static str, &'static str)> {
-    CORE.iter().chain(OVERLAY).chain(FORMS).chain(NAVIGATION).copied().collect()
+    CORE.iter().chain(OVERLAY).chain(FORMS).chain(NAVIGATION).chain(LAYOUT).copied().collect()
 }
 
 /// Adds a `<style id="{id}">` to `<head>`. Does nothing if that id exists, so

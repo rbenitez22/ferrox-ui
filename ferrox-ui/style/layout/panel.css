@@ -1,0 +1,125 @@
+/* Panels (`.panel`): a titled box, its header band holding the title and the
+   actions, then the body. Part of ferrox-ui `layout`. Tokens only and
+   class-only. The look is ported from conrad's `.panel`. */
+
+.panel {
+  background: var(--surface-1);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+/* ── The band: the title on the left, the actions on the right ── */
+
+.panel__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 3rem;
+  box-sizing: border-box;
+  padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-lg);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface-2);
+}
+
+/* The title and its `?`: they take the free space, so the actions sit right. */
+.panel__heading {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* A real heading, styled as the band's title whatever its level: the level
+   is for the outline, not the look. A long title ends in an ellipsis rather
+   than wrapping under the buttons. */
+.panel__title {
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.panel__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex: 0 0 auto;
+}
+
+.panel__body {
+  padding: var(--space-lg);
+}
+
+/* ── Variants ── */
+
+/* One panel among several on a working screen: a slimmer band in body type,
+   a tighter body. */
+.panel--compact .panel__header {
+  min-height: 2.5rem;
+  padding-left: var(--space-md);
+}
+
+.panel--compact .panel__title {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+}
+
+.panel--compact .panel__body {
+  padding: var(--space-sm) var(--space-md);
+}
+
+/* A body that is a table or a grid runs to the panel's edges. */
+.panel--flush .panel__body {
+  padding: 0;
+}
+
+/* Something to act on: the warning colour mixed into the band's own surface,
+   so it never turns translucent. */
+.panel--warning {
+  border-color: var(--warning-line);
+}
+
+.panel--warning .panel__header {
+  background: color-mix(in srgb, var(--warning-base) 14%, var(--surface-2));
+}
+
+/* Something that can't be undone: the same in the danger colour, and the
+   title too, so the word reads as a warning first. */
+.panel--danger {
+  border-color: var(--danger-line);
+}
+
+.panel--danger .panel__header {
+  background: color-mix(in srgb, var(--danger-base) 14%, var(--surface-2));
+}
+
+.panel--danger .panel__title {
+  color: var(--danger-text);
+}
+
+/* Phone: the band's buttons are big enough for a thumb, and the body keeps
+   more of the narrow width. */
+@media (max-width: 768px) {
+  .panel__actions .icon-btn {
+    width: 44px;
+    height: 44px;
+  }
+
+  .panel__header {
+    padding-left: var(--space-md);
+  }
+
+  .panel__body {
+    padding: var(--space-md);
+  }
+}

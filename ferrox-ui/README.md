@@ -35,7 +35,8 @@ call adds nothing.
 | `overlay` | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
 | `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
 | `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
-| `menus`, `layout`, `data` | one each, planned | see `plans/ferrox-ui.md` |
+| `layout` | `layout` | `Panel`, `PanelTone`, `HeadingLevel`; collapsible panels and `Card` coming (`plans/layout.md`; documented with the group's last piece, see the rustdoc meanwhile) |
+| `data`, `menus` | one each, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)
 
@@ -1081,7 +1082,7 @@ class.
 - `cargo test -p ferrox-ui`: class lists, roles, and the class-only rule on
   every sheet.
 - The demo (`demo/`) shows every component: `/buttons`, `/feedback`,
-  `/overlay`, `/forms`, `/navigation` and `/help` (with a fake assistant that shows the
+  `/overlay`, `/forms`, `/navigation`, `/layout` and `/help` (with a fake assistant that shows the
   request it receives). Its Playwright tests (`demo/e2e/tests/*.spec.ts`)
   run in Chromium and Firefox through `scripts/release-check.sh`.
 

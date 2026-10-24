@@ -9,7 +9,7 @@ webapp-lib keeps the app plumbing (http, storage, reactive, auth, app-level
 components such as `Login`) and depends on ferrox-ui; see webapp-lib's
 `plans/crate-split.md` for that side.
 
-Status: pieces 0–5 done; piece 6 under way (core, overlay, help (plan `plans/help.md`), forms (plan `plans/forms.md`) and navigation (plan `plans/navigation.md`) done; next: `layout`, then `data`; then the help follow-ups F1 and help signals (`plans/help.md`), before webapp-lib piece 2). Repo `/programming/ferrox-ui`
+Status: pieces 0–5 done; piece 6 under way (core, overlay, help (plan `plans/help.md`), forms (plan `plans/forms.md`) and navigation (plan `plans/navigation.md`) done; next: `layout`, then `data`, then `menus`; then the help follow-ups F1 and help signals (`plans/help.md`), before webapp-lib piece 2). Repo `/programming/ferrox-ui`
 (`git@github.com:rbenitez22/ferrox-ui.git`, branch `master`).
 
 ## Crates (one workspace, this repo)
@@ -83,7 +83,7 @@ components, one story each, when an app needs them.
 | | Spinner | W C R | now | |
 | | Alert (today `Message`) | W C R | now | |
 | | Skeleton | C R | | conrad has `Skeleton`/`SkeletonSwap` |
-| | Badge, Separator, Kbd, Card, Empty, Status | R | | |
+| | Badge, Separator, Kbd, Empty, Status | R | | Card moved to `layout` (2026-10-23) |
 | | Icon slot | C | now | renders a `ferrox-icons` icon |
 | | Theme toggle | R | | needs `ferrox-theme`'s leptos context |
 | **forms** | Field (label + help + error) | C R | now | conrad `FormField`; fixes id clashes (H12) |
@@ -98,9 +98,9 @@ components, one story each, when an app needs them.
 | | MultiSelect | R | | |
 | | Combobox / Autocomplete | W C R | now | today `AutocompleteInput` (UI half) |
 | | Slider, Input OTP, Input Phone, Chips, Dropzone | R | | |
-| **menus** | Dropdown menu | C R | | conrad `Menu` |
+| **menus** | Dropdown menu (popup menu) | C R | after `data` | conrad `Menu`. Scheduled 2026-10-23: row actions, a user menu, an overflow "More" all need one |
 | | Split button | | | main action + chevron opening related actions (e.g. "Edit ▾"); a menu with a button trigger |
-| | Menu button | | | one button with a chevron; looks like a select, each option is an action |
+| | Menu button | | after `data` | one button with a chevron; looks like a select, each option is an action |
 | | Context menu, Menubar, Command palette | R | | |
 | **overlay** | Dialog | W C R | now | conrad header / body / footer (footer band padding, user request 2026-10-23) |
 | | Alert dialog (confirm) | W C R | now | today `ConfirmDialog`, `DeleteConfirmDialog` (C6) |
@@ -108,14 +108,16 @@ components, one story each, when an app needs them.
 | | Popover, Tooltip, Hover card | R | | |
 | | Toast | C R | | conrad `Toasts` |
 | **navigation** | Side menu + menu link | W | now | today `SideMenu`/`MenuLink` (needs leptos_router) |
-| | Breadcrumb, Pagination, Bottom nav, Stepper / Wizard | C R | | conrad `Wizard` |
+| | Breadcrumb, Bottom nav, Stepper / Wizard | C R | | conrad `Wizard`. Pagination moved to `data` (2026-10-23) |
 | **layout** | Panel (title + control box + body) | W C | now | today `ComponentTitleBar` (as a panel header: `Toolbar` title + buttons); collapsible variant = conrad `CollapsiblePanel` |
-| | Tabs | C R | | conrad `Tabs` |
-| | Accordion / Collapsible | C R | | |
+| | Card | R | now | moved from `core` (2026-10-23): a surface for one thing, optionally a link or a button as a whole; the record template for `DataView` |
+| | Tabs | C R | | conrad `Tabs`; when an app needs it |
+| | Accordion / Collapsible | C R | | a stack of collapsible `Panel`s, optionally one open at a time; when an app needs it |
 | | Card columns | C | | conrad `CardColumns` |
 | | Page frame, Scroll area, Aspect ratio | C R | | conrad `PageFrame` |
 | **data** | Table | R | | |
-| | Data grid | W R | now | today `DataGrid` (keyed rows, Q10) |
+| | DataView (was "Data grid") | W R | now | a record list rendered through one item template (usually a `Card`), laid out as a grid of cards, a list of rows or a column, optionally switchable; loading / empty / error states; keyed rows (Q10). Lineage: PrimeFaces' `DataGrid` / `DataView` → webapp-lib `DataGrid` + `ListComponentView` → rusty-skillet's `DataListView` (empty message, loading, infinite scroll), the user's attempt at improving it. Named `DataView`, since "data grid" usually means a spreadsheet-like table |
+| | Pagination | C R | now | moved from `navigation` (2026-10-23): pages through a `DataView`; no router needed |
 | | Data table (sort, filter, page) | R | | |
 | **media** | Avatar, Image, Carousel, Marquee, Attachment | R | | probably not needed; listed for completeness |
 | **motion** | Animate, Shimmer, Drag and drop | R | | probably not needed |
@@ -204,7 +206,8 @@ webapp-lib's history as the record (fresh first commit here).
    (`Dialog` with conrad's footer band, `Alert dialog`, `Sheet`) → `forms`
    (`Field`, `Input` with password strength, `Checkbox`, `Select`,
    `Combobox`) → `navigation` (side menu) → `layout` (`Panel`, from
-   `ComponentTitleBar`) → `data` (`Data grid`).
+   `ComponentTitleBar`, and `Card`) → `data` (`DataView`, `Pagination`) →
+   `menus` (dropdown menu, menu button; added 2026-10-23).
 7. **Docs.** README per crate (purpose, every public item with an example),
    root README as the map, CHANGELOG. Tag `v0.1.0` when webapp-lib is ready to
    switch.
