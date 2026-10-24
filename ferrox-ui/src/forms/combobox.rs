@@ -8,7 +8,7 @@ use wasm_bindgen::JsCast;
 use web_sys::{Element, HtmlElement, KeyboardEvent, MouseEvent, ScrollIntoViewOptions, ScrollLogicalPosition};
 
 use super::field::{control_classes, offer_value, wiring};
-use crate::core::anchor::{follow, place};
+use crate::core::anchor::{follow, place, Align};
 use crate::ids::unique_id;
 use crate::{Spinner, SpinnerKind};
 
@@ -179,8 +179,8 @@ where
         if shown && !is_open {
             let _ = popup.show_popover();
             let anchor: Element = field.unchecked_into();
-            place(&anchor, &popup, true);
-            follow(anchor, popup, true);
+            place(&anchor, &popup, true, Align::Start);
+            follow(anchor, popup, true, Align::Start);
         } else if !shown && is_open {
             let _ = popup.hide_popover();
         }

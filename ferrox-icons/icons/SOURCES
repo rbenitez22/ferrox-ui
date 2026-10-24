@@ -19,6 +19,7 @@ layout-grid layout-grid
 list list
 lock lock
 menu menu
+more-vertical ellipsis-vertical
 plus plus
 refresh refresh-cw
 search search

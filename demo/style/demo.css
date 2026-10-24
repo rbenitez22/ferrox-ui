@@ -272,3 +272,27 @@
     border-radius: var(--radius-md);
     padding: var(--space-sm);
 }
+
+/* ── /menus ── */
+.demo-avatar {
+    display: inline-grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--primary-tint-strong);
+    color: var(--primary-text);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+/* A record's row with its actions menu at the end. */
+.demo-menu-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 32rem;
+    padding: var(--space-xs) var(--space-sm);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-sm);
+}

@@ -1,0 +1,109 @@
+/* Menus (`.menu`): a trigger and a panel of actions. Part of ferrox-ui
+   `menus`. Tokens only and class-only.
+
+   The panel is a popover in the top layer, placed from script (`left`,
+   `top`, `data-side`) under or over its trigger, so no `overflow` parent
+   clips it. */
+
+.menu {
+  display: inline-flex;
+  flex: none;
+}
+
+/* ── Triggers ── */
+
+.menu__trigger {
+  gap: var(--space-xs);
+}
+
+.menu__chevron {
+  transition: transform var(--transition-fast);
+}
+
+.menu__trigger[aria-expanded='true'] > .menu__chevron {
+  transform: rotate(180deg);
+}
+
+/* The caller's view in a plain button: no look of its own beyond a hover. */
+.menu__trigger--custom {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.menu__trigger--custom:hover {
+  background: var(--surface-2);
+}
+
+.menu__trigger--custom:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* ── The panel ── */
+
+.menu__panel {
+  position: fixed;
+  inset: auto;
+  box-sizing: border-box;
+  margin: 0;
+  min-width: 12rem;
+  max-width: calc(100vw - 16px);
+  padding: var(--space-xs) 0;
+  background: var(--surface-0);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.menu__items {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-xs) var(--space-md);
+  border: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+/* Hover and keyboard focus look alike: the item the next Enter chooses. */
+.menu__item:hover,
+.menu__item:focus-visible,
+.menu__item:focus {
+  background: var(--surface-2);
+  outline: none;
+}
+
+.menu__item:active {
+  background: var(--primary-tint);
+}
+
+.menu__divider {
+  margin: var(--space-xs) 0;
+  border-top: 1px solid var(--line);
+}
+
+/* Phone: 44px targets. */
+@media (max-width: 768px) {
+  .menu__item {
+    min-height: 44px;
+  }
+}

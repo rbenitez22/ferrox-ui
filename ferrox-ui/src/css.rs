@@ -67,9 +67,15 @@ const DATA: &[(&str, &str)] = &[
 #[cfg(not(feature = "data"))]
 const DATA: &[(&str, &str)] = &[];
 
+/// `menus`: the menu.
+#[cfg(feature = "menus")]
+const MENUS: &[(&str, &str)] = &[("ferrox-ui-menu", include_str!("../style/menus/menu.css"))];
+#[cfg(not(feature = "menus"))]
+const MENUS: &[(&str, &str)] = &[];
+
 /// Every stylesheet of the compiled groups, in injection order.
 pub(crate) fn sheets() -> Vec<(&'static str, &'static str)> {
-    CORE.iter().chain(OVERLAY).chain(FORMS).chain(NAVIGATION).chain(LAYOUT).chain(DATA).copied().collect()
+    CORE.iter().chain(OVERLAY).chain(FORMS).chain(NAVIGATION).chain(LAYOUT).chain(DATA).chain(MENUS).copied().collect()
 }
 
 /// Adds a `<style id="{id}">` to `<head>`. Does nothing if that id exists, so

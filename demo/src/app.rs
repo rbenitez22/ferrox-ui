@@ -8,7 +8,7 @@ use leptos_router::components::{Route, Router, Routes, A};
 use leptos_router::path;
 
 use crate::menu::DemoMenu;
-use crate::pages::{buttons::ButtonsPage, data::DataPage, feedback::FeedbackPage, forms::FormsPage, help::HelpPage, icons::IconsPage, layout::LayoutPage, navigation::NavigationPage, overlay::OverlayPage, themes::ThemesPage};
+use crate::pages::{buttons::ButtonsPage, data::DataPage, feedback::FeedbackPage, forms::FormsPage, help::HelpPage, icons::IconsPage, layout::LayoutPage, menus::MenusPage, navigation::NavigationPage, overlay::OverlayPage, themes::ThemesPage};
 use crate::theme_bar::ThemeBar;
 
 #[component]
@@ -32,6 +32,7 @@ pub fn App() -> impl IntoView {
                         <A href="/navigation">"Navigation"</A>
                         <A href="/layout">"Layout"</A>
                         <A href="/data">"Data"</A>
+                        <A href="/menus">"Menus"</A>
                     </nav>
                 </header>
                 <DemoMenu open=menu />
@@ -49,6 +50,7 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("/navigation/details") view=NavigationPage />
                         <Route path=path!("/layout") view=LayoutPage />
                         <Route path=path!("/data") view=DataPage />
+                        <Route path=path!("/menus") view=MenusPage />
                     </Routes>
                 </main>
             </div>

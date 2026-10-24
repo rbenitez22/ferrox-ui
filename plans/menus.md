@@ -8,6 +8,19 @@ menu-button keyboard contract.
 Status: approved (2026-10-24), all open points as recommended, with
 `ContextMenu` added as piece 4 at the user's request.
 
+Notes from piece 1 (done 2026-10-24):
+- The items get the menu's context through a `Provider` inside the lazy
+  `Show`: `provide_context` in the component leaked between sibling menus
+  (focus went back to the wrong trigger).
+- The panel is `popover="auto"` (outside press and the browser's Esc for
+  free) with `popovertarget` on the trigger; Esc is handled on the panel
+  first, so focus goes back and a `Dialog` stays open. Focus leaving the
+  panel (Tab) closes it.
+- The first opening builds the items and focuses one a frame later; later
+  openings focus at once.
+- `core::anchor` gained `Align::{Start, End}`.
+- e2e: 26 menu tests; full suite 512.
+
 ## Where it comes from
 
 - **conrad's `Menu`** (`ui/src/components/Menu.tsx`, 166 lines;

@@ -5,7 +5,7 @@ use leptos::{component, view, IntoView};
 use wasm_bindgen::JsCast;
 use web_sys::{Element, Event, HtmlElement};
 
-use super::anchor::{follow, place};
+use super::anchor::{follow, place, Align};
 use super::help_request::HelpRequest;
 use super::help_scope::{assistant, scope_context};
 use super::help_topic::{HelpBlock, HelpTopic, MaybeHelp};
@@ -82,9 +82,9 @@ pub fn HelpButton(
         if is_open {
             let anchor: Element = button.unchecked_into();
             let floating: HtmlElement = popover.clone().unchecked_into();
-            place(&anchor, &floating, false);
+            place(&anchor, &floating, false, Align::Start);
             let _ = popover.focus();
-            follow(anchor, floating, false);
+            follow(anchor, floating, false, Align::Start);
         }
     };
 

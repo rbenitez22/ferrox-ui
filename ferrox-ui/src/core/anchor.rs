@@ -1,7 +1,8 @@
 //! Places a floating element (a top-layer popover, `position: fixed`) next
 //! to the element it belongs to: below it when there is room, above when
 //! there is not, always inside the viewport, and following it while the page
-//! scrolls or resizes. The help popover uses it, and the Combobox list.
+//! scrolls or resizes. The help popover uses it, the Combobox list and the
+//! menus' panels.
 
 use leptos::prelude::request_animation_frame;
 use web_sys::{Element, HtmlElement};
@@ -27,10 +28,21 @@ pub(crate) enum Side {
     Above,
 }
 
+/// Which edge of the anchor the floating element lines up with.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub(crate) enum Align {
+    /// Their left edges.
+    #[default]
+    Start,
+    /// Their right edges: a menu hanging from a button at a row's end.
+    #[cfg_attr(not(feature = "menus"), allow(dead_code))]
+    End,
+}
+
 /// Where a floating box of `size` goes for `anchor` in a `viewport`:
 /// below if it fits, else above if it fits, else the side with more room;
-/// start-aligned with the anchor, then nudged inside the viewport.
-pub(crate) fn position(anchor: Rect, width: f64, height: f64, viewport_width: f64, viewport_height: f64) -> (f64, f64, Side) {
+/// aligned with the anchor's start or end, then nudged inside the viewport.
+pub(crate) fn position(anchor: Rect, width: f64, height: f64, viewport_width: f64, viewport_height: f64, align: Align) -> (f64, f64, Side) {
     let below = anchor.top + anchor.height + GAP;
     let above = anchor.top - GAP - height;
     let fits_below = below + height <= viewport_height - MARGIN;
@@ -42,14 +54,18 @@ pub(crate) fn position(anchor: Rect, width: f64, height: f64, viewport_width: f6
         Side::Below => below,
         Side::Above => above.max(MARGIN),
     };
-    let left = anchor.left.min(viewport_width - MARGIN - width).max(MARGIN);
+    let left = match align {
+        Align::Start => anchor.left,
+        Align::End => anchor.left + anchor.width - width,
+    };
+    let left = left.min(viewport_width - MARGIN - width).max(MARGIN);
     (left, top, side)
 }
 
 /// Places `floating` next to `anchor` now, and records the side it took in
 /// `data-side` (`below` / `above`) for CSS and tests. With `match_width` it
 /// also takes the anchor's width (a combobox's list under its field).
-pub(crate) fn place(anchor: &Element, floating: &HtmlElement, match_width: bool) {
+pub(crate) fn place(anchor: &Element, floating: &HtmlElement, match_width: bool, align: Align) {
     let Some(window) = web_sys::window() else { return };
     let viewport_width = window.inner_width().ok().and_then(|w| w.as_f64()).unwrap_or(0.0);
     let viewport_height = window.inner_height().ok().and_then(|h| h.as_f64()).unwrap_or(0.0);
@@ -59,7 +75,7 @@ pub(crate) fn place(anchor: &Element, floating: &HtmlElement, match_width: bool)
     }
     let f = floating.get_bounding_client_rect();
     let anchor = Rect { left: a.left(), top: a.top(), width: a.width(), height: a.height() };
-    let (left, top, side) = position(anchor, f.width(), f.height(), viewport_width, viewport_height);
+    let (left, top, side) = position(anchor, f.width(), f.height(), viewport_width, viewport_height, align);
     let style = floating.style();
     let _ = style.set_property("left", &format!("{left}px"));
     let _ = style.set_property("top", &format!("{top}px"));
@@ -70,12 +86,12 @@ pub(crate) fn place(anchor: &Element, floating: &HtmlElement, match_width: bool)
 /// it is an open popover. Per frame rather than on scroll events, so it
 /// follows every way the anchor can move: page scroll, a scrolling parent,
 /// a resize, the layout shifting.
-pub(crate) fn follow(anchor: Element, floating: HtmlElement, match_width: bool) {
+pub(crate) fn follow(anchor: Element, floating: HtmlElement, match_width: bool, align: Align) {
     if !floating.matches(":popover-open").unwrap_or(false) {
         return;
     }
-    place(&anchor, &floating, match_width);
-    request_animation_frame(move || follow(anchor, floating, match_width));
+    place(&anchor, &floating, match_width, align);
+    request_animation_frame(move || follow(anchor, floating, match_width, align));
 }
 
 #[cfg(test)]
@@ -90,29 +106,37 @@ mod tests {
 
     #[test]
     fn below_and_start_aligned_when_it_fits() {
-        assert_eq!(position(at(100.0, 100.0), 300.0, 200.0, VIEWPORT.0, VIEWPORT.1), (100.0, 124.0, Side::Below));
+        assert_eq!(position(at(100.0, 100.0), 300.0, 200.0, VIEWPORT.0, VIEWPORT.1, Align::Start), (100.0, 124.0, Side::Below));
     }
 
     #[test]
     fn above_when_there_is_no_room_below() {
-        assert_eq!(position(at(100.0, 700.0), 300.0, 200.0, VIEWPORT.0, VIEWPORT.1), (100.0, 496.0, Side::Above));
+        assert_eq!(position(at(100.0, 700.0), 300.0, 200.0, VIEWPORT.0, VIEWPORT.1, Align::Start), (100.0, 496.0, Side::Above));
     }
 
     #[test]
     fn the_roomier_side_when_it_fits_neither() {
-        let (_, top, side) = position(at(100.0, 300.0), 300.0, 700.0, VIEWPORT.0, VIEWPORT.1);
+        let (_, top, side) = position(at(100.0, 300.0), 300.0, 700.0, VIEWPORT.0, VIEWPORT.1, Align::Start);
         assert_eq!(side, Side::Below);
         assert_eq!(top, 324.0);
-        let (_, top, side) = position(at(100.0, 500.0), 300.0, 700.0, VIEWPORT.0, VIEWPORT.1);
+        let (_, top, side) = position(at(100.0, 500.0), 300.0, 700.0, VIEWPORT.0, VIEWPORT.1, Align::Start);
         assert_eq!(side, Side::Above);
         assert_eq!(top, MARGIN);
     }
 
     #[test]
+    fn end_aligned_lines_up_the_right_edges() {
+        let (left, _, _) = position(at(400.0, 100.0), 300.0, 200.0, VIEWPORT.0, VIEWPORT.1, Align::End);
+        assert_eq!(left, 400.0 + 20.0 - 300.0);
+        let (left, _, _) = position(at(100.0, 100.0), 300.0, 200.0, VIEWPORT.0, VIEWPORT.1, Align::End);
+        assert_eq!(left, MARGIN);
+    }
+
+    #[test]
     fn kept_inside_the_viewport_at_the_edges() {
-        let (left, _, _) = position(at(950.0, 100.0), 300.0, 200.0, VIEWPORT.0, VIEWPORT.1);
+        let (left, _, _) = position(at(950.0, 100.0), 300.0, 200.0, VIEWPORT.0, VIEWPORT.1, Align::Start);
         assert_eq!(left, 1000.0 - MARGIN - 300.0);
-        let (left, _, _) = position(at(-50.0, 100.0), 300.0, 200.0, VIEWPORT.0, VIEWPORT.1);
+        let (left, _, _) = position(at(-50.0, 100.0), 300.0, 200.0, VIEWPORT.0, VIEWPORT.1, Align::Start);
         assert_eq!(left, MARGIN);
     }
 }

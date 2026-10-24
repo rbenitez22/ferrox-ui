@@ -9,8 +9,8 @@
 //! `Combobox`. Feature `navigation`: `NavList`, `NavLink`,
 //! `NavGroup`, `SideMenu`, `SideMenuButton`. Feature `layout`: `Panel` (also collapsible),
 //! `Card`. Feature `data`: `DataView`,
-//! `DataLayoutSwitch`, `Pagination`.
-//! Further groups (`menus`) arrive as they are built.
+//! `DataLayoutSwitch`, `Pagination`. Feature `menus`: `Menu`, `MenuItem`,
+//! `MenuDivider`.
 //!
 //! Call [`init`] once at startup, before mounting, to add the components'
 //! CSS. The theme itself (tokens, themes, fonts) comes from ferrox-theme.
@@ -30,6 +30,8 @@ mod forms;
 mod ids;
 #[cfg(feature = "layout")]
 mod layout;
+#[cfg(feature = "menus")]
+mod menus;
 #[cfg(feature = "navigation")]
 mod navigation;
 #[cfg(feature = "overlay")]
@@ -42,6 +44,8 @@ pub use data::*;
 pub use forms::*;
 #[cfg(feature = "layout")]
 pub use layout::*;
+#[cfg(feature = "menus")]
+pub use menus::*;
 #[cfg(feature = "navigation")]
 pub use navigation::*;
 #[cfg(feature = "overlay")]

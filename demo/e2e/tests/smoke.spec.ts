@@ -14,6 +14,7 @@ const ROUTES = [
   { path: '/navigation/details', heading: 'Link list' },
   { path: '/layout', heading: 'Page panel' },
   { path: '/data', heading: 'Data view' },
+  { path: '/menus', heading: 'Menu' },
 ];
 
 for (const { path, heading } of ROUTES) {

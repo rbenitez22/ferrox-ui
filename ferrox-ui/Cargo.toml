@@ -23,6 +23,8 @@ navigation = ["overlay", "dep:leptos_router"]
 layout = []
 # DataView: record lists in a grid, a list, a strip or wrapping chips.
 data = []
+# Menu: actions behind a trigger.
+menus = []
 
 [dependencies]
 ferrox-icons = { path = "../ferrox-icons" }
@@ -30,4 +32,4 @@ leptos  = { workspace = true }
 leptos_router = { workspace = true, optional = true }
 wasm-bindgen = { workspace = true }
 js-sys = { workspace = true }
-web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent", "DomTokenList", "Event", "EventTarget", "HtmlDialogElement", "HtmlElement", "KeyboardEvent", "DomRect", "ScrollIntoViewOptions", "ScrollLogicalPosition", "IntersectionObserver", "IntersectionObserverEntry", "IntersectionObserverInit"] }
+web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent", "DomTokenList", "Event", "EventTarget", "HtmlDialogElement", "HtmlElement", "KeyboardEvent", "DomRect", "ScrollIntoViewOptions", "ScrollLogicalPosition", "IntersectionObserver", "IntersectionObserverEntry", "IntersectionObserverInit", "FocusEvent", "NodeList"] }

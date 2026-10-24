@@ -37,7 +37,7 @@ call adds nothing.
 | `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
 | `layout` | `layout` | `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card` |
 | `data` | `data` | `DataView` (with infinite scroll), `DataLayout`, `CardSize`, `DataLayoutSwitch`, `DataLayoutLabels`, `Pagination`, `PaginationLabels`, `page_window`, `PageItem` |
-| `menus` | `menus`, planned | see `plans/ferrox-ui.md` |
+| `menus` | `menus` | `Menu`, `MenuTrigger`, `MenuAlign`, `MenuItem`, `MenuDivider` (item variants, `SplitButton` and `ContextMenu` under way) |
 
 ### Conventions (every component)
 
@@ -1194,6 +1194,55 @@ view! {
   call per list: pages where users return to a place (admin, results),
   infinite scroll for feeds.
 
+## menus (feature `menus`)
+
+*Under way (`plans/menus.md`): item variants, `SplitButton`, `ContextMenu`,
+then the full section.*
+
+### `Menu`
+
+A list of actions behind a trigger, as ARIA's menu button has it.
+
+```rust
+use ferrox_icons::MORE_VERTICAL;
+use ferrox_ui::{Menu, MenuDivider, MenuItem, MenuTrigger};
+
+view! {
+    <Menu label="Recipe actions" trigger=MenuTrigger::icon(MORE_VERTICAL, "More actions")>
+        <MenuItem on_select=move || edit()>"Edit"</MenuItem>
+        <MenuItem on_select=move || duplicate()>"Duplicate"</MenuItem>
+        <MenuDivider />
+        <MenuItem on_select=move || ask_delete()>"Delete"</MenuItem>
+    </Menu>
+}
+```
+
+| Prop | Default | |
+|---|---|---|
+| `label` | required | the menu's accessible name |
+| `trigger` | required | `MenuTrigger::button("Export")` (a secondary `.btn` with a chevron; `MenuTrigger::Button { text, family }` for another family), `MenuTrigger::icon(icon, label)` (an icon button named by `label`), `MenuTrigger::custom(view, label)` (the caller's view in a plain button) |
+| `align` | `MenuAlign::End` | which edge of the trigger the panel lines up with: `End` for a menu at a row's end, `Start` for one read from its button |
+| `disabled` | `false` | the trigger is disabled |
+| `class` | | extra classes on the `.menu` wrapper |
+| children | | `MenuItem`s and `MenuDivider`s |
+
+- **Opening:** a click, Enter or Space on the trigger opens it with the first
+  item focused; ↓ opens on the first item, ↑ on the last.
+- **In the menu:** ↑ / ↓ move, wrapping; Home / End; a letter moves to the
+  next item starting with it; Enter or Space chooses.
+- **Closing:** choosing (the menu closes, focus returns to the trigger, then
+  the action runs, so a dialog it opens takes focus from there), Esc (focus
+  back to the trigger; an enclosing `Dialog` stays open), Tab (focus moves
+  on), a press outside.
+- **The panel** is a popover in the top layer: below the trigger, above
+  when there's no room, lined up by `align`, kept inside the viewport,
+  following the trigger while open. No `overflow` parent clips it. Items
+  are built on first opening, then kept, so a long list of row menus costs
+  little. On a phone, items are 44px tall.
+
+`MenuItem` (`on_select`, children) is a `<button role="menuitem">`;
+`MenuDivider` a `role="separator"` line.
+
 ## Help (in `core`)
 
 Any component with a label or a title can carry help. Give it a topic and a
@@ -1431,6 +1480,14 @@ These are injected only when the `layout` feature is on.
 
 These are injected only when the `data` feature is on.
 
+## CSS classes (menus)
+
+| Sheet | Classes |
+|---|---|
+| `menu.css` | `.menu` (the wrapper), `.menu__trigger` (`[aria-expanded='true']`), `.menu__chevron`, `.menu__trigger--custom`, `.menu__panel` (the popover; `data-side`), `.menu__items` (`role="menu"`), `.menu__item`, `.menu__divider` |
+
+These are injected only when the `menus` feature is on.
+
 A unit test (`css.rs`) fails if any shipped selector doesn't start with a
 class.
 
@@ -1456,14 +1513,14 @@ class.
 - `cargo test -p ferrox-ui`: class lists, roles, and the class-only rule on
   every sheet.
 - The demo (`demo/`) shows every component: `/buttons`, `/feedback`,
-  `/overlay`, `/forms`, `/navigation`, `/layout`, `/data` and `/help` (with a fake assistant that shows the
+  `/overlay`, `/forms`, `/navigation`, `/layout`, `/data`, `/menus` and `/help` (with a fake assistant that shows the
   request it receives). Its Playwright tests (`demo/e2e/tests/*.spec.ts`)
   run in Chromium and Firefox through `scripts/release-check.sh`.
 
 ## Planned
 
 From `plans/ferrox-ui.md`, one group per piece, each with a demo page and e2e
-tests: `menus` (dropdown menu, menu button) next. `core` later gains
+tests: `menus` (under way). `core` later gains
 Skeleton, Badge and a theme toggle. `overlay` later gains
 `TypeToConfirmDialog`, Toast, Popover and Tooltip, and the
 phone variants of Dialog (a bottom sheet, full screen) when an app needs them.
