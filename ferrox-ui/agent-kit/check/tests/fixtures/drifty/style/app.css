@@ -1,0 +1,19 @@
+/* A fixture for ferrox-check. */
+:root {
+  --brand: #3366ff;
+  --gutter: 12px;
+}
+
+.box {
+  color: #333;
+  background: rgb(10, 20, 30);
+  padding: 12px;
+  border: 1px solid var(--line);
+  margin: var(--space-md);
+}
+
+@media (max-width: 768px) {
+  .box {
+    padding: 0.5px;
+  }
+}

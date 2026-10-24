@@ -1,0 +1,16 @@
+/* A fixture for ferrox-check: tokens only. */
+:root {
+  --brand: #3366ff;
+}
+
+.note {
+  color: var(--text-muted);
+  margin-top: var(--space-sm);
+  border-top: 1px solid var(--line);
+}
+
+@media (max-width: 768px) {
+  .note {
+    margin-top: var(--space-xs);
+  }
+}

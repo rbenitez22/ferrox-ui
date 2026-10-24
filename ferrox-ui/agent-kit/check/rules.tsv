@@ -1,0 +1,16 @@
+# ferrox-check rules: one per line, tab-separated, read by ferrox-check.sh and ferrox-check.ps1 (see ferrox-check.spec.md).
+# id	kind	files	pattern	except	rule	fix
+raw-button	forbid	*.rs	<button([ >/]|$)		a hand-made <button>	use Button, or IconButton for an icon
+raw-input	forbid	*.rs	<input([ >/]|$)		a hand-made <input>	use Input (in a Field), Checkbox or Switch
+raw-select	forbid	*.rs	<select([ >/]|$)		a hand-made <select>	use Select (in a Field), or Combobox for a long list
+raw-textarea	forbid	*.rs	<textarea([ >/]|$)		a hand-made <textarea>	use Textarea (in a Field)
+raw-dialog	forbid	*.rs	<dialog([ >/]|$)		a hand-made <dialog>	use Dialog, ConfirmDialog or Sheet
+raw-menu	forbid	*.rs	role="menu"		a hand-made menu	use Menu, SplitButton or ContextMenu
+inline-style	forbid	*.rs	(^|[ ])style=[^ ]		an inline style	use a component prop, a layout component (Stack, Cluster, PageGrid) or a class on the tokens
+css-hex-colour	forbid	*.css	:[^;{]*#[0-9a-fA-F]{3,8}([^0-9a-zA-Z_-]|$)	^[ ]*--	a colour written out in CSS (outside a --token definition)	use a theme token: var(--text), var(--primary-fill), ...
+css-colour-function	forbid	*.css	:[^;{]*(rgb|rgba|hsl|hsla)\(	^[ ]*--	a colour written out in CSS (outside a --token definition)	use a theme token: var(--text), var(--primary-fill), ...
+css-pixels	forbid	*.css	:[^;{]*[^0-9.]([2-9]|[1-9][0-9]+)px	^[ ]*(@|--)	a size in pixels in CSS (outside @media and --token definitions)	use a spacing token (var(--space-sm), ...), or a layout component
+missing-ui-init	require	*.rs	ferrox_ui::init\(\)		ferrox_ui::init() is never called	call it in main(), after ferrox_theme::init() and before mounting
+missing-theme-init	require	*.rs	ferrox_theme::init\(\)		ferrox_theme::init() is never called	call it in main(), before ferrox_ui::init() and mounting
+missing-app-ground	require	*.html	class="ferrox-app"		<body> lacks class="ferrox-app"	write <body class="ferrox-app"> in index.html
+missing-prepaint	require	*.html	prepaint\.js		index.html does not inline the pre-paint script	add <link data-trunk rel="inline" href="style/ferrox/prepaint.js" /> first in <head>

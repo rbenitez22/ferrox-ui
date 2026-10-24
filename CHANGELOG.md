@@ -47,6 +47,11 @@ From the names audit in `plans/agent-first.md` (piece 3).
 - `.ferrox-app` styles plain links (an `<a>` with no class) in the theme's
   link colour.
 - Recipes: whole screens in `demo/src/recipes`, listed in `docs/recipes.md`.
+- The drift check (`ferrox-ui/agent-kit/check/`): `ferrox-check` lists
+  where an app drifts from ferrox-ui, with the fix; `ferrox-docs` prints
+  the docs of the ferrox-ui an app builds against. Each in bash and
+  PowerShell 7, with a spec (`*.spec.md`) to port it anywhere else; the
+  rules are data (`rules.tsv`).
 - `layout`: `PageGrid` (the page: a width cap, padding, `<main>` and an
   optional side column that moves under it on a phone), `Stack` and
   `Cluster` (a column, or a wrapping row, with a token gap), and `Gap`,

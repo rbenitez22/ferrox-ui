@@ -62,7 +62,10 @@ call adds nothing.
 - `cargo test -p ferrox-ui --all-features`: class lists, roles, the
   class-only rule on every sheet, and that `docs/` is current
   (`tests/docs_current.rs`: the index matches the source;
-  `FERROX_BLESS=1` rewrites it).
+  `FERROX_BLESS=1` rewrites it), and the agent kit's scripts
+  (`tests/agent_kit.rs`: the bash and PowerShell versions give the same,
+  specified output on the same fixtures; the PowerShell half needs
+  `pwsh`).
 - The demo (`demo/`) shows every component: `/buttons`, `/feedback`,
   `/overlay`, `/forms`, `/navigation`, `/layout`, `/data`, `/menus` and `/help` (with a fake assistant that shows the
   request it receives). Its Playwright tests (`demo/e2e/tests/*.spec.ts`)

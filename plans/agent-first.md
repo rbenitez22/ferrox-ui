@@ -532,6 +532,25 @@ a CHANGELOG started with the renames.
   deletes through `remove_all`.
 - The starter stays the smallest app (one list page, no shell).
 
+## Notes from piece 7 (drift check, 2026-10-24)
+
+- `ferrox-ui/agent-kit/check/`: `rules.tsv` (14 rules: `forbid` raw
+  controls, inline styles, colours and pixel sizes written out in CSS;
+  `require` the two `init()` calls, `.ferrox-app`, the pre-paint script),
+  `ferrox-check.{sh,ps1,spec.md}`, `ferrox-docs.{sh,ps1,spec.md}`, and
+  fixtures. `tests/agent_kit.rs` runs both implementations against them
+  and requires the expected output, byte for byte.
+- Found while building: bash's `read` merges the tabs around an empty
+  field, which shifted every rule with an empty `except` (the starter
+  "passed" for that reason); fields now split on a unit separator. The
+  inline-style pattern needed `style=[^ ]` (text mentioning "style= "
+  isn't an attribute). Colour and pixel rules let `--token` definitions
+  (theme files) and `@media` lines through. `require` rules apply only at
+  an app's root (a `Cargo.toml`).
+- Targets that must pass: the starter and the recipes. The demo (a
+  showcase) trips 19 real findings (raw controls on purpose, its own
+  layout CSS); it isn't held to the check.
+
 ## Pieces
 
 Each is small and reviewed on its own.
