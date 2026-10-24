@@ -10,6 +10,8 @@ const ROUTES = [
   { path: '/overlay', heading: 'Dialogs' },
   { path: '/forms', heading: 'Fields' },
   { path: '/help', heading: 'Help topics' },
+  { path: '/navigation', heading: 'Link list' },
+  { path: '/navigation/details', heading: 'Link list' },
 ];
 
 for (const { path, heading } of ROUTES) {

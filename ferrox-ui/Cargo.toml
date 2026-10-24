@@ -16,9 +16,13 @@ default = []
 overlay = []
 # Field and the form controls.
 forms = []
+# NavList, NavLink, then the side menu (on `Sheet`). The only group that
+# needs leptos_router.
+navigation = ["overlay", "dep:leptos_router"]
 
 [dependencies]
 ferrox-icons = { path = "../ferrox-icons" }
 leptos  = { workspace = true }
+leptos_router = { workspace = true, optional = true }
 wasm-bindgen = { workspace = true }
 web-sys = { workspace = true, features = ["Window", "Document", "Element", "HtmlHeadElement", "Node", "MouseEvent", "DomTokenList", "Event", "EventTarget", "HtmlDialogElement", "HtmlElement", "KeyboardEvent", "DomRect", "ScrollIntoViewOptions", "ScrollLogicalPosition"] }

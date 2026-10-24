@@ -42,6 +42,11 @@
     text-decoration: underline;
 }
 
+/* A narrow column, so a link list reads as a menu would. */
+.demo-nav-column {
+    max-width: 16rem;
+}
+
 /* ── Theme bar ── */
 .demo-theme-bar {
     display: flex;

@@ -5,7 +5,7 @@ use leptos::prelude::*;
 use leptos_router::components::{Route, Router, Routes, A};
 use leptos_router::path;
 
-use crate::pages::{buttons::ButtonsPage, feedback::FeedbackPage, forms::FormsPage, help::HelpPage, icons::IconsPage, overlay::OverlayPage, themes::ThemesPage};
+use crate::pages::{buttons::ButtonsPage, feedback::FeedbackPage, forms::FormsPage, help::HelpPage, icons::IconsPage, navigation::NavigationPage, overlay::OverlayPage, themes::ThemesPage};
 use crate::theme_bar::ThemeBar;
 
 #[component]
@@ -24,6 +24,7 @@ pub fn App() -> impl IntoView {
                         <A href="/overlay">"Overlay"</A>
                         <A href="/forms">"Forms"</A>
                         <A href="/help">"Help"</A>
+                        <A href="/navigation">"Navigation"</A>
                     </nav>
                 </header>
                 <ThemeBar />
@@ -36,6 +37,8 @@ pub fn App() -> impl IntoView {
                         <Route path=path!("/overlay") view=OverlayPage />
                         <Route path=path!("/forms") view=FormsPage />
                         <Route path=path!("/help") view=HelpPage />
+                        <Route path=path!("/navigation") view=NavigationPage />
+                        <Route path=path!("/navigation/details") view=NavigationPage />
                     </Routes>
                 </main>
             </div>

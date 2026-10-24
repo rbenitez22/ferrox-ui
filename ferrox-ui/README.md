@@ -34,7 +34,8 @@ call adds nothing.
 | `core` | always on | `Button`, `IconButton`, `Toolbar`, `ToolbarGroup`, `Spinner`, `LoadingOverlay`, `Alert`; help: `HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`, `HelpRequest` |
 | `overlay` | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
 | `forms` | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
-| `menus`, `navigation`, `layout`, `data` | one each, planned | see `plans/ferrox-ui.md` |
+| `navigation` | `navigation` (turns on `overlay`; brings leptos_router) | `NavList`, `NavLink`; `NavGroup` and `SideMenu` coming (`plans/navigation.md`; documented with the group's last piece, see the rustdoc meanwhile) |
+| `menus`, `layout`, `data` | one each, planned | see `plans/ferrox-ui.md` |
 
 ### Conventions (every component)
 
@@ -891,7 +892,7 @@ class.
 - `cargo test -p ferrox-ui`: class lists, roles, and the class-only rule on
   every sheet.
 - The demo (`demo/`) shows every component: `/buttons`, `/feedback`,
-  `/overlay`, `/forms` and `/help` (with a fake assistant that shows the
+  `/overlay`, `/forms`, `/navigation` and `/help` (with a fake assistant that shows the
   request it receives). Its Playwright tests (`demo/e2e/tests/*.spec.ts`)
   run in Chromium and Firefox through `scripts/release-check.sh`.
 

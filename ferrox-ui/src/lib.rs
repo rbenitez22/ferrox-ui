@@ -6,8 +6,8 @@
 //! [`LoadingOverlay`], [`Alert`], [`HelpButton`] / [`HelpTopic`]. Feature
 //! `overlay`: `Dialog`, `ConfirmDialog`, `Sheet`. Feature `forms`: `Field`,
 //! `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`,
-//! `Combobox`.
-//! Further groups (`menus`, `navigation`, `layout`, `data`) arrive as they
+//! `Combobox`. Feature `navigation`: `NavList`, `NavLink`.
+//! Further groups (`menus`, `layout`, `data`) arrive as they
 //! are built.
 //!
 //! Call [`init`] once at startup, before mounting, to add the components'
@@ -24,12 +24,16 @@ mod css;
 #[cfg(feature = "forms")]
 mod forms;
 mod ids;
+#[cfg(feature = "navigation")]
+mod navigation;
 #[cfg(feature = "overlay")]
 mod overlay;
 
 pub use core::*;
 #[cfg(feature = "forms")]
 pub use forms::*;
+#[cfg(feature = "navigation")]
+pub use navigation::*;
 #[cfg(feature = "overlay")]
 pub use overlay::*;
 

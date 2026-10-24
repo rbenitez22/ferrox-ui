@@ -1,0 +1,74 @@
+/* Link lists (`.nav-list`, `.nav-link`): places to go, the current one
+   marked. Part of ferrox-ui `navigation`. Tokens only and class-only. The
+   link look is ported from conrad's sidebar items. */
+
+/* ── The list: a column of full-width rows ── */
+
+.nav-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ── A link: the icon, then the words ── */
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  box-sizing: border-box;
+  width: 100%;
+  padding: 0.6em 1em;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  text-decoration: none;
+  transition:
+    color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+/* The mark leads the row, a little larger than the words. */
+.nav-link__icon {
+  flex: 0 0 auto;
+  font-size: 1.15em;
+}
+
+/* A row answers the pointer in colour only, never in size: a growing row
+   would shove the ones around it. */
+.nav-link:hover {
+  background: var(--primary-tint);
+}
+
+/* Pressed. Before the current page's rule, so the page you are on keeps its
+   fill. */
+.nav-link:active {
+  background: var(--primary-tint-strong);
+}
+
+.nav-link[aria-current='page'] {
+  background: var(--primary-fill);
+  color: var(--primary-on-fill);
+}
+
+/* The keyboard's focus ring: the theme's, as on buttons. On the current
+   page's fill it takes the fill's text colour, or it would vanish. */
+.nav-link:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: calc(-1 * var(--focus-ring-width));
+}
+
+.nav-link[aria-current='page']:focus-visible {
+  outline-color: var(--primary-on-fill);
+}
+
+/* Phone: rows a thumb can hit. */
+@media (max-width: 768px) {
+  .nav-link {
+    min-height: 2.75rem;
+  }
+}
