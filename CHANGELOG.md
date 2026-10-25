@@ -56,6 +56,8 @@ From the names audit in `plans/agent-first.md` (piece 3).
   sub-agent, a `CLAUDE.md` block), `--copilot` (prompt files, an
   instructions block), `--agents-md` (an `AGENTS.md` block), generated from
   templates and `kit.tsv`; `--update` lists and applies only what changed.
+- The installed kit carries the starter (`.ferrox/starter`), so `setup`
+  starts a new app before it has any docs to find.
 - The drift check (`ferrox-ui/agent-kit/check/`): `ferrox-check` lists
   where an app drifts from ferrox-ui, with the fix; `ferrox-docs` prints
   the docs of the ferrox-ui an app builds against. Each in bash and
