@@ -42,4 +42,4 @@ which a single screen may not have:
 | Form in a dialog | `store.rs` (`save`) | call your own save; on success, what `save`'s callback does |
 | Detail page | `store.rs`, `recipe_dialog.rs`; a router (`use_params_map`, `use_navigate`), the list's route; `store.settings.units` | no settings: drop the units fact |
 | Settings page | `store.rs` (`settings`; `remove_all` for the danger zone) | keep the `Settings` struct from `store.rs` |
-| The data | nothing; `?offline` in the address fails the first load, to show the error state | keep `Settings` only if a page reads it; its latency is `LATENCY` |
+| The data | nothing; `?offline` in the address fails the first load, to show the error state | delete what no copied page uses (`Settings` and its fields, `find`, `remove_all`), or the build warns of dead code; its latency is `LATENCY` |

@@ -697,6 +697,9 @@ The cost is the same; the result went from drifted to clean, first build.
   --dry-run` shows the kit intact), and the unused parts of `store.rs`
   (`Settings.units`, `remove_all`, `find`) gave dead-code warnings the
   copying table doesn't mention. Both are one-line fixes (10f).
+- **10f.** *Done:* `setup.md` gives the copy command (bash and
+  PowerShell); the copying table says to delete the store's unused
+  parts. Piece 10 is complete.
 
 ## Pieces
 

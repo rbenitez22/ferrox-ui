@@ -7,7 +7,10 @@ The setup lives in one place, the starter app, installed with this kit at
 ## A new app
 
 1. Ask the user for the app's name if they haven't given it.
-2. Copy every file in `{{KIT}}/starter` to the app's folder.
+2. Copy every file in `{{KIT}}/starter` to the app's folder itself (not
+   into `{{KIT}}`): from the app's folder, `cp -r {{KIT}}/starter/. .`
+   (PowerShell: `Copy-Item -Recurse {{KIT}}/starter/* .` and
+   `Copy-Item {{KIT}}/starter/.gitignore .`).
 3. In the copy: set `name` in `Cargo.toml`, delete the comment at its top
    (it's the starter's), and set the `<title>` in `index.html`.
 4. The ferrox dependencies: keep them exactly as the starter pins them
