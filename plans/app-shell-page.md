@@ -156,6 +156,13 @@ Each passes `scripts/release-check.sh` and is reviewed on its own.
    stays a bare `PageGrid` (the detail recipe's spinner).
 3. **The kit:** the two drift rules, `choosing.md`, `recipes.md`, the
    starter, CHANGELOG; then one measured run.
+   *Done 2026-10-25:* `page-h1` forbids `HeadingLevel::H1` and a raw
+   `<h1>`; `hand-shell` forbids `SideMenuButton`. The starter: `App` is a
+   `Router` around an `AppShell` (one `NavLink`) and `Routes` (a `Page`
+   "Not found" fallback); its screen is `ItemsPage`, a `Page`. Its name
+   is `APP_NAME` in `src/app.rs` (`setup.md` says to rename it). Its pins
+   moved to `ce70859`, the first commit with `AppShell` and `Page`: a
+   copied starter resolves once that commit is pushed.
 
 ## Open points (all approved as recommended, 2026-10-25)
 

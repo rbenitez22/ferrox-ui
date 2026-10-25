@@ -1,17 +1,23 @@
-//! One page, built only from ferrox-ui: the page itself (`PageGrid`: its
-//! width, padding and `<main>`), a list of items in a panel, each a
-//! card with its actions in a menu, an add dialog, a delete confirmation, and
-//! the loading and empty states. Replace `Item` and the in-memory store with
-//! your own data; the shape of the page stays.
+//! The app, built only from ferrox-ui: its frame (`AppShell`: the bar, the
+//! side menu with the app's pages, one `<main>`) around the router's pages,
+//! and one page (`Page`: its title, width and padding), a list of items,
+//! each a card with its actions in a menu, an add dialog, a delete
+//! confirmation, and the loading and empty states. Replace `Item` and the
+//! in-memory store with your own data; the shape of the page stays.
 
 use std::time::Duration;
 
 use ferrox_icons::{Icon, DELETE, EDIT, MORE_VERTICAL, PLUS};
 use ferrox_ui::{
-    Button, Card, ConfirmDialog, DataView, Dialog, DialogAction, Field, HeadingLevel, IconButton, Input, Menu, MenuItem,
-    MenuTrigger, PageGrid, Panel,
+    AppShell, Button, Card, ConfirmDialog, DataView, Dialog, DialogAction, Field, IconButton, Input, Menu, MenuItem,
+    MenuTrigger, NavLink, Page,
 };
 use leptos::prelude::*;
+use leptos_router::components::{Route, Router, Routes};
+use leptos_router::path;
+
+/// The app's name: the bar, the side menu, the tab's title.
+const APP_NAME: &str = "Starter";
 
 /// One record.
 #[derive(Clone, Debug, PartialEq)]
@@ -20,8 +26,23 @@ struct Item {
     name: String,
 }
 
+/// The frame and the routes. Add a page: a `Route` here, a `NavLink` in
+/// `nav`.
 #[component]
 pub fn App() -> impl IntoView {
+    view! {
+        <Router>
+            <AppShell title=APP_NAME href="/" nav=|| view! { <NavLink href="/" exact=true>"Items"</NavLink> }>
+                <Routes fallback=|| view! { <Page title="Not found">"There's no such page."</Page> }>
+                    <Route path=path!("/") view=ItemsPage />
+                </Routes>
+            </AppShell>
+        </Router>
+    }
+}
+
+#[component]
+fn ItemsPage() -> impl IntoView {
     let items = RwSignal::new(Vec::<Item>::new());
     let loading = RwSignal::new(true);
     let next_id = StoredValue::new(1_u32);
@@ -99,28 +120,25 @@ pub fn App() -> impl IntoView {
     };
 
     view! {
-        <PageGrid>
-            <Panel
-                title="Items"
-                heading_level=HeadingLevel::H1
-                actions=move || view! {
-                    <IconButton label="Add item" on_click=move || open_add()><Icon icon=PLUS /></IconButton>
+        <Page
+            title="Items"
+            actions=move || view! {
+                <IconButton label="Add item" on_click=move || open_add()><Icon icon=PLUS /></IconButton>
+            }
+        >
+            <DataView
+                items=items
+                key_of=|item: &Item| item.id.to_string()
+                item=card
+                label="Items"
+                loading=loading
+                loading_label="Loading items…"
+                empty_view=move || view! {
+                    <p>"No items yet."</p>
+                    <Button on_click=move || open_add()>"Add an item"</Button>
                 }
-            >
-                <DataView
-                    items=items
-                    key_of=|item: &Item| item.id.to_string()
-                    item=card
-                    label="Items"
-                    loading=loading
-                    loading_label="Loading items…"
-                    empty_view=move || view! {
-                        <p>"No items yet."</p>
-                        <Button on_click=move || open_add()>"Add an item"</Button>
-                    }
-                />
-            </Panel>
-        </PageGrid>
+            />
+        </Page>
         <Dialog
             open=dialog_open
             title=Signal::derive(move || if editing.get().is_some() { "Rename item".to_string() } else { "Add item".to_string() })

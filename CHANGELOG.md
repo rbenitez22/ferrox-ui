@@ -58,6 +58,10 @@ From the names audit in `plans/agent-first.md` (piece 3).
   sub-agent, a `CLAUDE.md` block), `--copilot` (prompt files, an
   instructions block), `--agents-md` (an `AGENTS.md` block), generated from
   templates and `kit.tsv`; `--update` lists and applies only what changed.
+- The drift check's `page-h1` and `hand-shell` rules: a page's `<h1>` or an
+  app frame made by hand (use `Page`, `AppShell`). The starter is an
+  `AppShell` with one `Page` (rename `APP_NAME` too) and needs
+  `navigation` and leptos_router.
 - `Page` (`layout`): `PageGrid` with the page's own H1 `Panel`; sets the
   tab's title ("{page} · {app}") and, after a navigation inside an
   `AppShell`, moves focus to its title. A modal now gives focus back to its

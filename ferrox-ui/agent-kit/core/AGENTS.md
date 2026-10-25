@@ -45,6 +45,8 @@ The drift check enforces these; each line says what to do instead.
 - `raw-textarea`: a hand-made <textarea>. Instead: use Textarea (in a Field).
 - `raw-dialog`: a hand-made <dialog>. Instead: use Dialog, ConfirmDialog or Sheet.
 - `raw-menu`: a hand-made menu. Instead: use Menu, SplitButton or ContextMenu.
+- `page-h1`: the page's title made by hand. Instead: use Page: its title is the page's <h1>.
+- `hand-shell`: the app's frame wired by hand. Instead: use AppShell: it wires the menu button, the side menu and the page.
 - `inline-style`: an inline style. Instead: use a component prop, a layout component (Stack, Cluster, PageGrid) or a class on the tokens.
 - `css-hex-colour`: a colour written out in CSS (outside a --token definition). Instead: use a theme token such as var(--text) or var(--primary-fill).
 - `css-colour-function`: a colour written out in CSS (outside a --token definition). Instead: use a theme token such as var(--text) or var(--primary-fill).
@@ -104,16 +106,18 @@ a `Panel` (`heading_level=HeadingLevel::H1`), and a list of records is a
 
 | Use it for | Use |
 |---|---|
+| the app's frame: its bar, its side menu of pages, one `<main>` around the routes | `AppShell` (every app) |
 | a list of places: a sidebar, a settings page's sections | `NavList` of `NavLink`s |
 | places that belong together (one service's pages, the account's) | `NavGroup` inside the list, collapsible if it's long or rarely used |
-| the app's navigation on a phone, or any screen without room for a sidebar | `SideMenu`, opened by a `SideMenuButton` |
+| a side menu outside `AppShell` (rare: the shell has one) | `SideMenu`, opened by a `SideMenuButton` |
 
 ### layout
 
 | Use it for | Use |
 |---|---|
-| the app's top band: its menu button, its name, its actions | `AppBar` |
-| the page: its width, padding and `<main>`, and a side column (filters, a summary) that moves under it on a phone | `PageGrid` |
+| a page: its `<h1>` title and actions, its width, a side column, the tab's title | `Page` (every route) |
+| a page's grid with no title yet (a spinner while its record loads) | `PageGrid` |
+| the app's top band outside `AppShell` (rare: the shell has one) | `AppBar` |
 | things one under another with even space: fields, panels, a card's lines | `Stack` |
 | things side by side, wrapping: a row of buttons, tags | `Cluster` |
 | a record's facts, label beside value (on a detail page, in a side column) | `Facts` with a `Fact` each |

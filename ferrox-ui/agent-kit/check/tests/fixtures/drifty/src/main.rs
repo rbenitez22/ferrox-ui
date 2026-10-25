@@ -16,6 +16,8 @@ fn App() -> impl IntoView {
         <textarea></textarea>
         <dialog open=true>"Hi"</dialog>
         <div role="menu"></div>
+        <h1>"Settings"</h1>
+        <SideMenuButton open=menu />
         <div style="margin: 4px">"Squeezed"</div>
         // ferrox-check: allow raw-input
         <input type="file" />

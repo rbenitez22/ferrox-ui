@@ -6,6 +6,8 @@ raw-select	forbid	*.rs	<select([ >/]|$)		a hand-made <select>	use Select (in a F
 raw-textarea	forbid	*.rs	<textarea([ >/]|$)		a hand-made <textarea>	use Textarea (in a Field)
 raw-dialog	forbid	*.rs	<dialog([ >/]|$)		a hand-made <dialog>	use Dialog, ConfirmDialog or Sheet
 raw-menu	forbid	*.rs	role="menu"		a hand-made menu	use Menu, SplitButton or ContextMenu
+page-h1	forbid	*.rs	HeadingLevel::H1|<h1([ >/]|$)		the page's title made by hand	use Page: its title is the page's <h1>
+hand-shell	forbid	*.rs	SideMenuButton		the app's frame wired by hand	use AppShell: it wires the menu button, the side menu and the page
 inline-style	forbid	*.rs	(^|[ ])style=[^ ]		an inline style	use a component prop, a layout component (Stack, Cluster, PageGrid) or a class on the tokens
 css-hex-colour	forbid	*.css	:[^;{]*#[0-9a-fA-F]{3,8}([^0-9a-zA-Z_-]|$)	^[ ]*--	a colour written out in CSS (outside a --token definition)	use a theme token such as var(--text) or var(--primary-fill)
 css-colour-function	forbid	*.css	:[^;{]*(rgb|rgba|hsl|hsla)\(	^[ ]*--	a colour written out in CSS (outside a --token definition)	use a theme token such as var(--text) or var(--primary-fill)

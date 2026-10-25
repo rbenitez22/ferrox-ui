@@ -12,7 +12,8 @@ The setup lives in one place, the starter app, installed with this kit at
    (PowerShell: `Copy-Item -Recurse {{KIT}}/starter/* .` and
    `Copy-Item {{KIT}}/starter/.gitignore .`).
 3. In the copy: set `name` in `Cargo.toml`, delete the comment at its top
-   (it's the starter's), and set the `<title>` in `index.html`.
+   (it's the starter's), set the `<title>` in `index.html` and `APP_NAME`
+   in `src/app.rs`.
 4. The ferrox dependencies: keep them exactly as the starter pins them
    (one git reference for all four crates). Only if the user wants a local
    clone of ferrox-ui: the path lines are in `Cargo.toml`, commented, under

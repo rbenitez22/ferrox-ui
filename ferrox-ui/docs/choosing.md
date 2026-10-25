@@ -44,16 +44,18 @@ One table per group. Each component's page has its props and example;
 
 | Use it for | Use |
 |---|---|
+| the app's frame: its bar, its side menu of pages, one `<main>` around the routes | `AppShell` (every app) |
 | a list of places: a sidebar, a settings page's sections | `NavList` of `NavLink`s |
 | places that belong together (one service's pages, the account's) | `NavGroup` inside the list, collapsible if it's long or rarely used |
-| the app's navigation on a phone, or any screen without room for a sidebar | `SideMenu`, opened by a `SideMenuButton` |
+| a side menu outside `AppShell` (rare: the shell has one) | `SideMenu`, opened by a `SideMenuButton` |
 
 ## layout
 
 | Use it for | Use |
 |---|---|
-| the app's top band: its menu button, its name, its actions | `AppBar` |
-| the page: its width, padding and `<main>`, and a side column (filters, a summary) that moves under it on a phone | `PageGrid` |
+| a page: its `<h1>` title and actions, its width, a side column, the tab's title | `Page` (every route) |
+| a page's grid with no title yet (a spinner while its record loads) | `PageGrid` |
+| the app's top band outside `AppShell` (rare: the shell has one) | `AppBar` |
 | things one under another with even space: fields, panels, a card's lines | `Stack` |
 | things side by side, wrapping: a row of buttons, tags | `Cluster` |
 | a record's facts, label beside value (on a detail page, in a side column) | `Facts` with a `Fact` each |
