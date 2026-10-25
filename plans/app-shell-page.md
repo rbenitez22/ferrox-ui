@@ -172,6 +172,11 @@ Each passes `scripts/release-check.sh` and is reviewed on its own.
    combine (replace `ItemsPage` and `Item`, the route renders the
    recipe's page, `Store::provide()` in `App`), and deleting the git lines
    leaves the starter's `# data, menus.` comment orphaned.
+   *Then fixed:* `recipes.md` gained "Into the starter" (keep `App`,
+   delete the sample, `Store::provide()` in `App`, a route and a
+   `NavLink` per recipe page); the starter's dependency comments put the
+   feature groups first and "Pinned to one commit" alone above the git
+   lines, so the swap deletes exactly that line. The plan is complete.
 
 ## Open points (all approved as recommended, 2026-10-25)
 

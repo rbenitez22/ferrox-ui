@@ -10,14 +10,14 @@ publish = false
 [dependencies]
 leptos = { version = "0.8.14", features = ["csr"] }
 leptos_router = "0.8.10"
-# ferrox-ui, pinned to one commit (a release tag once v0.1.0 is out).
-# Add the features (groups) you use: overlay, forms, navigation, layout,
-# data, menus.
+# ferrox-ui and its sibling crates. Add the features (groups) you use:
+# overlay, forms, navigation, layout, data, menus.
+# Pinned to one commit (a release tag once v0.1.0 is out):
 ferrox-ui    = { git = "https://github.com/rbenitez22/ferrox-ui", rev = "ce7085984609a8a4433e6f4c6539bae45db2627a", features = ["overlay", "forms", "navigation", "layout", "data", "menus"] }
 ferrox-theme = { git = "https://github.com/rbenitez22/ferrox-ui", rev = "ce7085984609a8a4433e6f4c6539bae45db2627a", features = ["leptos"] }
 ferrox-icons = { git = "https://github.com/rbenitez22/ferrox-ui", rev = "ce7085984609a8a4433e6f4c6539bae45db2627a" }
-# A local clone instead: these three and ferrox-theme-build's below replace
-# the git lines (delete those, uncomment these, put the clone's folder in).
+# Or a local clone: delete the "Pinned" line and the git lines (these three
+# and ferrox-theme-build's), uncomment these, put the clone's folder in.
 # ferrox-ui    = { path = "<clone>/ferrox-ui", features = ["overlay", "forms", "navigation", "layout", "data", "menus"] }
 # ferrox-theme = { path = "<clone>/ferrox-theme", features = ["leptos"] }
 # ferrox-icons = { path = "<clone>/ferrox-icons" }

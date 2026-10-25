@@ -23,9 +23,16 @@ them (`mod store; mod recipe_dialog; mod list_page;`) and re-exports the
 screens and the store (`pub use list_page::ListPage;`,
 `pub use store::Store;`), and `mod recipes;` in
 `main.rs`. Call `Store::provide()` once, in the component that holds the
-screens (the shell does; with no shell, the app's root), then render a
+screens (the Cookbook shell does; in the starter, `App`), then render a
 screen. `store.rs` reads the page's address (`?offline`): it needs
 web-sys's `Location` feature, which the starter enables.
+
+**Into the starter.** Its `src/app.rs` is the frame (`App`: the router,
+the `AppShell` and its links) and one sample screen (`ItemsPage`, with its
+`Item` and in-memory list). Keep `App`; delete the sample; call
+`Store::provide()` at the top of `App`; make each route render a recipe's
+page (`<Route path=path!("/") view=ListPage />`) and give it a `NavLink`
+in the shell's `nav`.
 
 ## Copying one recipe alone
 
