@@ -65,11 +65,13 @@
 
 /* ── Body ── */
 
+/* It scrolls on its own; reaching its end never scrolls the page behind. */
 .dialog__body {
   position: relative;
   flex: 1 1 auto;
   padding: var(--space-lg);
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 /* ── Footer band ── */

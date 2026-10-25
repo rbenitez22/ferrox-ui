@@ -360,3 +360,34 @@ test.describe('SideMenu', () => {
     await expect(group()).toHaveAttribute('aria-expanded', 'false');
   });
 });
+
+test.describe('the side menu on a phone', () => {
+  test.use({ viewport: { width: 390, height: 640 } });
+
+  test('only the menu scrolls: its end is in view, the page behind never moves', async ({ page }) => {
+    await openApp(page, '/');
+    await page.getByRole('button', { name: 'Menu', exact: true }).click();
+    const sheet = page.locator('dialog.sheet[open]');
+    await expect(sheet).toBeVisible();
+    // Done sliding in: wheel events during the slide don't scroll it yet.
+    await expect.poll(() => sheet.evaluate((el) => el.getAnimations().length)).toBe(0);
+    const body = sheet.locator('.sheet__body');
+    expect(await body.evaluate((el) => getComputedStyle(el).overscrollBehaviorY)).toBe('contain');
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('hidden');
+    // The sheet is the visible height, so its end can't sit under a toolbar.
+    expect((await sheet.boundingBox())!.height).toBeCloseTo(await page.evaluate(() => innerHeight), 0);
+    // More links than fit: the body scrolls, to its end, and no further.
+    expect(await body.evaluate((el) => el.scrollHeight > el.clientHeight)).toBe(true);
+    const box = (await body.boundingBox())!;
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    for (let i = 0; i < 6; i++) {
+      await page.mouse.wheel(0, 300);
+      await page.waitForTimeout(100);
+    }
+    await expect.poll(() => body.evaluate((el) => Math.ceil(el.scrollTop + el.clientHeight) >= el.scrollHeight)).toBe(true);
+    expect(await page.evaluate(() => scrollY)).toBe(0);
+    const last = body.getByRole('link').last();
+    const lastBox = (await last.boundingBox())!;
+    expect(lastBox.y + lastBox.height).toBeLessThanOrEqual(box.y + box.height + 0.5);
+  });
+});

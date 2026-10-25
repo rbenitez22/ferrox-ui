@@ -91,6 +91,12 @@ From the names audit in `plans/agent-first.md` (piece 3).
   writes `prepaint.js`, which `index.html` inlines.
 - `starter/`: an app to copy.
 
+### Fixed
+
+- On a phone, scrolling a sheet (a `SideMenu`) or a dialog to its end
+  could scroll the page behind it. The scroll lock is on `<html>` too, the
+  modal's body contains its overscroll, and a side sheet is `100dvh` tall.
+
 ### Removed
 
 - `ferrox_theme::PREPAINT_SCRIPT`: the script is written by

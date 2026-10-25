@@ -13,9 +13,13 @@ the same behaviour:
   `open` false when its work is done (after any saving state).
 - **Focus** goes to an element marked `autofocus`, otherwise the first
   control (the ×). On close it returns to whatever opened the modal.
-- **The page doesn't scroll** while a modal is open (`<body>` gets
-  `.dialog-open`). This is counted, so a confirm opened from a dialog keeps
-  the page locked until both close.
+- **The page doesn't scroll** while a modal is open (`<html>` and `<body>`
+  get `.dialog-open`: a phone browser may scroll either). This is counted,
+  so a confirm opened from a dialog keeps the page locked until both close.
+  Only the modal's body scrolls, and reaching its end never hands the swipe
+  on to the page (`overscroll-behavior: contain`). A sheet is the visible
+  height (`100dvh`), so its end stays in view as a phone's toolbars come
+  and go.
 - **The body is mounted only while open**, so each opening starts fresh.
 
 

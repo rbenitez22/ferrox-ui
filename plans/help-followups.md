@@ -244,6 +244,10 @@ the menu scrolls; the page never moves. Fix in `Sheet` (so every sheet and
 `SideMenu` gets it): `overscroll-behavior: contain` on its body, a height
 that follows the visible viewport (`100dvh`), and the scroll lock on
 `<html>` as well as `<body>`; e2e on a phone-sized viewport.
+*Done 2026-10-25:* as written, and the dialog body contains its overscroll
+too. Headless Chromium can't show the touch bug itself; the e2e checks the
+rules are in force and that wheeling the menu to its end leaves the page
+at 0. Not yet tried on the user's phone.
 
 ## Open points (all approved as recommended, 2026-10-25)
 

@@ -159,8 +159,13 @@ fn unlock_scroll(locked: StoredValue<bool>) {
     }
 }
 
+/// On `<html>` as well as `<body>`: the page scrolls whichever of the two is
+/// the viewport's scroller, and a phone browser may scroll the other.
 fn set_body_class(on: bool) {
-    let Some(body) = document().body() else { return };
-    let classes = body.class_list();
-    let _ = if on { classes.add_1(SCROLL_LOCK_CLASS) } else { classes.remove_1(SCROLL_LOCK_CLASS) };
+    let document = document();
+    let roots = [document.document_element(), document.body().map(Into::into)];
+    for root in roots.into_iter().flatten() {
+        let classes = root.class_list();
+        let _ = if on { classes.add_1(SCROLL_LOCK_CLASS) } else { classes.remove_1(SCROLL_LOCK_CLASS) };
+    }
 }

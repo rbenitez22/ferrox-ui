@@ -24,7 +24,9 @@ const focused = (page: Page) =>
     return el?.getAttribute('aria-label') ?? el?.getAttribute('name') ?? el?.textContent?.trim() ?? null;
   });
 
-const bodyLocked = (page: Page) => page.evaluate(() => document.body.classList.contains('dialog-open'));
+/** Both roots: a phone browser may scroll either one. */
+const bodyLocked = (page: Page) =>
+  page.evaluate(() => document.body.classList.contains('dialog-open') && document.documentElement.classList.contains('dialog-open'));
 
 test.beforeEach(async ({ page }) => {
   await openApp(page, '/overlay');
@@ -153,6 +155,7 @@ test.describe('scroll lock', () => {
     await open(page, 'Edit account…', 'Edit account');
     expect(await bodyLocked(page)).toBe(true);
     expect(await page.evaluate(() => getComputedStyle(document.body).overflow)).toBe('hidden');
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('hidden');
     await page.keyboard.press('Escape');
     await expect.poll(() => bodyLocked(page)).toBe(false);
   });
