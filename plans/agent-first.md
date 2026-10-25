@@ -604,15 +604,15 @@ baseline's exact prompt wasn't kept; this one was rebuilt from the
 description above. From now on the prompt is kept in
 `agent-kit/tests/measure-prompt.md`, so later runs use the same words.
 
-| Measure | Baseline | With the kit |
-|---|---|---|
-| Tokens | 68,009 | 64,708 |
-| Tool calls | 13 | 14 |
-| Time | 1 min 48 s | 1 min 46 s |
-| Build rounds | 2 (one compile error) | 1 (no errors, no warnings) |
-| Drift check | (no check yet) unstyled hand-made rows; an error state nothing triggers | no drift |
-| Read | the root README, 650 lines of the crate README in 7 slices, the demo's setup files, three crates' sources | `AGENTS.md`, the four tasks, the starter's files, `recipes.md` and six component pages, three recipe sources in full |
-| App | 187 lines | 336 lines (the list recipe, trimmed: row `Menu`, `ConfirmDialog`, `DataView` with Retry, `?offline` shows the error) |
+| Measure | Baseline | With the kit | After 10b–c |
+|---|---|---|---|
+| Tokens | 68,009 | 64,708 | 61,335 |
+| Tool calls | 13 | 14 | 10 |
+| Time | 1 min 48 s | 1 min 46 s | 1 min 42 s |
+| Build rounds | 2 (one compile error) | 1 (no errors, no warnings) | 1 (no errors; a second after a comment edit) |
+| Drift check | (no check yet) unstyled hand-made rows; an error state nothing triggers | no drift | no drift |
+| Read | the root README, 650 lines of the crate README in 7 slices, the demo's setup files, three crates' sources | `AGENTS.md`, the four tasks, the starter's files, `recipes.md` and six component pages, three recipe sources in full | `AGENTS.md`, the four tasks, `.ferrox/starter`, `recipes.md`, `conventions.md`, three recipe sources; no component page |
+| App | 187 lines | 336 lines (the list recipe, trimmed: row `Menu`, `ConfirmDialog`, `DataView` with Retry, `?offline` shows the error) | 351 lines (the same recipes, as a `recipes` module) |
 
 The cost is the same; the result went from drifted to clean, first build.
 
@@ -670,6 +670,18 @@ The cost is the same; the result went from drifted to clean, first build.
   `starter-local.sh`'s `git = ` check, now limited to code lines.
 - **10d. Measure once more** with the same prompt, in a fresh empty
   folder; record the third column here.
+  *Done:* the third column above. No stumble at the start; it read
+  less (no component page: the recipe compiled as copied). What it still
+  had to guess:
+  1. The path swap is prose; its first `sed` broke `Cargo.toml`. The
+     starter's pinned-rev comment goes stale after the swap.
+  2. `store.rs` reads `window().location()`: web-sys `Location`, which the
+     starter's `Cargo.toml` doesn't enable; it added it before building.
+  3. Wiring copied recipes in (`mod recipes;`, `Store::provide()`) is
+     said nowhere; it inferred it from the shell recipe.
+  4. Trunk warns the starter's `address` is deprecated (`addresses`).
+  5. `screen.md` sends it to `DOCS/choosing.md`, whose table `AGENTS.md`
+     already carries.
 
 ## Pieces
 
