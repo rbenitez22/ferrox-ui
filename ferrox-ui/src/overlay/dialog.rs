@@ -7,6 +7,7 @@ use web_sys::{Element, KeyboardEvent};
 use super::modal::{closer, Modal};
 use crate::ids::unique_id;
 use crate::core::component_help;
+use crate::{help_signals, HelpSignalKind};
 use crate::{Button, ButtonFamily, IconButton, MaybeHelp};
 
 // ---------------------------------------------------------------------------
@@ -84,10 +85,13 @@ impl DialogAction {
         !self.saving.get_untracked() && !self.disabled.get_untracked()
     }
 
-    fn button(self, family: ButtonFamily) -> impl IntoView {
+    /// `refused` runs when the button is pressed while saving (from the
+    /// keyboard: the pointer passes through a saving button). A press on a
+    /// disabled one never arrives.
+    fn button(self, family: ButtonFamily, refused: UnsyncCallback<()>) -> impl IntoView {
         let Self { label, on_click, saving, disabled, .. } = self;
         view! {
-            <Button family=family saving=saving disabled=disabled on_click=move || on_click.run(())>
+            <Button family=family saving=saving disabled=disabled on_click=move || on_click.run(()) on_refused=refused>
                 {move || label.get()}
             </Button>
         }
@@ -163,18 +167,31 @@ pub fn Dialog(
     let title_id = unique_id("ferrox-dialog-title");
     let labelled_by = title_id.clone();
 
+    let kind = if alert { "alertdialog" } else { "dialog" };
+    // Inside a `HelpSignals`: the affirm action tried while it can't run.
+    let signals = help_signals();
+    let topic_id = help.0.as_ref().map(|topic| topic.id().to_string());
+    let refused = move || signals.emit(HelpSignalKind::SubmitRefused, kind, title.get_untracked(), topic_id.clone(), None);
+
     let enter_action = affirm.clone().filter(|_| submit_on_enter);
-    let on_keydown = move |ev: KeyboardEvent| {
-        let Some(action) = &enter_action else { return };
-        // A control that handled Enter itself (a combobox choosing an option)
-        // has prevented its default: then it is not a submit.
-        if ev.key() == "Enter" && !ev.default_prevented() && action.ready() && !takes_enter(&ev) {
-            ev.prevent_default();
-            action.on_click.run(());
+    let on_keydown = {
+        let refused = refused.clone();
+        move |ev: KeyboardEvent| {
+            let Some(action) = &enter_action else { return };
+            // A control that handled Enter itself (a combobox choosing an
+            // option) has prevented its default: then it is not a submit.
+            if ev.key() != "Enter" || ev.default_prevented() || takes_enter(&ev) {
+                return;
+            }
+            if action.ready() {
+                ev.prevent_default();
+                action.on_click.run(());
+            } else {
+                refused();
+            }
         }
     };
 
-    let kind = if alert { "alertdialog" } else { "dialog" };
     let (help, help_id) = component_help(help, kind, title, Signal::stored(None), false, "dialog__help", false).unzip();
 
     let has_footer = !no_cancel || alternate.is_some() || affirm.is_some();
@@ -185,8 +202,8 @@ pub fn Dialog(
                     {move || cancel_label.get()}
                 </Button>
             })}
-            {alternate.map(|action| action.button(ButtonFamily::Secondary))}
-            {affirm.map(|action| { let family = action.family; action.button(family) })}
+            {alternate.map(|action| action.button(ButtonFamily::Secondary, UnsyncCallback::new(|_| ())))}
+            {affirm.map(|action| { let family = action.family; action.button(family, UnsyncCallback::new(move |_| refused())) })}
         </div>
     });
 

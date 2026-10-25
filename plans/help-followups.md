@@ -216,8 +216,28 @@ Each passes `scripts/release-check.sh` and is reviewed on its own.
    listens on the document and never fires.
 4. **C2: the components' facts.** Field's error kinds, Dialog's
    `SubmitRefused`, Combobox's `NoMatch`; e2e, docs.
+   *Done 2026-10-25:* Field counts committed edits (`change`, on its
+   container: no control value needed, so passwords too), and only an
+   edit that leaves an error already there (at focus or the last change):
+   the edit that makes an error isn't a failed fix. No report for an
+   error present at mount. `SubmitRefused`: Enter while not ready (its
+   default kept, as before), or a keyboard press on the saving affirm
+   button through Button's new `on_refused` (a saving button has
+   `pointer-events: none`, and a disabled one gets no click at all).
+   Combobox takes its Field's label and topic (`signal_about`). The
+   demo's `Trunk.toml` now watches the library crates: Trunk ignores a
+   `touch` that changes no content, so library edits never rebuilt it.
 5. **C3: the suggested state.** `suggest` / `clear`, `data-suggested`,
    CSS, the label; e2e, docs.
+
+## After these (the user, 2026-10-25)
+
+The demo's side menu on a phone (Firefox on Android): scrolling the menu
+to reach its last entries scrolls the page behind instead. Expected: only
+the menu scrolls; the page never moves. Fix in `Sheet` (so every sheet and
+`SideMenu` gets it): `overscroll-behavior: contain` on its body, a height
+that follows the visible viewport (`100dvh`), and the scroll lock on
+`<html>` as well as `<body>`; e2e on a phone-sized viewport.
 
 ## Open points (all approved as recommended, 2026-10-25)
 

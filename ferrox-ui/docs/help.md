@@ -286,9 +286,18 @@ policy or a log:
 
 | `HelpSignalKind` | `name()` | Reported by |
 |---|---|---|
+| `ErrorShown` | `error_shown` | a `Field`, as its error appears |
+| `ErrorCleared` | `error_cleared` | a `Field`, as its error goes away |
+| `ErrorPersisted { edits }` | `error_persisted` | a `Field`, at each committed edit (`change`) that leaves an error that was already there; `edits` since it appeared |
+| `SubmitRefused` | `submit_refused` | a `Dialog` (and `ConfirmDialog`): Enter while its affirm action can't run, or that button pressed while saving |
+| `NoMatch { times }` | `no_match` | a `Combobox` left with text that names no item; `times` in a row (a match resets it) |
 | `HelpOpened` | `help_opened` | a `?`, as its topic opens |
 | `HelpDismissed` | `help_dismissed` | a `?` closed within a second (not by asking) |
 | `App(kind)` | the app's `kind` | the app, through `help_signals()` |
+
+A control inside a `Field` reports with the field's label and topic. An
+error already there when a field appears isn't reported: it's not
+something the user did.
 
 The app's own signals are the strongest: only it knows that an entry won't
 balance. Make a reporter in a component's body (that's where it finds the

@@ -9,7 +9,7 @@
 use std::sync::LazyLock;
 
 use ferrox_ui::{help_signals, 
-    Button, ButtonFamily, Checkbox, ConfirmDialog, Dialog, Field, HelpAssistant, HelpButton, HelpKeys, HelpRequest, HelpReveal,
+    Button, ButtonFamily, Checkbox, Combobox, ConfirmDialog, Dialog, DialogAction, Field, HelpAssistant, HelpButton, HelpKeys, HelpRequest, HelpReveal,
     HelpScope, HelpSignal, HelpSignals, HelpTopic, Input, PasswordInput, Sheet, SheetSide, Switch, Toolbar,
 };
 use leptos::prelude::*;
@@ -130,6 +130,7 @@ fn Signals(log: RwSignal<Vec<HelpSignal>>) -> impl IntoView {
         <Section title="Help signals">
             <HelpScope context=[("screen", "signals")]>
                 <ReportImbalance />
+                <SignalSources />
             </HelpScope>
             <Button family=ButtonFamily::Secondary on_click=move || log.set(Vec::new())>"Clear the log"</Button>
             <ol class="demo-signals">
@@ -138,6 +139,7 @@ fn Signals(log: RwSignal<Vec<HelpSignal>>) -> impl IntoView {
                     view! {
                         <li
                             data-signal=s.kind.name().to_string()
+                            data-kind=format!("{:?}", s.kind)
                             data-component=s.component.clone()
                             data-about=s.about.clone()
                             data-topic=s.topic_id.clone().unwrap_or_default()
@@ -150,6 +152,49 @@ fn Signals(log: RwSignal<Vec<HelpSignal>>) -> impl IntoView {
                 }).collect_view()}
             </ol>
         </Section>
+    }
+}
+
+/// Components that report: a field whose error persists, a combobox left
+/// with no match, a dialog whose Pay is pressed again while paying.
+#[component]
+fn SignalSources() -> impl IntoView {
+    let total = RwSignal::new(String::new());
+    let total_error = Signal::derive(move || {
+        let text = total.get();
+        (!text.is_empty() && text.parse::<f64>().is_err()).then(|| "A number, like 12.50".to_string())
+    });
+    let category = RwSignal::new(String::new());
+    let categories = Signal::stored(vec!["Groceries".to_string(), "Rent".to_string()]);
+    let (paying_open, paying) = (RwSignal::new(false), RwSignal::new(false));
+    let memo = RwSignal::new(String::new());
+    let ignore_choice = |_: Option<String>| ();
+    view! {
+        <div class="demo-form">
+            <Field label="Total" error=total_error help=about("total", "Totals")>
+                <Input value=total name="signal-total" />
+            </Field>
+            <Field label="Category" help=about("category-signal", "Choosing a category")>
+                <Combobox
+                    items=categories
+                    key_of=|c: &String| c.clone()
+                    label_of=|c: &String| c.clone()
+                    text=category
+                    on_select=ignore_choice
+                />
+            </Field>
+        </div>
+        <Button family=ButtonFamily::Secondary on_click=move || { paying.set(false); paying_open.set(true) }>"Pay…"</Button>
+        <Dialog
+            open=paying_open
+            title="Pay the bill"
+            help=about("paying", "Paying a bill")
+            affirm=DialogAction::new("Pay", move || paying.set(true)).saving(paying)
+        >
+            <Field label="Note">
+                <Input value=memo name="signal-note" />
+            </Field>
+        </Dialog>
     }
 }
 

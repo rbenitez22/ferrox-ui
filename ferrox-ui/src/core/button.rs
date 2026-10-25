@@ -74,7 +74,8 @@ pub fn button_classes(family: ButtonFamily, quiet: bool, size: ButtonSize, savin
 /// A standard padded button (`.btn`).
 ///
 /// - `saving` sets `aria-disabled` and `.is-saving`, never `disabled`: the
-///   button stays focusable mid-request, and the click is refused.
+///   button stays focusable mid-request, and the click is refused
+///   (`on_refused` hears of it: someone pressed again while it worked).
 /// - `button_type` defaults to `"button"`, not HTML's `"submit"`. Pass
 ///   `"submit"` for a form's submit button.
 ///
@@ -93,6 +94,9 @@ pub fn Button(
     #[prop(optional, into)] disabled: Signal<bool>,
     #[prop(default = "button")] button_type: &'static str,
     #[prop(optional, into)] on_click: Option<UnsyncCallback<()>>,
+    /// Runs when a press is refused because it is `saving` (from the
+    /// keyboard: a saving button lets the pointer pass through it).
+    #[prop(optional, into)] on_refused: Option<UnsyncCallback<()>>,
     #[prop(optional, into)] title: MaybeProp<String>,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
@@ -101,6 +105,7 @@ pub fn Button(
     let on_click = move |ev: MouseEvent| {
         if saving.get_untracked() {
             ev.prevent_default();
+            if let Some(cb) = &on_refused { cb.run(()); }
             return;
         }
         if let Some(cb) = &on_click { cb.run(()); }

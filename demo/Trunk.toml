@@ -4,6 +4,16 @@ port    = 3200
 open    = false
 
 [watch]
+# The demo, and the library crates it shows: Trunk watches only this folder
+# by default, so an edit to ferrox-ui alone would never rebuild the demo.
+watch = [
+    ".",
+    "../ferrox-ui/src",
+    "../ferrox-ui/style",
+    "../ferrox-ui/docs/recipes",
+    "../ferrox-theme/src",
+    "../ferrox-icons/src",
+]
 # e2e/: Playwright writes test-results/ there; watching it would rebuild and
 # auto-reload every open page mid-test.
 # style/ferrox/: written by build.rs on every build; a change there is always

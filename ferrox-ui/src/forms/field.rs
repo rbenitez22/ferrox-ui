@@ -4,7 +4,10 @@ use leptos::context::Provider;
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
+use web_sys::{Event, FocusEvent};
+
 use crate::core::{component_help, reveals_while_active, with_reveal, HelpReveal};
+use crate::{help_signals, HelpSignalKind};
 use crate::ids::unique_id;
 use crate::MaybeHelp;
 
@@ -20,6 +23,17 @@ pub(crate) struct FieldContext {
     /// The control's value, for a help request that shares it. Filled by
     /// controls that offer theirs (`PasswordInput` never does).
     value: StoredValue<Option<Signal<String>>>,
+    /// The field's label and its help topic, for a control's help signals.
+    label: Signal<String>,
+    topic_id: Option<Arc<str>>,
+}
+
+/// What a control inside a `Field` reports a help signal about: the
+/// field's label and topic. Outside a field, nothing to name it by.
+pub(crate) fn signal_about() -> (String, Option<String>) {
+    use_context::<FieldContext>()
+        .map(|field| (field.label.get_untracked(), field.topic_id.as_deref().map(str::to_string)))
+        .unwrap_or_default()
 }
 
 /// Offers a control's value to its `Field`, for help requests that share
@@ -114,7 +128,17 @@ pub fn Field(
     // component does not, so a plain `provide_context` here would reach the
     // controls *after* this field too.
     let value = StoredValue::new(None::<Signal<String>>);
-    let context = FieldContext { id: id.clone(), message_id: message_id.clone(), has_message, invalid, value };
+    let topic_id: Option<Arc<str>> = help.0.as_ref().map(|topic| topic.id().into());
+    let context = FieldContext {
+        id: id.clone(),
+        message_id: message_id.clone(),
+        has_message,
+        invalid,
+        value,
+        label,
+        topic_id: topic_id.clone(),
+    };
+    let (on_focus, on_change) = error_signals(error, label, topic_id);
 
     let shared = Signal::derive(move || {
         if help_shares_value { value.get_value().map(|v| v.get()) } else { None }
@@ -136,12 +160,57 @@ pub fn Field(
     };
 
     view! {
-        <div class=move || with_reveal(field_classes(&class.get().unwrap_or_default()), reveal) data-help=help_id>
+        <div class=move || with_reveal(field_classes(&class.get().unwrap_or_default()), reveal) data-help=help_id on:focusin=on_focus on:change=on_change>
             {label_row}
             <Provider value=context>{children()}</Provider>
             {message}
         </div>
     }
+}
+
+/// Inside a `HelpSignals`: reports the error appearing and going away (an
+/// effect), and each committed edit that leaves it there: the returned
+/// `focusin` and `change` handlers, on the field's container, so they need
+/// no control's value. An edit counts only if the error was there before it
+/// (when the field got focus, or at the last change): the edit that makes
+/// an error isn't one that failed to fix it.
+fn error_signals(
+    error: Signal<Option<String>>,
+    label: Signal<String>,
+    topic_id: Option<Arc<str>>,
+) -> (impl Fn(FocusEvent) + 'static, impl Fn(Event) + 'static) {
+    let signals = help_signals();
+    let edits = StoredValue::new(0_u32);
+    let had_error = StoredValue::new(false);
+    let topic = move || topic_id.as_deref().map(str::to_string);
+    let report = move |kind: HelpSignalKind| signals.emit(kind, "field", label.get_untracked(), topic(), None);
+    if signals.is_observed() {
+        let report = report.clone();
+        // Transitions only: an error already there when the field appears
+        // isn't something the user did.
+        Effect::new(move |was: Option<bool>| {
+            let is = error.with(Option::is_some);
+            match (was, is) {
+                (Some(false), true) => {
+                    edits.set_value(0);
+                    report(HelpSignalKind::ErrorShown);
+                }
+                (Some(true), false) => report(HelpSignalKind::ErrorCleared),
+                _ => {}
+            }
+            is
+        });
+    }
+    let on_focus = move |_: FocusEvent| had_error.set_value(error.with_untracked(Option::is_some));
+    let on_change = move |_: Event| {
+        let has_error = error.with_untracked(Option::is_some);
+        if signals.is_observed() && has_error && had_error.get_value() {
+            edits.update_value(|n| *n += 1);
+            report(HelpSignalKind::ErrorPersisted { edits: edits.get_value() });
+        }
+        had_error.set_value(has_error);
+    };
+    (on_focus, on_change)
 }
 
 /// The class list for a form control: its base class, `.is-invalid` while

@@ -287,6 +287,69 @@ test.describe('help signals (HelpSignals)', () => {
     await expect(entry(page, 'help_dismissed')).toHaveCount(0);
   });
 
+  test('a field: its error shown, then each edit that leaves it, then cleared', async ({ page }) => {
+    const total = page.locator('input[name=signal-total]');
+    await total.fill('abc');
+    const shown = entry(page, 'error_shown');
+    await expect(shown).toHaveCount(1);
+    await expect(shown).toHaveAttribute('data-component', 'field');
+    await expect(shown).toHaveAttribute('data-about', 'Total');
+    await expect(shown).toHaveAttribute('data-topic', 'total');
+    await expect(shown).toHaveAttribute('data-context', 'screen=signals');
+    // The edit that made the error isn't one that failed to fix it.
+    await page.keyboard.press('Tab');
+    await expect(entry(page, 'error_persisted')).toHaveCount(0);
+
+    for (const [text, edits] of [['abcd', 1], ['12x', 2]] as const) {
+      await total.fill(text);
+      await page.keyboard.press('Tab');
+      await expect(entry(page, 'error_persisted').last()).toHaveAttribute('data-kind', `ErrorPersisted { edits: ${edits} }`);
+    }
+    await total.fill('12.50');
+    await expect(entry(page, 'error_cleared')).toHaveCount(1);
+    await page.keyboard.press('Tab');
+    await expect(entry(page, 'error_persisted')).toHaveCount(2);
+  });
+
+  test('a combobox left with no match, counted until a match', async ({ page }) => {
+    const box = page.getByRole('combobox', { name: 'Category' });
+    for (const [text, times] of [['Fuel', 1], ['Gas', 2]] as const) {
+      await box.fill(text);
+      await page.keyboard.press('Tab');
+      await expect(entry(page, 'no_match').last()).toHaveAttribute('data-kind', `NoMatch { times: ${times} }`);
+    }
+    const missed = entry(page, 'no_match').first();
+    await expect(missed).toHaveAttribute('data-component', 'combobox');
+    await expect(missed).toHaveAttribute('data-about', 'Category');
+    await expect(missed).toHaveAttribute('data-topic', 'category-signal');
+    await box.fill('Rent');
+    await page.keyboard.press('Tab');
+    await box.fill('Fuel');
+    await page.keyboard.press('Tab');
+    await expect(entry(page, 'no_match').last()).toHaveAttribute('data-kind', 'NoMatch { times: 1 }');
+  });
+
+  test('a dialog: Pay pressed again while paying, and Enter while paying, are refused', async ({ page }) => {
+    await page.getByRole('button', { name: 'Pay…' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Pay the bill' });
+    await expect(dialog).toBeVisible();
+    const pay = dialog.getByRole('button', { name: 'Pay', exact: true });
+    await pay.click();
+    await expect(pay).toHaveAttribute('aria-disabled', 'true');
+    await expect(entry(page, 'submit_refused')).toHaveCount(0);
+    // From the keyboard: a saving button lets the pointer pass through it.
+    await pay.focus();
+    await page.keyboard.press('Space');
+    const refused = entry(page, 'submit_refused');
+    await expect(refused).toHaveCount(1);
+    await expect(refused).toHaveAttribute('data-component', 'dialog');
+    await expect(refused).toHaveAttribute('data-about', 'Pay the bill');
+    await expect(refused).toHaveAttribute('data-topic', 'paying');
+    await dialog.locator('input[name=signal-note]').focus();
+    await page.keyboard.press('Enter');
+    await expect(refused).toHaveCount(2);
+  });
+
   test("the app's own signal, with its detail and its scope's context", async ({ page }) => {
     await page.getByRole('button', { name: 'Report an imbalance' }).click();
     const imbalance = entry(page, 'imbalance');

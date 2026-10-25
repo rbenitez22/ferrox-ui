@@ -7,7 +7,8 @@ use leptos::{component, view, IntoView};
 use wasm_bindgen::JsCast;
 use web_sys::{Element, HtmlElement, KeyboardEvent, MouseEvent, ScrollIntoViewOptions, ScrollLogicalPosition};
 
-use super::field::{control_classes, offer_value, wiring};
+use super::field::{control_classes, offer_value, signal_about, wiring};
+use crate::{help_signals, HelpSignalKind};
 use crate::core::anchor::{follow, place, Align};
 use crate::ids::unique_id;
 use crate::{Spinner, SpinnerKind};
@@ -279,7 +280,11 @@ where
         }
     };
 
-    // Leaving the field: the list closes; text that names no item is no choice.
+    // Leaving the field: the list closes; text that names no item is no
+    // choice, and (inside a `HelpSignals`) one more try that matched nothing.
+    let signals = help_signals();
+    let (about, topic_id) = signal_about();
+    let misses = StoredValue::new(0_u32);
     let on_blur = {
         let label_of = label_of.clone();
         move |_| {
@@ -288,6 +293,11 @@ where
             let names_one = items.with_untracked(|items| items.iter().any(|item| label_of(item).eq_ignore_ascii_case(&typed)));
             if !typed.is_empty() && !names_one {
                 on_select.run(None);
+                misses.update_value(|n| *n += 1);
+                let times = misses.get_value();
+                signals.emit(HelpSignalKind::NoMatch { times }, "combobox", about.clone(), topic_id.clone(), None);
+            } else {
+                misses.set_value(0);
             }
         }
     };

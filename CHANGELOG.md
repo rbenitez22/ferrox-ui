@@ -68,7 +68,9 @@ From the names audit in `plans/agent-first.md` (piece 3).
   `HelpButton` takes an `id`.
 - `HelpSignals`, `HelpSignal`, `HelpSignalKind`, `help_signals()` /
   `HelpReporter`: facts that may mean a user needs help (a `?` opened, or
-  dismissed at once; the app's own reports), for the app's policy.
+  dismissed at once; the app's own reports), for the app's policy. Field
+  reports its error shown, cleared and persisting; Dialog a refused
+  submit; Combobox text left with no match. `Button` gains `on_refused`.
 - The drift check (`ferrox-ui/agent-kit/check/`): `ferrox-check` lists
   where an app drifts from ferrox-ui, with the fix; `ferrox-docs` prints
   the docs of the ferrox-ui an app builds against. Each in bash and

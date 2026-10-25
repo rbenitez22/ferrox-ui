@@ -40,6 +40,7 @@ A standard padded button (`.btn`).
 - `disabled: Signal<bool>`, optional
 - `button_type: &'static str`, default `"button"`
 - `on_click: Option<UnsyncCallback<()>>`, optional
+- `on_refused: Option<UnsyncCallback<()>>`, optional
 - `title: MaybeProp<String>`, optional
 - `class: MaybeProp<String>`, optional
 - `children: Children`

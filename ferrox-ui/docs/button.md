@@ -24,6 +24,7 @@ view! {
 | `saving` | `false` | a request is running: `aria-disabled` and a sweeping border. The button stays focusable and refuses clicks. It never sets `disabled`. |
 | `disabled` | `false` | |
 | `button_type` | `"button"` | not HTML's `"submit"`; pass `"submit"` for a form's submit button |
+| `on_refused` | | runs when a press is refused because it's `saving` (from the keyboard: the pointer passes through a saving button) |
 | `on_click`, `title`, `class` | | |
 
 `button_classes(family, quiet, size, saving, extra)` returns the class list.
