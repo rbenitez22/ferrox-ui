@@ -211,7 +211,8 @@ webapp-lib's history as the record (fresh first commit here).
    `menus` (dropdown menu, menu button; added 2026-10-23).
 7. **Docs.** README per crate (purpose, every public item with an example),
    root README as the map, CHANGELOG. Tag `v0.1.0` when webapp-lib is ready to
-   switch.
+   switch. *Tagged 2026-10-25* (webapp-lib's `switch-to-ferrox.md` piece 0:
+   apps and webapp-lib depend on ferrox by tag only, one copy per build).
 
 New components from the inventory come after, one story each.
 

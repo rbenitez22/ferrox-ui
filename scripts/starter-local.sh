@@ -17,9 +17,9 @@ mkdir -p "$copy"
 rm -rf "$copy/src" "$copy/Cargo.toml" "$copy/Cargo.lock"
 cp -r "$root/starter/src" "$root/starter/build.rs" "$root/starter/Trunk.toml" "$root/starter/index.html" "$root/starter/Cargo.toml" "$copy/"
 
-# `ferrox-x = { git = "…ferrox-ui", rev = "…", …` → `ferrox-x = { path = "<root>/ferrox-x", …`
+# `ferrox-x = { git = "…ferrox-ui", tag = "…", …` → `ferrox-x = { path = "<root>/ferrox-x", …`
 for crate in ferrox-ui ferrox-theme ferrox-icons ferrox-theme-build; do
-    sed -i -E "s#^(${crate} +=) \{ git = \"[^\"]+\", rev = \"[^\"]+\"#\1 { path = \"${root}/${crate}\"#" "$copy/Cargo.toml"
+    sed -i -E "s#^(${crate} +=) \{ git = \"[^\"]+\", tag = \"[^\"]+\"#\1 { path = \"${root}/${crate}\"#" "$copy/Cargo.toml"
 done
 # The copy sits inside this repo's workspace folder: make it its own root.
 printf '\n[workspace]\n' >> "$copy/Cargo.toml"

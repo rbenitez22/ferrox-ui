@@ -18,7 +18,7 @@ The setup lives in one place, the starter app, installed with this kit at
    (one git reference for all four crates). Only if the user wants a local
    clone of ferrox-ui: the path lines are in `Cargo.toml`, commented, under
    the git ones. Delete the four git lines (`ferrox-ui`, `ferrox-theme`,
-   `ferrox-icons`, `ferrox-theme-build`) and the "Pinned to one commit"
+   `ferrox-icons`, `ferrox-theme-build`) and the "Pinned to one release"
    comment, uncomment the four path lines, and replace `<clone>` with the
    clone's folder. Edit the file; don't script it.
 5. Build: `trunk build` in the app's folder (`trunk serve` to look at it).

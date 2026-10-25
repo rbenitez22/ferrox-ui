@@ -44,7 +44,7 @@ starter's files. Copy each part into yours:
 
 | Starter file | What to take |
 |---|---|
-| [`Cargo.toml`](starter/Cargo.toml) | the ferrox dependencies (pinned to one commit until `v0.1.0`), the feature groups you need |
+| [`Cargo.toml`](starter/Cargo.toml) | the ferrox dependencies (pinned to one release tag), the feature groups you need |
 | [`build.rs`](starter/build.rs) | the `write_css` call: it writes `style/ferrox/` (stylesheet, fonts, pre-paint script) |
 | [`index.html`](starter/index.html) | the `<link data-trunk>` lines in `<head>`, in that order; `class="ferrox-app"` on `<body>` (the page in the theme's background, text colour and font); the loading screen in `<body>` |
 | [`Trunk.toml`](starter/Trunk.toml) | the `pre_build` hook and the `[watch]` ignore |
@@ -65,10 +65,16 @@ set up, build screens from recipes, pick components, and check its work.
 The kit works with any agent that reads files and runs commands; see
 [its README](ferrox-ui/agent-kit/README.md).
 
-**Versions.** Every crate here shares one version and one git reference.
-Use the same reference (the starter's `rev`, later a release tag) for all
-of them: two references, even to the same commit (`ssh://` and
-`https://`), make Cargo build two copies of every type.
+**Versions.** Every crate here shares one version and one git tag. Use the
+same tag, through the same URL, for all of them, and the same one any
+library you use names (webapp-lib pins one). Two copies of ferrox in one
+build would compile and then mix types, theme state and CSS, so Cargo
+refuses them: `ferrox-theme`, `ferrox-icons` and `ferrox-theme-build` each
+declare a `links` value, and only one package may claim each. The error
+reads "package `ferrox-icons` links to the native library `ferrox-icons`,
+but it conflicts with a previous package"; it means two tags (or two URL
+spellings, `ssh://` and `https://`) are in play. Make every ferrox line
+name the one tag the rest of the build uses.
 
 ### Your own themes
 

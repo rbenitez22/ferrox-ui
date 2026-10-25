@@ -200,13 +200,13 @@ fn the_starters_local_clone_lines_match_its_git_lines() {
     // `setup` swaps the git lines for the commented path lines; they must
     // name the same crates with the same features.
     let manifest = std::fs::read_to_string(repo().join("starter/Cargo.toml")).unwrap();
-    let source = r#"git = "https://github.com/rbenitez22/ferrox-ui", rev = ""#;
+    let source = r#"git = "https://github.com/rbenitez22/ferrox-ui", tag = ""#;
     let mut swapped = Vec::new();
     for line in manifest.lines().filter(|l| l.starts_with("ferrox-")) {
         let (name, rest) = line.split_once(" = { ").unwrap();
         let crate_name = name.trim_end();
-        let after_rev = &rest[rest.find(source).expect(line) + source.len()..];
-        let tail = &after_rev[after_rev.find('"').unwrap() + 1..];
+        let after_tag = &rest[rest.find(source).expect(line) + source.len()..];
+        let tail = &after_tag[after_tag.find('"').unwrap() + 1..];
         swapped.push(format!("# {name} = {{ path = \"<clone>/{crate_name}\"{tail}"));
     }
     assert_eq!(swapped.len(), 4);

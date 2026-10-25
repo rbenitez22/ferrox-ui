@@ -6,6 +6,11 @@ edition.workspace    = true
 license.workspace    = true
 repository.workspace = true
 authors.workspace    = true
+# One copy per build: Cargo allows one package per `links` value, so an app
+# that pulls in two ferrox versions (a different tag, or the same tag through
+# another URL) fails to resolve, naming both, instead of compiling two copies
+# whose types, theme state and CSS don't mix. Not a native library.
+links = "ferrox-icons"
 
 [dependencies]
 leptos = { workspace = true }

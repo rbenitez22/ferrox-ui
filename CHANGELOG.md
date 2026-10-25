@@ -1,9 +1,18 @@
 # Changelog
 
-All crates in this repo share one version. Nothing is released yet; until
-`v0.1.0`, breaking changes land here under "Unreleased".
+All crates in this repo share one version and are released together under
+one git tag.
 
-## Unreleased
+## 0.1.0 (2026-10-25)
+
+The first release.
+
+### One copy per build
+
+- `ferrox-theme`, `ferrox-icons` and `ferrox-theme-build` declare `links`,
+  so a build that would hold two ferrox versions fails to resolve instead
+  (see the README's "Versions"). `ferrox-theme-build` gains an empty build
+  script for it. The starter pins `tag = "v0.1.0"`.
 
 ### Changed (breaking): one name, one type per idea
 
