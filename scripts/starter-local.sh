@@ -23,7 +23,7 @@ for crate in ferrox-ui ferrox-theme ferrox-icons ferrox-theme-build; do
 done
 # The copy sits inside this repo's workspace folder: make it its own root.
 printf '\n[workspace]\n' >> "$copy/Cargo.toml"
-if grep -q 'git = ' "$copy/Cargo.toml"; then
+if grep -q '^[^#]*git = ' "$copy/Cargo.toml"; then
     echo "starter-local: a ferrox dependency in starter/Cargo.toml isn't in the expected form" >&2
     exit 1
 fi
