@@ -13,7 +13,8 @@ app puts it where that app's agent finds it.
 ```
 
 (`install.ps1` on Windows, with the same arguments; bash 4 or later
-elsewhere.) It copies the kit into `path/to/app/.ferrox/`, with paths
+elsewhere.) It copies the kit, and the starter app the `setup` task
+copies from, into `path/to/app/.ferrox/`, with paths
 filled in (a `.ferrox/` already there is kept as `.ferrox.bak`), and
 writes small wrappers where the agent looks:
 

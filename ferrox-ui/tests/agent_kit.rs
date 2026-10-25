@@ -176,6 +176,26 @@ fn install_puts_the_same_kit_in_place_from_either_shell() {
 }
 
 #[test]
+fn install_carries_the_starter_as_git_has_it() {
+    // targets.tsv lists the starter file by file; a file added to it but not
+    // there would be missing from every new app.
+    let listed = Command::new("git").args(["ls-files", "starter"]).current_dir(repo()).output().unwrap();
+    assert!(listed.status.success());
+    let tracked: Tree = String::from_utf8(listed.stdout)
+        .unwrap()
+        .lines()
+        .map(|p| (p.strip_prefix("starter/").unwrap().to_string(), std::fs::read(repo().join(p)).unwrap()))
+        .collect::<std::collections::BTreeMap<_, _>>()
+        .into_iter()
+        .collect();
+    let app = scratch("starter");
+    let (out, code) = install("bash", &["--generic"], &app);
+    assert_eq!(code, 0, "{out}");
+    assert!(tree(&app.join(".ferrox/starter")) == tracked, "the installed starter differs from starter/");
+    std::fs::remove_dir_all(&app).unwrap();
+}
+
+#[test]
 fn install_dry_run_writes_nothing_and_an_old_kit_is_kept() {
     for shell in shells() {
         let app = scratch(&format!("again-{shell}"));

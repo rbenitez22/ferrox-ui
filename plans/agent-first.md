@@ -645,6 +645,13 @@ The cost is the same; the result went from drifted to clean, first build.
   on rename. `AGENTS.md` step 1: "no `Cargo.toml` yet? do `setup` first".
   The starter's comment becomes one line. Tests: the installers still
   agree; the installed starter equals `starter/`.
+  *Done:* the starter is listed file by file in `targets.tsv` (a folder
+  copy would take its `target/`, `dist/`, `style/ferrox/`), and a test
+  compares the installed copy with `git ls-files starter`, so a new
+  starter file can't be left out. The installer reaches it as
+  `../../starter`, so it must run from a checkout of the repo (a local
+  clone, or Cargo's git cache), as the README already says; a packaged
+  crate alone has no starter.
 - **10c. Recipe sources move into the crate** (fixes 3, 4):
   `ferrox-ui/docs/recipes/*.rs`, which ships with the crate and is found
   through DOCS like every page. The demo compiles them from there

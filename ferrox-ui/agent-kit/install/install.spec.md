@@ -51,9 +51,9 @@ order.
 ## The targets (`targets.tsv`)
 
 Lines that are empty or start with `#` are skipped; each other line has
-four tab-separated fields: adapter, source (a path in the kit), destination
-(a path in the app), how. Only the rows of the chosen adapters count, in
-file order.
+four tab-separated fields: adapter, source (a path relative to the kit; it
+may lead out of it, as the starter's do), destination (a path in the app),
+how. Only the rows of the chosen adapters count, in file order.
 
 **Rendering** a template for a `kit.tsv` row replaces, everywhere in the
 text, `{{ID}}` with its id, `{{KIND}}` its kind, `{{PATH}}` its path,

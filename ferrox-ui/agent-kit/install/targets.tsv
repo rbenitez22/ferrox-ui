@@ -1,4 +1,5 @@
-# What each adapter installs into an app: adapter, source (in the kit), destination (in the app), how; tab-separated.
+# What each adapter installs into an app: adapter, source (relative to the kit), destination (in the app), how; tab-separated.
+# The starter is listed file by file: a folder copy would take its build output (target/, dist/, style/ferrox/) too.
 # how: copy (the file, or a folder file by file without its tests/), each:<kinds> (the template once per kit.tsv row of those
 # kinds; {{ID}} in the destination), block:<kinds> (the template per row, as one marked block in the file). See install.spec.md.
 generic	core	.ferrox/core	copy
@@ -6,6 +7,13 @@ generic	check	.ferrox/check	copy
 generic	kit.tsv	.ferrox/kit.tsv	copy
 generic	VERSION	.ferrox/VERSION	copy
 generic	BOOTSTRAP.md	.ferrox/BOOTSTRAP.md	copy
+generic	../../starter/.gitignore	.ferrox/starter/.gitignore	copy
+generic	../../starter/Cargo.toml	.ferrox/starter/Cargo.toml	copy
+generic	../../starter/README.md	.ferrox/starter/README.md	copy
+generic	../../starter/Trunk.toml	.ferrox/starter/Trunk.toml	copy
+generic	../../starter/build.rs	.ferrox/starter/build.rs	copy
+generic	../../starter/index.html	.ferrox/starter/index.html	copy
+generic	../../starter/src	.ferrox/starter/src	copy
 claude	adapters/claude/skill.md	.claude/skills/ferrox-{{ID}}/SKILL.md	each:task
 claude	adapters/claude/command.md	.claude/commands/ferrox-{{ID}}.md	each:task
 claude	adapters/claude/agent.md	.claude/agents/ferrox-{{ID}}.md	each:role

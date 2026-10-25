@@ -9,10 +9,12 @@ component already does.
 
 ## How to work
 
-1. **Find the docs.** Run `{{KIT}}/check/ferrox-docs.sh` (or
-   `ferrox-docs.ps1`) in the app's folder. It prints the docs folder of the
-   ferrox-ui this app builds against; below, that folder is **DOCS**. Read
-   nothing else for ferrox-ui's API: those docs match the code you compile.
+1. **Find the docs.** No `Cargo.toml` with ferrox-ui in it yet? Do the
+   `setup` task first; it needs no docs. Then run
+   `{{KIT}}/check/ferrox-docs.sh` (or `ferrox-docs.ps1`) in the app's
+   folder. It prints the docs folder of the ferrox-ui this app builds
+   against; below, that folder is **DOCS**. Read nothing else for
+   ferrox-ui's API: those docs match the code you compile.
 2. **Pick the job's task** and follow it:
    <!-- rendered: tasks -->
    - `setup`: Add ferrox-ui to a Leptos CSR app, or start a new app from the starter (`{{KIT}}/core/tasks/setup.md`)

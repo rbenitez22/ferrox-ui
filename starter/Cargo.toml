@@ -11,8 +11,8 @@ publish = false
 leptos = { version = "0.8.14", features = ["csr"] }
 # ferrox-ui, pinned to one commit (a release tag once v0.1.0 is out).
 # Add the features (groups) you use: overlay, forms, navigation, layout,
-# data, menus. Working from a local clone instead? Swap `git` and `rev`
-# for `path = "/path/to/ferrox-ui/ferrox-ui"` (and the same for the others).
+# data, menus.
+# A local clone instead: in all four, `git = …, rev = …` → `path = "<clone>/<crate>"`.
 ferrox-ui    = { git = "https://github.com/rbenitez22/ferrox-ui", rev = "e05d7d183034918a08761ece3a28bc26b63ea4ae", features = ["overlay", "forms", "layout", "data", "menus"] }
 ferrox-theme = { git = "https://github.com/rbenitez22/ferrox-ui", rev = "e05d7d183034918a08761ece3a28bc26b63ea4ae", features = ["leptos"] }
 ferrox-icons = { git = "https://github.com/rbenitez22/ferrox-ui", rev = "e05d7d183034918a08761ece3a28bc26b63ea4ae" }

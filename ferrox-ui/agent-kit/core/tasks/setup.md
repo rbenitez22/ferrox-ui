@@ -1,19 +1,21 @@
 # Task: set up ferrox-ui in an app
 
 Add ferrox-ui to a Leptos CSR app built with Trunk, or start a new app.
-The setup lives in one place, the starter app, beside the docs: with DOCS
-the folder `{{KIT}}/check/ferrox-docs` prints, the starter is
-`DOCS/../../starter`, and its `README.md` names every file and its job.
+The setup lives in one place, the starter app, installed with this kit at
+`{{KIT}}/starter`; its `README.md` names every file and its job.
 
 ## A new app
 
 1. Ask the user for the app's name if they haven't given it.
-2. Copy the starter folder to where the app goes (everything but `target/`
-   and `dist/`).
-3. In the copy: set `name` in `Cargo.toml` and the `<title>` in
-   `index.html`. Keep the ferrox dependencies exactly as the starter pins
-   them (one git reference for all four crates).
-4. Build: `trunk build` in the app's folder (`trunk serve` to look at it).
+2. Copy every file in `{{KIT}}/starter` to the app's folder.
+3. In the copy: set `name` in `Cargo.toml`, delete the comment at its top
+   (it's the starter's), and set the `<title>` in `index.html`.
+4. The ferrox dependencies: keep them exactly as the starter pins them
+   (one git reference for all four crates). Only if the user wants a local
+   clone of ferrox-ui: in each of the four lines (`ferrox-ui`,
+   `ferrox-theme`, `ferrox-icons`, `ferrox-theme-build`), replace
+   `git = "…", rev = "…"` with `path = "<clone>/<that crate>"`.
+5. Build: `trunk build` in the app's folder (`trunk serve` to look at it).
    Replace the starter's page with the app's own screens (the `screen`
    task).
 
