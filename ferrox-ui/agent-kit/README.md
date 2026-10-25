@@ -55,6 +55,7 @@ And beside them:
 | `adapters/` | each agent's templates: its boilerplate and placeholders, filled from `kit.tsv` on install (no guidance of their own) |
 | `install/` | the installer, in bash and PowerShell 7, and `targets.tsv` (what goes where, and how) |
 | `kit.tsv` | the list of pieces above: the one place an adapter or the installer reads them from |
+| `tests/measure-prompt.md` | the reference task, word for word, for measuring how an agent does with the kit (not installed) |
 
 ## Scripts in other languages
 

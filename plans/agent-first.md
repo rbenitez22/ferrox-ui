@@ -591,6 +591,72 @@ a CHANGELOG started with the renames.
   one uses ordinal string comparisons (.NET's defaults are
   culture-sensitive). The bash one needs bash 4 (associative arrays).
 
+## Piece 10: measure again (2026-10-25)
+
+### The run
+
+Same as the baseline: Sonnet, `general-purpose`, no skills, no memory, an
+empty app folder, ferrox-ui by path, done when `trunk build` passes. The
+kit was installed with `--generic` (a subagent doesn't load skills from the
+app's `.claude/`, so `--claude` would have measured nothing extra), and the
+prompt began with `BOOTSTRAP.md`'s paragraph plus the app's folder. The
+baseline's exact prompt wasn't kept; this one was rebuilt from the
+description above. From now on the prompt is kept in
+`agent-kit/tests/measure-prompt.md`, so later runs use the same words.
+
+| Measure | Baseline | With the kit |
+|---|---|---|
+| Tokens | 68,009 | 64,708 |
+| Tool calls | 13 | 14 |
+| Time | 1 min 48 s | 1 min 46 s |
+| Build rounds | 2 (one compile error) | 1 (no errors, no warnings) |
+| Drift check | (no check yet) unstyled hand-made rows; an error state nothing triggers | no drift |
+| Read | the root README, 650 lines of the crate README in 7 slices, the demo's setup files, three crates' sources | `AGENTS.md`, the four tasks, the starter's files, `recipes.md` and six component pages, three recipe sources in full |
+| App | 187 lines | 336 lines (the list recipe, trimmed: row `Menu`, `ConfirmDialog`, `DataView` with Retry, `?offline` shows the error) |
+
+The cost is the same; the result went from drifted to clean, first build.
+
+### Where it stumbled
+
+1. **A circle at the start.** `AGENTS.md` step 1 runs `ferrox-docs`,
+   which needs a `Cargo.toml` depending on ferrox-ui; an empty folder has
+   none, and `setup.md` finds the starter only through DOCS
+   (`DOCS/../../starter`).
+2. **Path or git.** The starter pins a git `rev`; switching to a local
+   path is a comment split over lines, easy to miss.
+3. **Recipes assume the demo's shell:** `store.settings`, a
+   `/recipes/{id}` route on the card, `use super::…`. It had to find and
+   strip these itself.
+4. **Recipe sources live in `demo/`**, outside the crate: `recipes.md`'s
+   links work only in a whole checkout (a git dependency has one, a
+   crates.io one won't).
+5. The starter's header comment ("ready to rename") survives the rename.
+
+### Fixes (each its own commit)
+
+- **10a. Record this run.** This section, and the prompt in
+  `agent-kit/tests/measure-prompt.md`.
+- **10b. The starter ships in the kit** (fixes 1, 2, 5). `targets.tsv`
+  gains `generic ../../starter .ferrox/starter copy` (without `target/`,
+  `dist/`); the kit is copies already, made from the same checkout, so the
+  starter matches the kit's version and its pinned `rev`. `setup.md` (new
+  app): copy `{{KIT}}/starter`, no DOCS needed; one plain step for a local
+  clone (each of the four `git`/`rev` → `path`); remove the header comment
+  on rename. `AGENTS.md` step 1: "no `Cargo.toml` yet? do `setup` first".
+  The starter's comment becomes one line. Tests: the installers still
+  agree; the installed starter equals `starter/`.
+- **10c. Recipe sources move into the crate** (fixes 3, 4):
+  `ferrox-ui/docs/recipes/*.rs`, which ships with the crate and is found
+  through DOCS like every page. The demo compiles them from there
+  (`#[path]` in `demo/src/recipes/mod.rs`), so its e2e tests still prove
+  them. `recipes.md` links `recipes/<file>.rs`, and each recipe's row
+  says what to change when copying it alone (the module path, the
+  settings it reads, the detail-page link). Tests: `docs_current`, the
+  demo's e2e, `cargo package --list` includes them, `ferrox-check` on the
+  demo.
+- **10d. Measure once more** with the same prompt, in a fresh empty
+  folder; record the third column here.
+
 ## Pieces
 
 Each is small and reviewed on its own.
