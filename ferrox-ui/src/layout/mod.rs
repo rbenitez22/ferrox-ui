@@ -10,6 +10,7 @@ mod flow;
 mod heading;
 mod page_grid;
 mod panel;
+mod shell;
 
 pub use app_bar::{app_bar_classes, AppBar};
 pub use card::{card_classes, Card};
@@ -18,3 +19,4 @@ pub use flow::{cluster_classes, stack_classes, Align, Cluster, Gap, Justify, Sta
 pub use heading::HeadingLevel;
 pub use page_grid::{page_grid_classes, PageGrid, PageWidth, SidePosition};
 pub use panel::{panel_classes, Panel, PanelTone};
+pub(crate) use shell::{shell, ShellContext};

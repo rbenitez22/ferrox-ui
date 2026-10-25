@@ -7,7 +7,7 @@ shows it at `/recipes`, and its e2e tests cover each one, so they work.
 
 | Recipe | File | What it shows |
 |---|---|---|
-| App shell | [`recipes/shell.rs`](recipes/shell.rs) | the store provided for every page; `AppBar` (menu button, the name linking home, a user `Menu` with a header); `SideMenu` with the app's pages; the router's `Outlet` |
+| App shell | [`recipes/shell.rs`](recipes/shell.rs) | the store provided for every page; an `AppShell`: the name linking home, a user `Menu` with a header at the bar's end, the app's pages in the side menu, its footer; the router's `Outlet` |
 | List page | [`recipes/list_page.rs`](recipes/list_page.rs) | `PageGrid` and a page `Panel` with a `DataLayoutSwitch` and an add button; `DataView` of `Card`s, each a link to its record with a row `Menu` (edit, delete); loading, error with Retry, and empty states; `ConfirmDialog` before deleting |
 | Form in a dialog | [`recipes/recipe_dialog.rs`](recipes/recipe_dialog.rs) | one `Dialog` to add or edit, filled each time it opens; `Field`s in a `Stack`; errors only after a save is tried; Save's saving state until the store answers |
 | Detail page | [`recipes/detail_page.rs`](recipes/detail_page.rs) | the record's name as the page's title; `SplitButton` (Edit, with Duplicate and Delete behind it); `Facts` in a side column; loading and not-found; delete, then back to the list |

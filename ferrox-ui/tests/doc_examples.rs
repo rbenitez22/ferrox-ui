@@ -552,35 +552,60 @@ mod navigation {
 
     fn navigation_intro() -> impl IntoView {
         // region: navigation
-        use ferrox_ui::{NavGroup, NavLink, SideMenu, SideMenuButton};
+        use ferrox_ui::{AppShell, NavGroup, NavLink};
         use leptos_router::components::{Route, Router, Routes};
         use leptos_router::path;
 
-        let menu = RwSignal::new(false);
-
         view! {
             <Router>
-                <header class="app-bar">
-                    <SideMenuButton open=menu />
-                    <span class="app-bar__title">"Groceries"</span>
-                </header>
-                <SideMenu open=menu title="Groceries">
-                    <NavLink href="/" exact=true>"Lists"</NavLink>
-                    <NavLink href="/load">"Load Data"</NavLink>
-                    <NavGroup label="Product database" collapsible=true>
-                        <NavLink href="/units">"Units"</NavLink>
-                        <NavLink href="/categories">"Categories"</NavLink>
-                        <NavLink href="/products">"Products"</NavLink>
-                    </NavGroup>
-                    <NavGroup label="Account">
-                        <NavLink href="/account">"Account"</NavLink>
-                        <NavLink href="/logout">"Logout"</NavLink>
-                    </NavGroup>
-                </SideMenu>
-                <Routes fallback=|| "Not found">
-                    <Route path=path!("/") view=|| "Lists" />
-                </Routes>
+                <AppShell
+                    title="Groceries"
+                    href="/"
+                    nav=|| view! {
+                        <NavLink href="/" exact=true>"Lists"</NavLink>
+                        <NavLink href="/load">"Load Data"</NavLink>
+                        <NavGroup label="Product database" collapsible=true>
+                            <NavLink href="/units">"Units"</NavLink>
+                            <NavLink href="/categories">"Categories"</NavLink>
+                            <NavLink href="/products">"Products"</NavLink>
+                        </NavGroup>
+                        <NavGroup label="Account">
+                            <NavLink href="/account">"Account"</NavLink>
+                            <NavLink href="/logout">"Logout"</NavLink>
+                        </NavGroup>
+                    }
+                >
+                    <Routes fallback=|| "Not found">
+                        <Route path=path!("/") view=|| "Lists" />
+                    </Routes>
+                </AppShell>
             </Router>
+        }
+        // endregion
+    }
+
+    fn app_shell() -> impl IntoView {
+        // region: app-shell
+        use ferrox_ui::{AppShell, Menu, MenuItem, MenuTrigger, NavLink};
+        use leptos_router::components::Outlet;
+
+        view! {
+            <AppShell
+                title="Cookbook"
+                href="/"
+                nav=|| view! {
+                    <NavLink href="/" exact=true>"Recipes"</NavLink>
+                    <NavLink href="/settings">"Settings"</NavLink>
+                }
+                bar_end=|| view! {
+                    <Menu label="Account" trigger=MenuTrigger::custom(|| view! { <span>"Ada Lovelace"</span> }, "Account")>
+                        <MenuItem on_select=|| ()>"Sign out"</MenuItem>
+                    </Menu>
+                }
+                menu_footer=|| view! { <span>"Version 1.4"</span> }
+            >
+                <Outlet />
+            </AppShell>
         }
         // endregion
     }

@@ -16,9 +16,9 @@ default = []
 overlay = []
 # Field and the form controls.
 forms = []
-# NavList, NavLink, then the side menu (on `Sheet`). The only group that
-# needs leptos_router.
-navigation = ["overlay", "dep:leptos_router"]
+# NavList, NavLink, the side menu (on `Sheet`), and AppShell (with
+# `layout`'s AppBar). The only group that needs leptos_router.
+navigation = ["overlay", "layout", "dep:leptos_router"]
 # Panel and Card: boxes that title and hold content.
 layout = []
 # DataView: record lists in a grid, a list, a strip or wrapping chips.

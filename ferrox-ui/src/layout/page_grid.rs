@@ -54,7 +54,9 @@ pub fn page_grid_classes(width: PageWidth, side: Option<SidePosition>, extra: &s
 /// column spaces its children (panels) by `--space-lg`, as does the side.
 ///
 /// - The main column is the page's `<main>` landmark, the side an `<aside>`.
-///   Inside an app shell that already has a `<main>`, set `landmark=false`.
+///   Inside an `AppShell`, which has its own `<main>`, the main column is a
+///   plain block (the side stays an `<aside>`). `landmark=false` makes both
+///   plain blocks; `true`, both landmarks.
 /// - `side` is built once.
 ///
 /// ```ignore
@@ -68,22 +70,24 @@ pub fn PageGrid(
     /// A side column beside the main one (under it on a phone).
     #[prop(optional, into)] side: Option<ViewFnOnce>,
     #[prop(optional)] side_position: SidePosition,
-    /// The main column is `<main>` (and the side `<aside>`). False inside a
-    /// shell that has its own `<main>`.
-    #[prop(default = true)] landmark: bool,
+    /// The main column is `<main>` and the side `<aside>`. Unset: both,
+    /// except no `<main>` inside an `AppShell`, which has its own.
+    #[prop(optional)] landmark: Option<bool>,
     /// Extra classes, appended to the generated ones. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
     /// The main column.
     children: Children,
 ) -> impl IntoView {
+    let main_landmark = landmark.unwrap_or_else(|| super::shell().is_none());
+    let side_landmark = landmark.unwrap_or(true);
     let has_side = side.as_ref().map(|_| side_position);
-    let main = if landmark {
+    let main = if main_landmark {
         view! { <main class="page-grid__main">{children()}</main> }.into_any()
     } else {
         view! { <div class="page-grid__main">{children()}</div> }.into_any()
     };
     let side = side.map(|side| {
-        if landmark {
+        if side_landmark {
             view! { <aside class="page-grid__side">{side.run()}</aside> }.into_any()
         } else {
             view! { <div class="page-grid__side">{side.run()}</div> }.into_any()

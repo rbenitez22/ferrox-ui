@@ -51,6 +51,7 @@ when the `forms` feature is on.
 |---|---|
 | `nav.css` | `.nav-list`, `.nav-list__items`; `.nav-link`, `.nav-link__icon`, `.nav-link[aria-current='page']`; `.nav-group`, `.nav-group--collapsible`, `.nav-group__heading`, `.nav-group__toggle` (`[aria-expanded='true']`), `.nav-group__label`, `.nav-group__chevron`, `.nav-group__list` |
 | `side-menu.css` | `.side-menu` (with `.sheet`), `.side-menu__content`, `.side-menu__footer` |
+| `app-shell.css` | `.app-shell`, `.app-shell__skip` (the skip link, shown on focus), `.app-shell__main` |
 
 These are injected only when the `navigation` feature is on.
 

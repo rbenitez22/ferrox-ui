@@ -39,8 +39,33 @@ test.describe('app shell', () => {
 
   test('the page is the main landmark; the demo\'s frame is not there', async ({ page }) => {
     await openApp(page, '/recipes');
+    // One <main>: the shell's, with the page's grid inside it.
     await expect(page.getByRole('main')).toHaveCount(1);
+    await expect(page.getByRole('main').locator('.page-grid')).toHaveCount(1);
     await expect(page.locator('.demo-header')).toHaveCount(0);
+  });
+
+  test('a skip link is the first Tab stop, shown on focus, and moves focus to the page', async ({ page }) => {
+    await openApp(page, '/recipes');
+    const skip = page.getByRole('link', { name: 'Skip to content' });
+    const hidden = await skip.boundingBox();
+    expect(hidden!.y + hidden!.height).toBeLessThanOrEqual(0);
+    await page.keyboard.press('Tab');
+    await expect(skip).toBeFocused();
+    const shown = await skip.boundingBox();
+    expect(shown!.y).toBeGreaterThanOrEqual(0);
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('main')).toBeFocused();
+    // Tab goes on from the page, not back to the bar.
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(() => !!document.activeElement?.closest('main'))).toBe(true);
+  });
+
+  test("the side menu's footer, below its links", async ({ page }) => {
+    await openApp(page, '/recipes');
+    await page.getByRole('button', { name: 'Menu' }).click();
+    const menu = page.getByRole('dialog', { name: 'Cookbook' });
+    await expect(menu.locator('.side-menu__footer').getByRole('link', { name: 'Back to the ferrox-ui demo' })).toBeVisible();
   });
 });
 

@@ -380,6 +380,18 @@ A multi-line text field (`.form-textarea`), bound two-way to `value`.
 
 ## navigation (feature `navigation`)
 
+### `AppShell` (component)
+The app's frame: a skip link, the [`AppBar`] (its menu button, the app's name, `bar_end`), the [`SideMenu`] holding `nav`, then the page in the app's one `<main>`.
+- `title: Signal<String>`
+- `href: MaybeProp<String>`, optional
+- `nav: ViewFn`
+- `bar_end: Option<ViewFnOnce>`, optional
+- `menu_footer: Option<ViewFn>`, optional
+- `skip_label: Signal<String>`, default `"Skip to content"`
+- `menu_label: Signal<String>`, default `"Menu"`
+- `nav_label: Signal<String>`, default `"Sections"`
+- `children: Children`
+
 ### `nav_group_classes` (function)
 `fn nav_group_classes(collapsible: bool, extra: &str) -> String`: The class list for a `.nav-group`.
 
@@ -519,7 +531,7 @@ A page: its content capped at a width and centred, with the page's padding, and 
 - `width: PageWidth`, optional
 - `side: Option<ViewFnOnce>`, optional
 - `side_position: SidePosition`, optional
-- `landmark: bool`, default `true`
+- `landmark: Option<bool>`, optional
 - `class: MaybeProp<String>`, optional
 - `children: Children`
 

@@ -18,7 +18,7 @@ view! {
 | `width` | `PageWidth::Medium` | the content's cap, centred: `Narrow` 40rem (a form, reading), `Medium` 64rem, `Wide` 80rem (grids of cards), `Full` |
 | `side` | none | a side column, 18rem wide, beside the main one; under it on a phone (≤ 768px). Built once |
 | `side_position` | `SidePosition::End` | `Start` puts the side column first (on a phone it still goes under the main one) |
-| `landmark` | `true` | the main column is `<main>` and the side `<aside>`; `false` inside a shell that has its own `<main>` |
+| `landmark` | automatic | the main column is `<main>` and the side `<aside>`; inside an `AppShell` (which has its own `<main>`) only the side is. `false`: neither; `true`: both |
 | `class` | | extra classes on the grid |
 | children | | the main column |
 

@@ -1,0 +1,30 @@
+/* The app's frame (`.app-shell`): a skip link, the app bar, the side menu,
+   the page. Part of ferrox-ui `navigation`. Tokens only and class-only; the
+   bar and the menu are their own components'. */
+
+/* The first Tab stop, out of sight until it has focus; then it sits over
+   the bar's start, where the eye already is. */
+.app-shell__skip {
+  position: absolute;
+  inset: var(--space-sm) auto auto var(--space-sm);
+  z-index: 11; /* above the sticky app bar (10) */
+  padding: var(--space-sm) var(--space-md);
+  background: var(--surface-1);
+  color: var(--primary-text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(calc(-100% - var(--space-lg)));
+}
+
+.app-shell__skip:focus {
+  transform: none;
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
+}
+
+/* Focused by the skip link only to move the reading position: no ring on
+   the whole page. */
+.app-shell__main:focus {
+  outline: none;
+}
