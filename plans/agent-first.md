@@ -604,15 +604,15 @@ baseline's exact prompt wasn't kept; this one was rebuilt from the
 description above. From now on the prompt is kept in
 `agent-kit/tests/measure-prompt.md`, so later runs use the same words.
 
-| Measure | Baseline | With the kit | After 10b–c |
-|---|---|---|---|
-| Tokens | 68,009 | 64,708 | 61,335 |
-| Tool calls | 13 | 14 | 10 |
-| Time | 1 min 48 s | 1 min 46 s | 1 min 42 s |
-| Build rounds | 2 (one compile error) | 1 (no errors, no warnings) | 1 (no errors; a second after a comment edit) |
-| Drift check | (no check yet) unstyled hand-made rows; an error state nothing triggers | no drift | no drift |
-| Read | the root README, 650 lines of the crate README in 7 slices, the demo's setup files, three crates' sources | `AGENTS.md`, the four tasks, the starter's files, `recipes.md` and six component pages, three recipe sources in full | `AGENTS.md`, the four tasks, `.ferrox/starter`, `recipes.md`, `conventions.md`, three recipe sources; no component page |
-| App | 187 lines | 336 lines (the list recipe, trimmed: row `Menu`, `ConfirmDialog`, `DataView` with Retry, `?offline` shows the error) | 351 lines (the same recipes, as a `recipes` module) |
+| Measure | Baseline | With the kit | After 10b–c | After 10e |
+|---|---|---|---|---|
+| Tokens | 68,009 | 64,708 | 61,335 | 60,793 |
+| Tool calls | 13 | 14 | 10 | 11 |
+| Time | 1 min 48 s | 1 min 46 s | 1 min 42 s | 1 min 59 s |
+| Build rounds | 2 (one compile error) | 1 (no errors, no warnings) | 1 (no errors; a second after a comment edit) | 1 (no errors; two dead-code warnings) |
+| Drift check | (no check yet) unstyled hand-made rows; an error state nothing triggers | no drift | no drift | no drift |
+| Read | the root README, 650 lines of the crate README in 7 slices, the demo's setup files, three crates' sources | `AGENTS.md`, the four tasks, the starter's files, `recipes.md` and six component pages, three recipe sources in full | `AGENTS.md`, the four tasks, `.ferrox/starter`, `recipes.md`, `conventions.md`, three recipe sources; no component page | the same, less `store.rs`'s middle (its own truncated output) |
+| App | 187 lines | 336 lines (the list recipe, trimmed: row `Menu`, `ConfirmDialog`, `DataView` with Retry, `?offline` shows the error) | 351 lines (the same recipes, as a `recipes` module) | 390 lines (the same) |
 
 The cost is the same; the result went from drifted to clean, first build.
 
@@ -690,6 +690,13 @@ The cost is the same; the result went from drifted to clean, first build.
   re-exporting the screens and `Store`, `Store::provide()`, the
   `Location` feature); `addresses` in the starter's and the demo's
   `Trunk.toml`; `screen.md` points at `AGENTS.md`'s table.
+  *Fourth run:* the cost has levelled off (61k), with no compile error
+  and no drift in each run since the kit; it read no component page.
+  What was left: `setup.md`'s "copy every file to the app's folder" let
+  it copy into `.ferrox/` first (its own slip, undone; `--update
+  --dry-run` shows the kit intact), and the unused parts of `store.rs`
+  (`Settings.units`, `remove_all`, `find`) gave dead-code warnings the
+  copying table doesn't mention. Both are one-line fixes (10f).
 
 ## Pieces
 
