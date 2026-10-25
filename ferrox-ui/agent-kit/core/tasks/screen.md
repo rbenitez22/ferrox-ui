@@ -16,7 +16,7 @@ app's shell. DOCS is the folder `{{KIT}}/check/ferrox-docs` prints.
 4. **For anything the recipe doesn't have**, follow the `component` task.
    Don't add CSS: if the screen seems to need some, a component or a
    layout component (`Stack`, `Cluster`, `PageGrid`) almost certainly does
-   it; look in `DOCS/choosing.md` again.
+   it; look in `AGENTS.md`'s component table again.
 5. **Check and build**: the `check` task, then the app's build.
 
 ## Done when

@@ -682,6 +682,14 @@ The cost is the same; the result went from drifted to clean, first build.
   4. Trunk warns the starter's `address` is deprecated (`addresses`).
   5. `screen.md` sends it to `DOCS/choosing.md`, whose table `AGENTS.md`
      already carries.
+- **10e. Fix those five** (approved 2026-10-25), then measure a fourth
+  time. *Done:* the starter carries the four path lines, commented, under
+  the git ones (a test keeps them naming the same crates and features),
+  and `setup.md` says to edit, not script, the swap; web-sys `Location` in
+  the starter; "Wiring copied recipes in" in `recipes.md` (the module,
+  re-exporting the screens and `Store`, `Store::provide()`, the
+  `Location` feature); `addresses` in the starter's and the demo's
+  `Trunk.toml`; `screen.md` points at `AGENTS.md`'s table.
 
 ## Pieces
 

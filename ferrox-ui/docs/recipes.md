@@ -16,6 +16,17 @@ shows it at `/recipes`, and its e2e tests cover each one, so they work.
 
 The starter (`starter/`) is the smallest of these: one list page, no shell.
 
+## Wiring copied recipes in
+
+Put the files in one module, `src/recipes/`, with a `mod.rs` that declares
+them (`mod store; mod recipe_dialog; mod list_page;`) and re-exports the
+screens and the store (`pub use list_page::ListPage;`,
+`pub use store::Store;`), and `mod recipes;` in
+`main.rs`. Call `Store::provide()` once, in the component that holds the
+screens (the shell does; with no shell, the app's root), then render a
+screen. `store.rs` reads the page's address (`?offline`): it needs
+web-sys's `Location` feature, which the starter enables.
+
 ## Copying one recipe alone
 
 The recipes are written as one module of the Cookbook app: each finds the

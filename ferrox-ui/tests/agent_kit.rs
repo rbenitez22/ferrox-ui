@@ -196,6 +196,26 @@ fn install_carries_the_starter_as_git_has_it() {
 }
 
 #[test]
+fn the_starters_local_clone_lines_match_its_git_lines() {
+    // `setup` swaps the git lines for the commented path lines; they must
+    // name the same crates with the same features.
+    let manifest = std::fs::read_to_string(repo().join("starter/Cargo.toml")).unwrap();
+    let source = r#"git = "https://github.com/rbenitez22/ferrox-ui", rev = ""#;
+    let mut swapped = Vec::new();
+    for line in manifest.lines().filter(|l| l.starts_with("ferrox-")) {
+        let (name, rest) = line.split_once(" = { ").unwrap();
+        let crate_name = name.trim_end();
+        let after_rev = &rest[rest.find(source).expect(line) + source.len()..];
+        let tail = &after_rev[after_rev.find('"').unwrap() + 1..];
+        swapped.push(format!("# {name} = {{ path = \"<clone>/{crate_name}\"{tail}"));
+    }
+    assert_eq!(swapped.len(), 4);
+    for line in &swapped {
+        assert!(manifest.lines().any(|l| l == line), "starter/Cargo.toml lacks `{line}`");
+    }
+}
+
+#[test]
 fn install_dry_run_writes_nothing_and_an_old_kit_is_kept() {
     for shell in shells() {
         let app = scratch(&format!("again-{shell}"));

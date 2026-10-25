@@ -12,9 +12,11 @@ The setup lives in one place, the starter app, installed with this kit at
    (it's the starter's), and set the `<title>` in `index.html`.
 4. The ferrox dependencies: keep them exactly as the starter pins them
    (one git reference for all four crates). Only if the user wants a local
-   clone of ferrox-ui: in each of the four lines (`ferrox-ui`,
-   `ferrox-theme`, `ferrox-icons`, `ferrox-theme-build`), replace
-   `git = "…", rev = "…"` with `path = "<clone>/<that crate>"`.
+   clone of ferrox-ui: the path lines are in `Cargo.toml`, commented, under
+   the git ones. Delete the four git lines (`ferrox-ui`, `ferrox-theme`,
+   `ferrox-icons`, `ferrox-theme-build`) and the comments about them,
+   uncomment the four path lines, and replace `<clone>` with the clone's
+   folder. Edit the file; don't script it.
 5. Build: `trunk build` in the app's folder (`trunk serve` to look at it).
    Replace the starter's page with the app's own screens (the `screen`
    task).
