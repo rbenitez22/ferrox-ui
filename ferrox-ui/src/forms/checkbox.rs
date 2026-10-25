@@ -66,7 +66,7 @@ pub fn Checkbox(
 
     let shared = Signal::derive(move || help_shares_value.then(|| checked.get().to_string()));
     let reveal = help.0.is_some() && reveals_while_active(help_reveal);
-    let help = component_help(help, "checkbox", label, shared, help_skip_tab, "checkbox__help", reveal);
+    let (help, help_id) = component_help(help, "checkbox", label, shared, help_skip_tab, "checkbox__help", reveal).unzip();
 
     let row = view! {
         <label class="checkbox__row">
@@ -92,7 +92,7 @@ pub fn Checkbox(
     };
 
     view! {
-        <div class=move || with_reveal(checkbox_classes(invalid.get(), &class.get().unwrap_or_default()), reveal)>
+        <div class=move || with_reveal(checkbox_classes(invalid.get(), &class.get().unwrap_or_default()), reveal) data-help=help_id>
             {line}
             {message}
         </div>

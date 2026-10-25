@@ -7,6 +7,7 @@ use web_sys::{Element, Event, HtmlElement};
 
 use super::anchor::{follow, place, Align};
 use super::help_request::HelpRequest;
+use super::help_keys::help_keys_shortcuts;
 use super::help_scope::{assistant, scope_context};
 use super::help_topic::{HelpBlock, HelpTopic, MaybeHelp};
 use crate::ids::unique_id;
@@ -57,16 +58,22 @@ pub fn HelpButton(
     /// A value to send with the request. Only pass one the user would expect
     /// an assistant to see.
     #[prop(optional, into)] value: MaybeProp<String>,
+    /// The button's id (one is made if not given). F1 (`HelpKeys`) finds a
+    /// `?` from the focused element's closest `[data-help]`, which names it
+    /// by this id; components that place a `?` set both.
+    #[prop(optional, into)] id: Option<String>,
     /// Extra classes on the button. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
 ) -> impl IntoView {
     let popover_id = unique_id("ferrox-help");
+    let button_id = id.unwrap_or_else(|| format!("{popover_id}-button"));
     let title_id = format!("{popover_id}-title");
     let (controls, target, labelled_by) = (popover_id.clone(), popover_id.clone(), title_id.clone());
     let open = RwSignal::new(false);
     // Where this `?` sits decides what a request carries.
     let scope_context_here = scope_context();
     let button_ref = NodeRef::<html::Button>::new();
+    let shortcuts = help_keys_shortcuts(assistant().is_some());
     let popover_ref = NodeRef::<html::Div>::new();
 
     let title = topic.title().to_string();
@@ -121,8 +128,10 @@ pub fn HelpButton(
     view! {
         <button
             type="button"
+            id=button_id
             node_ref=button_ref
             class=move || help_button_classes(&class.get().unwrap_or_default())
+            aria-keyshortcuts=shortcuts
             aria-label=label
             title=label
             aria-expanded=move || if open.get() { "true" } else { "false" }
@@ -158,7 +167,8 @@ pub(crate) fn with_reveal(classes: String, reveal: bool) -> String {
 /// The `?` a component places for its `help` prop, if it has a topic:
 /// labelled for the request by `about`, sending `value` only if given.
 /// `reveal`: shown only while the component's `.help-reveal` container is
-/// active (the container's class is the component's to add).
+/// active (the container's class is the component's to add). With it, the
+/// `?`'s id, for the container's `data-help` (so F1 finds it).
 pub(crate) fn component_help(
     help: MaybeHelp,
     kind: &'static str,
@@ -167,10 +177,14 @@ pub(crate) fn component_help(
     skip_tab: bool,
     class: &'static str,
     reveal: bool,
-) -> Option<impl IntoView> {
+) -> Option<(impl IntoView, String)> {
     let class = if reveal { format!("{class} help-btn--reveal") } else { class.to_string() };
-    help.0.map(|topic| view! {
-        <HelpButton topic=topic kind=kind about=about value=value skip_tab=skip_tab class=class />
+    help.0.map(|topic| {
+        let id = unique_id("ferrox-help-button");
+        let view = view! {
+            <HelpButton topic=topic kind=kind about=about value=value skip_tab=skip_tab id=id.clone() class=class />
+        };
+        (view, id)
     })
 }
 

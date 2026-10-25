@@ -195,6 +195,15 @@ Each passes `scripts/release-check.sh` and is reviewed on its own.
    `/help`; 5 e2e tests per browser; release check passed (639 e2e).
 2. **B: `HelpKeys`.** `data-help` and the `?`'s id on every component with
    help, `HelpKeys` (F1, Shift+F1, `aria-keyshortcuts`), demo, e2e, docs.
+   *Done 2026-10-25:* Esc after F1 gives focus back to the *control*
+   (the browser restores what had focus before the popover showed), not
+   to the `?` as written above: better, since that's where the user was.
+   F1 inside an open topic does nothing. `component_help` returns the
+   `?`'s id with its view. The demo's `/help` page is inside `HelpKeys`;
+   `/layout` is the outside case, checked with a synthetic keydown (a
+   real F1 there runs the browser's help, which aborts Firefox's font
+   loads). Added to `docs/choosing.md` (and so AGENTS.md): HelpReveal and
+   HelpKeys rows.
 3. **C1: the observer.** `HelpSignals`, `HelpSignal`/`HelpSignalKind`,
    `help_signals()` and `report`, `HelpOpened`/`HelpDismissed` from
    HelpButton; the demo's signals log; e2e, docs.

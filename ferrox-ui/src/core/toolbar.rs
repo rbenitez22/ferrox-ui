@@ -39,12 +39,13 @@ pub fn Toolbar(
     let about = Signal::derive(move || title.get().unwrap_or_default());
     // With help, the title and its `?` share the free space together, so the
     // `?` sits by the title rather than by the buttons.
-    let heading = match component_help(help, "toolbar", about, Signal::stored(None), false, "toolbar__help", false) {
+    let (help, help_id) = component_help(help, "toolbar", about, Signal::stored(None), false, "toolbar__help", false).unzip();
+    let heading = match help {
         Some(help) => view! { <div class="toolbar__heading">{title_text}{help}</div> }.into_any(),
         None => title_text.into_any(),
     };
     view! {
-        <div class=move || toolbar_classes(compact, &class.get().unwrap_or_default())>
+        <div class=move || toolbar_classes(compact, &class.get().unwrap_or_default()) data-help=help_id>
             {heading}
             {children()}
         </div>

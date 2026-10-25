@@ -63,6 +63,9 @@ From the names audit in `plans/agent-first.md` (piece 3).
 - `HelpReveal`: `help_reveal` on Field, Checkbox and Switch, and `reveal` on
   `HelpScope` for the controls inside, show a `?` only while its control is
   in use. `HelpScope`'s `context` is now optional.
+- `HelpKeys`: F1 opens the focused control's help, Shift+F1 asks the
+  assistant about it. Components with help mark themselves `data-help`;
+  `HelpButton` takes an `id`.
 - The drift check (`ferrox-ui/agent-kit/check/`): `ferrox-check` lists
   where an app drifts from ferrox-ui, with the fix; `ferrox-docs` prints
   the docs of the ferrox-ui an app builds against. Each in bash and

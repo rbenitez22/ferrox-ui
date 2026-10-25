@@ -85,7 +85,7 @@ pub fn Sheet(
     let (on_cancel, on_closed) = (modal.on_cancel(), modal.on_closed());
     let title_id = unique_id("ferrox-sheet-title");
     let labelled_by = title_id.clone();
-    let help = component_help(help, "sheet", title, Signal::stored(None), false, "sheet__help", false);
+    let (help, help_id) = component_help(help, "sheet", title, Signal::stored(None), false, "sheet__help", false).unzip();
 
     // A click closes only if it both started and ended on the backdrop, so a
     // text selection dragged out of the sheet does not close it.
@@ -102,6 +102,7 @@ pub fn Sheet(
         <dialog
             node_ref=modal.node_ref
             class=move || sheet_classes(side, &class.get().unwrap_or_default())
+            data-help=help_id
             aria-labelledby=labelled_by
             on:cancel=on_cancel
             on:close=on_closed

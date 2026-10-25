@@ -1,13 +1,14 @@
 //! Help: `?` buttons opening topics (a paragraph, a list, a table, a guide
 //! link), one out of the Tab order in a row of fields, a form whose `?`s
-//! show only while their control is in use, `?`s at the
+//! show only while their control is in use (F1 opens the focused control's
+//! help, Shift+F1 asks: the page is inside `HelpKeys`), `?`s at the
 //! viewport's edges for placement, and a section with a fake assistant that
 //! shows the request "Ask about this" sends.
 
 use std::sync::LazyLock;
 
 use ferrox_ui::{
-    Button, ButtonFamily, Checkbox, ConfirmDialog, Dialog, Field, HelpAssistant, HelpButton, HelpRequest, HelpReveal,
+    Button, ButtonFamily, Checkbox, ConfirmDialog, Dialog, Field, HelpAssistant, HelpButton, HelpKeys, HelpRequest, HelpReveal,
     HelpScope, HelpTopic, Input, PasswordInput, Sheet, SheetSide, Switch, Toolbar,
 };
 use leptos::prelude::*;
@@ -44,12 +45,14 @@ static ACCOUNT_KINDS: LazyLock<HelpTopic> = LazyLock::new(|| {
 #[component]
 pub fn HelpPage() -> impl IntoView {
     view! {
-        <Topics />
-        <Asking />
-        <OnComponents />
-        <RowOfFields />
-        <WhileActive />
-        <Edges />
+        <HelpKeys>
+            <Topics />
+            <Asking />
+            <OnComponents />
+            <RowOfFields />
+            <WhileActive />
+            <Edges />
+        </HelpKeys>
     }
 }
 
@@ -213,6 +216,7 @@ fn OnComponents() -> impl IntoView {
         assistant_open.set(true);
     };
     let (memo, payee, password) = (RwSignal::new(String::new()), RwSignal::new(String::new()), RwSignal::new(String::new()));
+    let split = RwSignal::new(String::new());
     let (repeat, archived) = (RwSignal::new(false), RwSignal::new(false));
     let (editing, deleting, menu) = (RwSignal::new(false), RwSignal::new(false), RwSignal::new(false));
     view! {
@@ -244,6 +248,9 @@ fn OnComponents() -> impl IntoView {
                     </div>
                     <Dialog open=editing title="Edit split" help=about("edit-split", "Editing a split")>
                         <p>"A dialog's ? sits in its title bar, before the ×."</p>
+                        <Field label="Split amount" help=about("split-line", "Split lines")>
+                            <Input value=split name="help-split" />
+                        </Field>
                     </Dialog>
                     <ConfirmDialog
                         open=deleting

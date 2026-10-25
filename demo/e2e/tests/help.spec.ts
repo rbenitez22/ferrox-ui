@@ -163,6 +163,82 @@ test.describe('only while in use (HelpReveal::WhileActive)', () => {
   });
 });
 
+test.describe('F1 and Shift+F1 (HelpKeys)', () => {
+  const components = (page: Page) => page.locator('section', { has: page.getByRole('heading', { name: 'Help on components' }) });
+  const assistant = (page: Page) => page.getByRole('dialog', { name: 'Assistant' });
+  const inPopover = (page: Page) => page.evaluate(() => !!document.activeElement?.closest('.help-popover'));
+
+  /** Whether the next F1 keydown reaches the page already default-prevented. */
+  async function watchF1(page: Page) {
+    await page.evaluate(() => {
+      (window as any).f1Prevented = null;
+      window.addEventListener('keydown', (e) => { if (e.key === 'F1') (window as any).f1Prevented = e.defaultPrevented; });
+    });
+  }
+
+  test('F1 opens the focused field\'s topic; Esc gives focus back to the field', async ({ page }) => {
+    const input = components(page).locator('input[name=help-payee]');
+    await input.focus();
+    await page.keyboard.press('F1');
+    await expect(topic(page, 'Payee')).toBeVisible();
+    await expect.poll(() => inPopover(page)).toBe(true);
+    await page.keyboard.press('Escape');
+    await expect(topic(page, 'Payee')).toBeHidden();
+    await expect(input).toBeFocused();
+  });
+
+  test('the innermost help wins: a field in a dialog, then the dialog', async ({ page }) => {
+    await page.getByRole('button', { name: 'Dialog with help…' }).click();
+    const dialog = page.getByRole('dialog', { name: 'Edit split' });
+    await dialog.locator('input[name=help-split]').focus();
+    await page.keyboard.press('F1');
+    await expect(topic(page, 'Split lines')).toBeVisible();
+    await expect(topic(page, 'Editing a split')).toBeHidden();
+    await page.keyboard.press('Escape');
+    await dialog.getByRole('button', { name: 'Close' }).focus();
+    await page.keyboard.press('F1');
+    await expect(topic(page, 'Editing a split')).toBeVisible();
+  });
+
+  test('Shift+F1 asks the assistant about the focused field', async ({ page }) => {
+    const input = components(page).locator('input[name=help-memo]');
+    await input.fill('Weekly shop');
+    await input.focus();
+    await page.keyboard.press('Shift+F1');
+    await expect(assistant(page)).toBeVisible();
+    await expect(assistant(page).locator('[data-request="component"]')).toHaveText('field');
+    await expect(assistant(page).locator('[data-request="label"]')).toHaveText('Memo');
+    await expect(assistant(page).locator('[data-request="value"]')).toHaveText('Weekly shop');
+  });
+
+  test('without an assistant, Shift+F1 opens the topic; a hidden ? still answers', async ({ page }) => {
+    const form = page.locator('section', { has: page.getByRole('heading', { name: 'Only while in use' }) });
+    await form.getByRole('textbox', { name: 'Reference', exact: true }).focus();
+    await page.keyboard.press('Shift+F1');
+    await expect(topic(page, 'Reference numbers')).toBeVisible();
+    await expect(form.getByRole('button', { name: 'Help: Reference numbers' })).toHaveCSS('opacity', '1');
+  });
+
+  test('a ? out of the Tab order still answers F1', async ({ page }) => {
+    await components(page).getByRole('switch', { name: 'Show archived' }).focus();
+    await page.keyboard.press('F1');
+    await expect(topic(page, 'Archived accounts')).toBeVisible();
+  });
+
+  test("the browser's F1 never runs inside, even with no help to open", async ({ page }) => {
+    await watchF1(page);
+    await page.getByRole('button', { name: 'Next account' }).focus();
+    await page.keyboard.press('F1');
+    expect(await page.evaluate(() => (window as any).f1Prevented)).toBe(true);
+    await expect(page.locator('.help-popover:popover-open')).toHaveCount(0);
+  });
+
+  test('every ? inside names its shortcuts', async ({ page }) => {
+    await expect(help(page, 'Statement balance')).toHaveAttribute('aria-keyshortcuts', 'F1');
+    await expect(components(page).getByRole('button', { name: 'Help: Payee' })).toHaveAttribute('aria-keyshortcuts', 'F1 Shift+F1');
+  });
+});
+
 test.describe('placement', () => {
   test('at the right edge, it stays inside the viewport', async ({ page }) => {
     const button = page.locator('.demo-help-right');

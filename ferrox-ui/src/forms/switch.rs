@@ -39,7 +39,7 @@ pub fn Switch(
     #[prop(optional, into)] class: MaybeProp<String>,
 ) -> impl IntoView {
     let reveal = help.0.is_some() && reveals_while_active(help_reveal);
-    let help = component_help(help, "switch", label, Signal::stored(None), help_skip_tab, "switch__help", reveal);
+    let (help, help_id) = component_help(help, "switch", label, Signal::stored(None), help_skip_tab, "switch__help", reveal).unzip();
     let button = view! {
         <button
             type="button"
@@ -54,7 +54,7 @@ pub fn Switch(
         </button>
     };
     match help {
-        Some(help) => view! { <span class=with_reveal("switch-line".to_string(), reveal)>{button}{help}</span> }.into_any(),
+        Some(help) => view! { <span class=with_reveal("switch-line".to_string(), reveal) data-help=help_id>{button}{help}</span> }.into_any(),
         None => button.into_any(),
     }
 }

@@ -119,7 +119,7 @@ view! {
   `?` (above when there's no room), stays inside the viewport, and follows
   the page as it scrolls.
 - Props: `topic`, `skip_tab`, `kind` / `about` / `value` (what a request says
-  carries the `?`; components set these), `help_label` (`"Help"`),
+  carries the `?`; components set these), `id` (for F1: see `HelpKeys`), `help_label` (`"Help"`),
   `guide_label` (`"Full guide"`), `ask_label` (`"Ask about this"`), `class`.
 - Put it where block content is allowed: not inside a `<label>` or a
   `<button>`.
@@ -214,6 +214,53 @@ account_id: checking
 `HelpRequest::new(&topic, component, label)` with `.with_context(…)` and
 `.with_value(…)` builds one, for testing a handler. Without a
 `HelpAssistant`, help is just the topics; nothing else changes.
+
+## `HelpKeys`: F1 and Shift+F1
+
+Wrap the app once. F1 opens the help of whatever has focus; Shift+F1 asks
+the assistant about it directly (without a `HelpAssistant`, it opens the
+help, as F1).
+
+<!-- example: help-keys -->
+```rust
+use ferrox_ui::HelpKeys;
+
+view! {
+    <HelpKeys>
+        <p>"The app: F1 opens the focused control's help, Shift+F1 asks about it."</p>
+    </HelpKeys>
+}
+```
+<!-- /example -->
+
+- **The innermost help wins.** Every component with a `help` prop marks
+  itself (`data-help`, naming its `?`), and F1 takes the one closest to the
+  focused element: in a field inside a dialog, the field's; elsewhere in
+  the dialog, the dialog's.
+- It opens the topic as a click would, and Esc gives focus back to the
+  control you were on.
+- A `?` that's hidden (`HelpReveal::WhileActive`) or out of the Tab order
+  (`help_skip_tab`) still answers: that's where F1 helps most.
+- Inside, every `?` says its shortcuts (`aria-keyshortcuts`: `F1`, plus
+  `Shift+F1` with an assistant), and the browser's own F1 never runs, even
+  where there's no help to open. Outside, F1 is the browser's.
+- A shortcut on top of the visible `?`, never the only way in: on macOS F1
+  is often a brightness key.
+
+A bare `HelpButton` is found the same way once what it explains names it:
+
+<!-- example: help-keys-bare -->
+```rust
+use ferrox_ui::HelpButton;
+
+view! {
+    <div data-help="balance-help">
+        <input aria-label="Statement balance" />
+        <HelpButton topic=STATEMENT_BALANCE.clone() id="balance-help" />
+    </div>
+}
+```
+<!-- /example -->
 
 ## Privacy
 

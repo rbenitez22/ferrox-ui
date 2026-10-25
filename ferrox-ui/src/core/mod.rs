@@ -4,6 +4,7 @@ mod alert;
 pub(crate) mod anchor;
 mod button;
 mod help_button;
+mod help_keys;
 mod help_request;
 mod help_scope;
 mod help_topic;
@@ -13,6 +14,7 @@ mod toolbar;
 
 pub use alert::{alert_classes, Alert, AlertSeverity};
 pub use help_button::{help_button_classes, HelpButton};
+pub use help_keys::HelpKeys;
 pub use help_request::HelpRequest;
 pub use help_scope::{HelpAssistant, HelpContext, HelpReveal, HelpScope};
 pub(crate) use help_scope::reveals_while_active;

@@ -210,6 +210,31 @@ mod core {
         }
         // endregion
     }
+
+    fn help_keys() -> impl IntoView {
+        // region: help-keys
+        use ferrox_ui::HelpKeys;
+
+        view! {
+            <HelpKeys>
+                <p>"The app: F1 opens the focused control's help, Shift+F1 asks about it."</p>
+            </HelpKeys>
+        }
+        // endregion
+    }
+
+    fn help_keys_bare_button() -> impl IntoView {
+        // region: help-keys-bare
+        use ferrox_ui::HelpButton;
+
+        view! {
+            <div data-help="balance-help">
+                <input aria-label="Statement balance" />
+                <HelpButton topic=STATEMENT_BALANCE.clone() id="balance-help" />
+            </div>
+        }
+        // endregion
+    }
 }
 
 // ---------------------------------------------------------------------------

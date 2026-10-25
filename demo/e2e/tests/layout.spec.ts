@@ -447,3 +447,15 @@ test.describe('App bar and facts', () => {
     expect(await css(cardLink, 'color')).not.toBe(primaryText);
   });
 });
+
+test('outside HelpKeys (this page has none), F1 is the browser\'s and a ? names no shortcut', async ({ page }) => {
+  const q = page.getByRole('button', { name: /^Help: / }).first();
+  await expect(q).not.toHaveAttribute('aria-keyshortcuts', /.*/);
+  await q.focus();
+  // A synthetic keydown: the real F1 would run the browser's own help.
+  const notPrevented = await q.evaluate((el) =>
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'F1', bubbles: true, cancelable: true })),
+  );
+  expect(notPrevented).toBe(true);
+});
+

@@ -74,6 +74,8 @@ a `Panel` (`heading_level=HeadingLevel::H1`), and a list of records is a
 | nothing on screen is valid yet (boot, signing in) | `LoadingOverlay` |
 | a message that stays until acted on (why a save failed) | `Alert` |
 | help on a component | its `help` prop (a `HelpTopic`), or a `HelpButton` |
+| many `?`s down a form | `HelpReveal::WhileActive` on their `HelpScope` |
+| help from the keyboard (F1) | `HelpKeys`, once around the app |
 
 ### overlay
 

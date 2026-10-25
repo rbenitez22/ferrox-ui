@@ -14,6 +14,8 @@ One table per group. Each component's page has its props and example;
 | nothing on screen is valid yet (boot, signing in) | `LoadingOverlay` |
 | a message that stays until acted on (why a save failed) | `Alert` |
 | help on a component | its `help` prop (a `HelpTopic`), or a `HelpButton` |
+| many `?`s down a form | `HelpReveal::WhileActive` on their `HelpScope` |
+| help from the keyboard (F1) | `HelpKeys`, once around the app |
 
 ## overlay
 

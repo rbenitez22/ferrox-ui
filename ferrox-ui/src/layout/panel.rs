@@ -115,11 +115,12 @@ pub fn Panel(
     } else {
         heading(heading_level, "panel__title", Some(title_id), (move || title.get()).into_any())
     };
-    let help = component_help(help, "panel", title, Signal::stored(None), false, "panel__help", false);
+    let (help, help_id) = component_help(help, "panel", title, Signal::stored(None), false, "panel__help", false).unzip();
 
     view! {
         <section
             class=move || panel_classes(collapsible, compact, flush, tone, &class.get().unwrap_or_default())
+            data-help=help_id
             aria-labelledby=labelled_by
         >
             <div class="panel__header">

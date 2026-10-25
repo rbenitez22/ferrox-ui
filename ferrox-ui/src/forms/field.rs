@@ -120,7 +120,7 @@ pub fn Field(
         if help_shares_value { value.get_value().map(|v| v.get()) } else { None }
     });
     let reveal = help.0.is_some() && reveals_while_active(help_reveal);
-    let help = component_help(help, "field", label, shared, help_skip_tab, "field__help", reveal);
+    let (help, help_id) = component_help(help, "field", label, shared, help_skip_tab, "field__help", reveal).unzip();
     let label_tag = view! { <label class="field__label" for=id.to_string()>{move || label.get()}</label> };
     // With help, the label and its `?` share a row; the `?` stays outside the
     // `<label>` (a button inside one is a control inside a control).
@@ -136,7 +136,7 @@ pub fn Field(
     };
 
     view! {
-        <div class=move || with_reveal(field_classes(&class.get().unwrap_or_default()), reveal)>
+        <div class=move || with_reveal(field_classes(&class.get().unwrap_or_default()), reveal) data-help=help_id>
             {label_row}
             <Provider value=context>{children()}</Provider>
             {message}

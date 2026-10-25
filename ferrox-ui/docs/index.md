@@ -57,7 +57,12 @@ A `?` that opens a help topic in a popover beside it.
 - `kind: &'static str`, default `"help"`
 - `about: MaybeProp<String>`, optional
 - `value: MaybeProp<String>`, optional
+- `id: Option<String>`, optional
 - `class: MaybeProp<String>`, optional
+
+### `HelpKeys` (component)
+F1 opens the help of whatever has focus; Shift+F1 asks the assistant about it directly (as F1, without a [`HelpAssistant`](crate::HelpAssistant)).
+- `children: Children`
 
 ### `HelpRequest` (struct)
 What "Ask about this" hands the app's assistant: which topic, on which component, and everything the app declared around it. Fields: topic_id, topic_title, component, label, context, value.
