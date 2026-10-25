@@ -46,7 +46,9 @@ From the names audit in `plans/agent-first.md` (piece 3).
   `Facts` / `Fact` (a record's labels and values).
 - `.ferrox-app` styles plain links (an `<a>` with no class) in the theme's
   link colour.
-- Recipes: whole screens in `demo/src/recipes`, listed in `docs/recipes.md`.
+- Recipes: whole screens in `docs/recipes/` (shipped with the crate, compiled
+  by the demo), listed in `docs/recipes.md` with what to change when copying
+  one alone.
 - The agent kit's agent-neutral core (`ferrox-ui/agent-kit/`): `core/AGENTS.md`
   (the entry point, its rules and component table rendered from their
   sources), four task procedures and a reviewer's brief, `kit.tsv`,

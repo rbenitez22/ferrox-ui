@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 import { test, expect, openApp } from '../fixtures';
 
-// The recipes (demo/src/recipes): one small app, "Cookbook", at /recipes,
+// The recipes (ferrox-ui/docs/recipes, compiled into the demo): one small app, "Cookbook", at /recipes,
 // outside the demo's frame. Its store answers after 400ms; `?offline` makes
 // the first load fail.
 

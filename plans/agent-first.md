@@ -62,7 +62,7 @@ The rule for every piece below:
 | Every public item, one line | the source's doc comments → `docs/index.md` (generated) | `AGENTS.md` (link), the `component` task |
 | Which component for which need | `docs/choosing.md` | `AGENTS.md` (rendered in, it's the most-used fact), the README (link) |
 | The consistency rules | `ferrox-ui/agent-kit/check/rules.tsv` (id, rule, pattern, fix) | the drift check (reads it), `AGENTS.md` (rules rendered in), the reviewer role (link) |
-| A recipe | the demo page's source (`demo/src/recipes/*.rs`, e2e-tested) | `docs/recipes.md`: one line each, what it shows, its path |
+| A recipe | its source (`ferrox-ui/docs/recipes/*.rs`, compiled by the demo, e2e-tested) | `docs/recipes.md`: one line each, what it shows, its path |
 | A task's procedure | `ferrox-ui/agent-kit/core/tasks/<task>.md` | adapters (generated from `kit.tsv`), `BOOTSTRAP.md` |
 | A task's name and purpose | `ferrox-ui/agent-kit/kit.tsv` | every generated adapter, `ADAPTING.md`, the kit README's table (rendered) |
 | A script's behaviour | its `.spec.md` (the master) | the bash and PowerShell implementations, which follow it; the shared test suite holds them to it |
@@ -661,6 +661,13 @@ The cost is the same; the result went from drifted to clean, first build.
   settings it reads, the detail-page link). Tests: `docs_current`, the
   demo's e2e, `cargo package --list` includes them, `ferrox-check` on the
   demo.
+  *Done:* `demo/src/recipes/mod.rs` keeps only the module tree, each
+  module `#[path]`ed to its file in the crate's docs, so `super::` works
+  the same in both places. `recipes.md` gained "Copying one recipe alone":
+  per recipe, what it needs from the rest of Cookbook and what to do
+  without it. The drift-check test now runs on `docs/recipes/`. Found on
+  the way: 10b's one-line comment in `starter/Cargo.toml` tripped
+  `starter-local.sh`'s `git = ` check, now limited to code lines.
 - **10d. Measure once more** with the same prompt, in a fresh empty
   folder; record the third column here.
 

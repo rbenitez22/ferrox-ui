@@ -106,7 +106,7 @@ fn check_finds_every_rule_broken_in_the_fixture() {
 
 #[test]
 fn check_passes_a_clean_app_the_starter_and_the_recipes() {
-    for folder in [kit().join("tests/fixtures/clean"), repo().join("starter"), repo().join("demo/src/recipes")] {
+    for folder in [kit().join("tests/fixtures/clean"), repo().join("starter"), crate_dir().join("docs/recipes")] {
         for shell in shells() {
             let (out, code) = run(shell, "ferrox-check", &[&folder]);
             assert_eq!((out.as_str(), code), ("ferrox-check: no drift\n", 0), "{shell} on {}", folder.display());
