@@ -23,7 +23,8 @@
 }
 
 .help-reveal:focus-within .help-btn--reveal,
-.help-btn--reveal[aria-expanded="true"] {
+.help-btn--reveal[aria-expanded="true"],
+.help-btn--reveal[data-suggested] {
   opacity: 1;
 }
 
@@ -36,6 +37,27 @@
 @media (prefers-reduced-motion: reduce) {
   .help-btn--reveal {
     transition: none;
+  }
+}
+
+/* ── Suggested (`HelpReporter::suggest`) ──
+   The app thinks this topic would help: a ring in the primary colour, one
+   gentle pulse as it appears. An offer, never an interruption: nothing
+   opens and focus stays put. */
+
+.help-btn[data-suggested] {
+  color: var(--primary-text);
+  box-shadow: 0 0 0 var(--focus-ring-width) var(--primary-base);
+  animation: ferrox-help-suggest 1.2s ease-out 1;
+}
+
+@keyframes ferrox-help-suggest {
+  from { box-shadow: 0 0 0 calc(var(--focus-ring-width) * 4) var(--primary-tint); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .help-btn[data-suggested] {
+    animation: none;
   }
 }
 

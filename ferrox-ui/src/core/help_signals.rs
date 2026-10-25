@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use leptos::context::Provider;
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
@@ -69,26 +71,74 @@ impl HelpSignalKind {
 // HelpSignals
 // ---------------------------------------------------------------------------
 
-/// The observer, as seen by a reporter.
+/// The topics an app currently suggests, marked on their `?`s. Make one
+/// where the policy lives (usually beside `HelpSignals`), pass it to
+/// `HelpSignals`, and suggest from the policy.
 #[derive(Clone, Copy)]
-struct Observer(UnsyncCallback<HelpSignal>);
+pub struct HelpSuggestions(RwSignal<BTreeSet<String>>);
+
+impl Default for HelpSuggestions {
+    fn default() -> Self {
+        Self(RwSignal::new(BTreeSet::new()))
+    }
+}
+
+impl HelpSuggestions {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Marks every `?` with this topic as suggested, until it's opened or
+    /// cleared: a ring, and ", suggested" in its label. The way to offer help
+    /// without interrupting; nothing opens and focus stays put.
+    pub fn suggest(&self, topic_id: impl Into<String>) {
+        self.0.update(|s| { s.insert(topic_id.into()); });
+    }
+
+    /// Ends a suggestion (opening the topic ends it too).
+    pub fn clear(&self, topic_id: &str) {
+        self.0.update(|s| { s.remove(topic_id); });
+    }
+
+    /// Whether this topic is suggested now (reactive).
+    pub fn is_suggested(&self, topic_id: &str) -> bool {
+        self.0.with(|s| s.contains(topic_id))
+    }
+}
+
+/// The observer, as seen by a reporter: where signals go, and the topics
+/// currently suggested.
+#[derive(Clone, Copy)]
+struct Observer {
+    on_signal: UnsyncCallback<HelpSignal>,
+    suggested: HelpSuggestions,
+}
 
 /// Receives every [`HelpSignal`] reported inside it: by its components
 /// (an error that persists, a refused submit, help dismissed at once, …)
 /// and by the app ([`help_signals`]). Without one, nothing is recorded.
 ///
 /// `on_signal` is where the app's policy lives: count, set thresholds and
-/// cool-downs, then offer help without interrupting. Signals stay in the
-/// page unless `on_signal` sends them somewhere.
+/// cool-downs, then offer help without interrupting: `suggestions` (a
+/// [`HelpSuggestions`] the app keeps) marks the `?`s of a topic; it never
+/// opens one, nor moves focus. Signals stay in the page unless `on_signal`
+/// sends them somewhere.
 ///
 /// ```ignore
-/// <HelpSignals on_signal=move |signal: HelpSignal| policy.observe(signal)>
+/// let suggestions = HelpSuggestions::new();
+/// <HelpSignals on_signal=move |signal: HelpSignal| policy.observe(signal, suggestions) suggestions=suggestions>
 ///     <Router>…</Router>
 /// </HelpSignals>
 /// ```
 #[component]
-pub fn HelpSignals(#[prop(into)] on_signal: UnsyncCallback<HelpSignal>, children: Children) -> impl IntoView {
-    view! { <Provider value=Observer(on_signal)>{children()}</Provider> }
+pub fn HelpSignals(
+    #[prop(into)] on_signal: UnsyncCallback<HelpSignal>,
+    /// The topics suggested inside (a fresh set if not given).
+    #[prop(optional)] suggestions: HelpSuggestions,
+    children: Children,
+) -> impl IntoView {
+    let observer = Observer { on_signal, suggested: suggestions };
+    view! { <Provider value=observer>{children()}</Provider> }
 }
 
 /// Reports signals to the enclosing [`HelpSignals`], with the context of
@@ -120,6 +170,26 @@ impl HelpReporter {
         self.emit(HelpSignalKind::App(kind.into()), "app", String::new(), None, detail);
     }
 
+    /// Suggests a topic in the enclosing `HelpSignals`
+    /// ([`HelpSuggestions::suggest`]); outside one, nothing.
+    pub fn suggest(&self, topic_id: impl Into<String>) {
+        if let Some(observer) = self.observer {
+            observer.suggested.suggest(topic_id);
+        }
+    }
+
+    /// Ends a suggestion ([`HelpSuggestions::clear`]).
+    pub fn clear(&self, topic_id: &str) {
+        if let Some(observer) = self.observer {
+            observer.suggested.clear(topic_id);
+        }
+    }
+
+    /// Whether this topic is suggested now (reactive).
+    pub(crate) fn is_suggested(&self, topic_id: &str) -> bool {
+        self.observer.is_some_and(|observer| observer.suggested.is_suggested(topic_id))
+    }
+
     /// Whether a [`HelpSignals`] receives what this reports.
     pub fn is_observed(&self) -> bool {
         self.observer.is_some()
@@ -134,7 +204,7 @@ impl HelpReporter {
         detail: Option<String>,
     ) {
         let Some(observer) = self.observer else { return };
-        observer.0.run(HelpSignal {
+        observer.on_signal.run(HelpSignal {
             kind,
             component: component.to_string(),
             about,
@@ -173,7 +243,10 @@ mod tests {
         Owner::new().with(|| {
             let seen = Rc::new(RefCell::new(Vec::new()));
             let into = seen.clone();
-            provide_context(Observer(UnsyncCallback::new(move |s: HelpSignal| into.borrow_mut().push(s))));
+            provide_context(Observer {
+                on_signal: UnsyncCallback::new(move |s: HelpSignal| into.borrow_mut().push(s)),
+                suggested: HelpSuggestions::new(),
+            });
             let signals = help_signals();
             assert!(signals.is_observed());
             signals.report("imbalance", Some("0.50".into()));
@@ -183,6 +256,22 @@ mod tests {
             assert_eq!(seen[0].component, "app");
             assert_eq!(seen[0].detail.as_deref(), Some("0.50"));
             assert!(seen[0].context.is_empty());
+        });
+    }
+
+    #[test]
+    fn suggest_and_clear_by_topic_and_nothing_outside() {
+        Owner::new().with(|| {
+            let outside = help_signals();
+            outside.suggest("payee");
+            assert!(!outside.is_suggested("payee"));
+            provide_context(Observer { on_signal: UnsyncCallback::new(|_: HelpSignal| ()), suggested: HelpSuggestions::new() });
+            let signals = help_signals();
+            signals.suggest("payee");
+            assert!(signals.is_suggested("payee"));
+            assert!(!signals.is_suggested("memo"));
+            signals.clear("payee");
+            assert!(!signals.is_suggested("payee"));
         });
     }
 }

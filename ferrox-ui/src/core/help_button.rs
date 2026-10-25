@@ -36,7 +36,9 @@ pub fn help_button_classes(extra: &str) -> String {
 ///   only if one is given.
 /// - Inside a [`HelpSignals`](crate::HelpSignals) it reports
 ///   `HelpOpened`, and `HelpDismissed` when closed within a second (not by
-///   asking).
+///   asking); while the app suggests its topic
+///   ([`HelpReporter::suggest`](crate::HelpReporter::suggest)) it wears a
+///   ring and says so in its label, until it's opened.
 /// - `skip_tab` leaves the Tab order: for a `?` in a row of fields, where it
 ///   would cost a stop on every entry. It stays clickable and reachable by a
 ///   screen reader.
@@ -55,6 +57,8 @@ pub fn HelpButton(
     #[prop(into, default = "Help".into())] help_label: Signal<String>,
     #[prop(into, default = "Full guide".into())] guide_label: Signal<String>,
     #[prop(into, default = "Ask about this".into())] ask_label: Signal<String>,
+    /// Added to the label while the app suggests this topic.
+    #[prop(into, default = ", suggested".into())] suggested_label: Signal<String>,
     /// What carries the `?`, for the request ("field", "dialog", …).
     #[prop(default = "help")] kind: &'static str,
     /// The label or title of what the `?` is about, for the request (the
@@ -93,9 +97,17 @@ pub fn HelpButton(
     let popover_ref = NodeRef::<html::Div>::new();
 
     let title = topic.title().to_string();
+    let topic_key = topic.id().to_string();
+    let suggested = Signal::derive({
+        let topic_key = topic_key.clone();
+        move || signals.is_suggested(&topic_key)
+    });
     let label = Signal::derive({
         let title = title.clone();
-        move || format!("{}: {title}", help_label.get())
+        move || {
+            let label = format!("{}: {title}", help_label.get());
+            if suggested.get() { format!("{label}{}", suggested_label.get()) } else { label }
+        }
     });
 
     let on_toggle = move |_: Event| {
@@ -118,6 +130,7 @@ pub fn HelpButton(
         let opening = js_sys::Reflect::get(&event, &"newState".into()).ok().and_then(|s| s.as_string()).as_deref() == Some("open");
         let now = js_sys::Date::now();
         if opening {
+            signals.clear(&topic_key);
             opened_at.set_value(now);
             asked.set_value(false);
             signal(HelpSignalKind::HelpOpened);
@@ -188,6 +201,7 @@ pub fn HelpButton(
             aria-label=label
             title=label
             aria-expanded=move || if open.get() { "true" } else { "false" }
+            data-suggested=move || suggested.get().then_some("true")
             aria-controls=controls
             popovertarget=target
             tabindex=skip_tab.then_some("-1")

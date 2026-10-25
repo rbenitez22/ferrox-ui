@@ -119,7 +119,8 @@ view! {
   `?` (above when there's no room), stays inside the viewport, and follows
   the page as it scrolls.
 - Props: `topic`, `skip_tab`, `kind` / `about` / `value` (what a request says
-  carries the `?`; components set these), `id` (for F1: see `HelpKeys`), `help_label` (`"Help"`),
+  carries the `?`; components set these), `id` (for F1: see `HelpKeys`),
+  `suggested_label` (`", suggested"`), `help_label` (`"Help"`),
   `guide_label` (`"Full guide"`), `ask_label` (`"Ask about this"`), `class`.
 - Put it where block content is allowed: not inside a `<label>` or a
   `<button>`.
@@ -310,6 +311,33 @@ use ferrox_ui::{help_signals, Button};
 let signals = help_signals();
 view! {
     <Button on_click=move || signals.report("imbalance", Some(difference()))>"Check"</Button>
+}
+```
+<!-- /example -->
+
+**Offering help: `HelpSuggestions`.** Keep one where the policy lives and
+pass it to `HelpSignals`. When the policy decides, `suggest(topic_id)`
+marks every `?` of that topic: a ring in the primary colour and ", suggested"
+in its label (`suggested_label`), shown even where `HelpReveal::WhileActive`
+would hide it. Nothing opens and focus stays where it is. Opening the topic
+ends the suggestion, and so does `clear(topic_id)`. A component inside can
+do the same through its reporter (`help_signals().suggest(…)`).
+
+<!-- example: help-signals-suggest -->
+```rust
+use ferrox_ui::{HelpSignal, HelpSignalKind, HelpSignals, HelpSuggestions};
+
+// A policy: the third failed fix of the same field suggests its help.
+let suggestions = HelpSuggestions::new();
+let policy = move |signal: HelpSignal| {
+    if let (HelpSignalKind::ErrorPersisted { edits: 3.. }, Some(topic)) = (&signal.kind, &signal.topic_id) {
+        suggestions.suggest(topic.clone());
+    }
+};
+view! {
+    <HelpSignals on_signal=policy suggestions=suggestions>
+        <p>"The app."</p>
+    </HelpSignals>
 }
 ```
 <!-- /example -->

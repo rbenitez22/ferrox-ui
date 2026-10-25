@@ -9,7 +9,7 @@ webapp-lib keeps the app plumbing (http, storage, reactive, auth, app-level
 components such as `Login`) and depends on ferrox-ui; see webapp-lib's
 `plans/crate-split.md` for that side.
 
-Status: pieces 0–5 done; piece 6 under way (core, overlay, help (plan `plans/help.md`), forms (plan `plans/forms.md`) navigation (plan `plans/navigation.md`) and layout (plan `plans/layout.md`) done; `plans/generalise.md` done (the user's stack out of the ported components; Combobox/Select `on_create`); data (plan `plans/data.md`) done 2026-10-24; menus (plan `plans/menus.md`) done 2026-10-24, with ContextMenu; `plans/agent-first.md` (the user's direction 2026-10-24: the audience is an agent) done 2026-10-25; next: the help follow-ups F1, `?` only while active, and help signals (`plans/help.md`), before webapp-lib piece 2). Repo `/programming/ferrox-ui`
+Status: pieces 0–5 done; piece 6 under way (core, overlay, help (plan `plans/help.md`), forms (plan `plans/forms.md`) navigation (plan `plans/navigation.md`) and layout (plan `plans/layout.md`) done; `plans/generalise.md` done (the user's stack out of the ported components; Combobox/Select `on_create`); data (plan `plans/data.md`) done 2026-10-24; menus (plan `plans/menus.md`) done 2026-10-24, with ContextMenu; `plans/agent-first.md` (the user's direction 2026-10-24: the audience is an agent) done 2026-10-25; the help follow-ups (`plans/help-followups.md`: HelpReveal, HelpKeys, HelpSignals) done 2026-10-25; next: the Sheet scrolling fix noted there, then webapp-lib piece 2). Repo `/programming/ferrox-ui`
 (`git@github.com:rbenitez22/ferrox-ui.git`, branch `master`).
 
 ## Crates (one workspace, this repo)

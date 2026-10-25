@@ -18,7 +18,7 @@ pub use help_button::{help_button_classes, HelpButton};
 pub use help_keys::HelpKeys;
 pub use help_request::HelpRequest;
 pub use help_scope::{HelpAssistant, HelpContext, HelpReveal, HelpScope};
-pub use help_signals::{help_signals, HelpReporter, HelpSignal, HelpSignalKind, HelpSignals};
+pub use help_signals::{help_signals, HelpReporter, HelpSignal, HelpSignalKind, HelpSignals, HelpSuggestions};
 pub(crate) use help_scope::reveals_while_active;
 pub(crate) use help_button::{component_help, with_reveal};
 pub use help_topic::{HelpBlock, HelpTopic, MaybeHelp};

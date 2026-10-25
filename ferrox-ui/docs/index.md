@@ -55,6 +55,7 @@ A `?` that opens a help topic in a popover beside it.
 - `help_label: Signal<String>`, default `"Help"`
 - `guide_label: Signal<String>`, default `"Full guide"`
 - `ask_label: Signal<String>`, default `"Ask about this"`
+- `suggested_label: Signal<String>`, default `", suggested"`
 - `kind: &'static str`, default `"help"`
 - `about: MaybeProp<String>`, optional
 - `value: MaybeProp<String>`, optional
@@ -91,9 +92,13 @@ A fact that may mean the user needs help: reported by a component, or by the app
 ### `HelpSignalKind` (enum)
 What happened. Variants: ErrorShown, ErrorCleared, ErrorPersisted, SubmitRefused, HelpOpened, HelpDismissed, NoMatch, App.
 
+### `HelpSuggestions` (struct)
+The topics an app currently suggests, marked on their `?`s.
+
 ### `HelpSignals` (component)
 Receives every [`HelpSignal`] reported inside it: by its components (an error that persists, a refused submit, help dismissed at once, …) and by the app ([`help_signals`]).
 - `on_signal: UnsyncCallback<HelpSignal>`
+- `suggestions: HelpSuggestions`, optional
 - `children: Children`
 
 ### `HelpReporter` (struct)

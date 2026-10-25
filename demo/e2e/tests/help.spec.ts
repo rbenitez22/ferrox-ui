@@ -350,6 +350,38 @@ test.describe('help signals (HelpSignals)', () => {
     await expect(refused).toHaveCount(2);
   });
 
+  test('suggesting a topic marks its ?, moves nothing, and opening it ends that', async ({ page }) => {
+    const totalHelp = page.getByRole('button', { name: /^Help: Totals/ });
+    await expect(totalHelp).not.toHaveAttribute('data-suggested', /.*/);
+    const suggest = page.getByRole('button', { name: 'Suggest help on Total' });
+    await suggest.click();
+    await expect(totalHelp).toHaveAttribute('data-suggested', 'true');
+    await expect(totalHelp).toHaveAttribute('aria-label', 'Help: Totals, suggested');
+    await expect(suggest).toBeFocused();
+    await expect(page.locator('.help-popover:popover-open')).toHaveCount(0);
+    await totalHelp.click();
+    await expect(topic(page, 'Totals')).toBeVisible();
+    await expect(totalHelp).not.toHaveAttribute('data-suggested', /.*/);
+    await expect(totalHelp).toHaveAttribute('aria-label', 'Help: Totals');
+  });
+
+  test('a suggestion can be taken back', async ({ page }) => {
+    const totalHelp = page.getByRole('button', { name: /^Help: Totals/ });
+    await page.getByRole('button', { name: 'Suggest help on Total' }).click();
+    await expect(totalHelp).toHaveAttribute('data-suggested', 'true');
+    await page.getByRole('button', { name: 'Take it back' }).click();
+    await expect(totalHelp).not.toHaveAttribute('data-suggested', /.*/);
+  });
+
+  test('a suggested ? shows even where it would show only while in use', async ({ page }) => {
+    await page.mouse.move(0, 0);
+    const reference = page.getByRole('button', { name: /^Help: Reference numbers/ });
+    await expect(reference).toHaveCSS('opacity', '0');
+    await page.getByRole('button', { name: 'Suggest help on Reference' }).click();
+    await page.mouse.move(0, 0);
+    await expect(reference).toHaveCSS('opacity', '1');
+  });
+
   test("the app's own signal, with its detail and its scope's context", async ({ page }) => {
     await page.getByRole('button', { name: 'Report an imbalance' }).click();
     const imbalance = entry(page, 'imbalance');

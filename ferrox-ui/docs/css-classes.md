@@ -18,7 +18,7 @@ selected by class only.
 | `toolbar.css` | `.toolbar`, `.toolbar--compact`, `.toolbar__title`, `.toolbar__group`, `.toolbar__heading` (a title with its `?`) |
 | `spinner.css` | `.spinner`, `.spinner--{region,inline,field}`, `.spinner-status`, `.spinner-status--region`, `.spinner-overlay`, `.spinner-overlay__text`; keyframes `ferrox-spin`, `ferrox-spinner-appear` |
 | `alert.css` | `.alert`, `.alert--{info,success,warning,error}`, `.alert__icon`, `.alert__body`, `.alert__close` |
-| `help.css` | `.help-btn` (the `?`, with `.icon-btn`), `.help-btn--reveal` in a `.help-reveal` container (shown only while it's active), `.help-popover`, `__title`, `__body`, `__paragraph`, `__list`, `__table` / `__heading` / `__cell`, `__actions`, `__link`, `__ask`; `[data-side]` below or above |
+| `help.css` | `.help-btn` (the `?`, with `.icon-btn`), `.help-btn--reveal` in a `.help-reveal` container (shown only while it's active), `.help-btn[data-suggested]` (a ring: the app suggests it), `.help-popover`, `__title`, `__body`, `__paragraph`, `__list`, `__table` / `__heading` / `__cell`, `__actions`, `__link`, `__ask`; `[data-side]` below or above |
 
 ## overlay
 

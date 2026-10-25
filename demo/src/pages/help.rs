@@ -130,6 +130,7 @@ fn Signals(log: RwSignal<Vec<HelpSignal>>) -> impl IntoView {
         <Section title="Help signals">
             <HelpScope context=[("screen", "signals")]>
                 <ReportImbalance />
+                <Suggest />
                 <SignalSources />
             </HelpScope>
             <Button family=ButtonFamily::Secondary on_click=move || log.set(Vec::new())>"Clear the log"</Button>
@@ -195,6 +196,20 @@ fn SignalSources() -> impl IntoView {
                 <Input value=memo name="signal-note" />
             </Field>
         </Dialog>
+    }
+}
+
+/// What a policy does when it decides to offer help: suggest a topic (its
+/// `?`s wear a ring until opened), or take the suggestion back.
+#[component]
+fn Suggest() -> impl IntoView {
+    let signals = help_signals();
+    view! {
+        <div class="demo-row">
+            <Button family=ButtonFamily::Secondary on_click=move || signals.suggest("total")>"Suggest help on Total"</Button>
+            <Button family=ButtonFamily::Secondary on_click=move || signals.suggest("reference")>"Suggest help on Reference"</Button>
+            <Button family=ButtonFamily::Secondary on_click=move || signals.clear("total")>"Take it back"</Button>
+        </div>
     }
 }
 

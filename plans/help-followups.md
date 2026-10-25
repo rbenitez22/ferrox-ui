@@ -229,6 +229,12 @@ Each passes `scripts/release-check.sh` and is reviewed on its own.
    `touch` that changes no content, so library edits never rebuilt it.
 5. **C3: the suggested state.** `suggest` / `clear`, `data-suggested`,
    CSS, the label; e2e, docs.
+   *Done 2026-10-25:* the app owns the suggested topics: a
+   `HelpSuggestions` it makes and passes to `HelpSignals`, since a policy
+   lives beside `HelpSignals`, outside it, where `help_signals()` finds no
+   observer. A component inside can suggest through its reporter too. A
+   suggested `?` also shows where `WhileActive` hides it. Its words are
+   `suggested_label`. All five pieces done.
 
 ## After these (the user, 2026-10-25)
 

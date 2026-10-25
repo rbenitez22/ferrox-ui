@@ -248,6 +248,25 @@ mod core {
         // endregion
     }
 
+    fn help_signals_suggest() -> impl IntoView {
+        // region: help-signals-suggest
+        use ferrox_ui::{HelpSignal, HelpSignalKind, HelpSignals, HelpSuggestions};
+
+        // A policy: the third failed fix of the same field suggests its help.
+        let suggestions = HelpSuggestions::new();
+        let policy = move |signal: HelpSignal| {
+            if let (HelpSignalKind::ErrorPersisted { edits: 3.. }, Some(topic)) = (&signal.kind, &signal.topic_id) {
+                suggestions.suggest(topic.clone());
+            }
+        };
+        view! {
+            <HelpSignals on_signal=policy suggestions=suggestions>
+                <p>"The app."</p>
+            </HelpSignals>
+        }
+        // endregion
+    }
+
     fn help_keys_bare_button() -> impl IntoView {
         // region: help-keys-bare
         use ferrox_ui::HelpButton;
