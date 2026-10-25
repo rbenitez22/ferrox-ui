@@ -146,6 +146,14 @@ Each passes `scripts/release-check.sh` and is reviewed on its own.
    example, which hand-made an `app-bar` header, is now an `AppShell`.
 2. **`Page`**, `document.title`, focus after navigation; the recipes'
    pages on it; e2e; its docs page.
+   *Done 2026-10-25:* "after a navigation" is a new path since the last
+   page took focus (the shell passes the router's path), so a page that
+   re-renders on its path (a spinner, then the record) doesn't take
+   focus twice, and the first load never does. The `Modal` gave focus back
+   to its opener on `close` unconditionally, which raced the new page's
+   title after a side-menu link (Firefox); it now does so only if focus is
+   on `<body>` or still in the dialog. A loading state with no title yet
+   stays a bare `PageGrid` (the detail recipe's spinner).
 3. **The kit:** the two drift rules, `choosing.md`, `recipes.md`, the
    starter, CHANGELOG; then one measured run.
 

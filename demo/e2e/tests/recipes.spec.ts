@@ -69,6 +69,47 @@ test.describe('app shell', () => {
   });
 });
 
+test.describe('Page: the tab title and focus', () => {
+  test("the tab's title is the page's, then the app's, and follows a title that arrives late", async ({ page }) => {
+    await openApp(page, '/recipes');
+    await expect(page).toHaveTitle('Recipes · Cookbook');
+    // A deep link: the recipe's name arrives with the data.
+    await openApp(page, '/recipes/2');
+    await expect(page).toHaveTitle('Ribollita · Cookbook');
+  });
+
+  test('on the first load, focus stays where the browser puts it', async ({ page }) => {
+    await openApp(page, '/recipes');
+    await expect(page.getByRole('heading', { level: 1, name: 'Recipes' })).toBeVisible();
+    await page.waitForTimeout(200);
+    expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
+  });
+
+  test("after following a link, focus is on the new page's title", async ({ page }) => {
+    await openApp(page, '/recipes');
+    await page.getByRole('button', { name: 'Menu' }).click();
+    await page.getByRole('navigation', { name: 'Sections' }).getByRole('link', { name: 'Settings' }).click();
+    const title = page.getByRole('heading', { level: 1, name: 'Settings' });
+    await expect(title).toBeFocused();
+    await expect(page).toHaveTitle('Settings · Cookbook');
+    // Tab goes on from the page's title.
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(() => !!document.activeElement?.closest('main'))).toBe(true);
+  });
+
+  test("one h1 per page; a settings page's further panels follow its own", async ({ page }) => {
+    await openApp(page, '/recipes/settings');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
+    const headings = await page.locator('main .panel').evaluateAll((panels) =>
+      panels.map((p) => p.querySelector('h1, h2')?.textContent?.trim()),
+    );
+    // A collapsible panel's heading also says its summary, after its title.
+    expect(headings[0]).toBe('Settings');
+    expect(headings[1]).toMatch(/^Advanced/);
+    expect(headings[2]).toMatch(/^Danger zone/);
+  });
+});
+
 test.describe('list page', () => {
   test('loads the recipes as cards; a card is a link to its page', async ({ page }) => {
     await openApp(page, '/recipes');

@@ -37,7 +37,7 @@ call adds nothing.
 | [`overlay`](docs/overlay.md) | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
 | [`forms`](docs/forms.md) | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
 | [`navigation`](docs/navigation.md) | `navigation` (turns on `overlay` and `layout`; brings leptos_router) | `AppShell`, `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
-| [`layout`](docs/layout.md) | `layout` | `AppBar`, `PageGrid`, `Stack`, `Cluster` (with `PageWidth`, `SidePosition`, `Gap`, `Align`, `Justify`), `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card`, `Facts`, `Fact` |
+| [`layout`](docs/layout.md) | `layout` | `AppBar`, `Page`, `PageGrid`, `Stack`, `Cluster` (with `PageWidth`, `SidePosition`, `Gap`, `Align`, `Justify`), `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card`, `Facts`, `Fact` |
 | [`data`](docs/data.md) | `data` | `DataView` (with infinite scroll), `DataLayout`, `CardSize`, `DataLayoutSwitch`, `DataLayoutLabels`, `Pagination`, `PaginationLabels`, `page_window`, `PageItem` |
 | [`menus`](docs/menus.md) | `menus` | `Menu`, `MenuTrigger`, `MenuAlign`, `MenuItem`, `MenuLink`, `MenuDivider`, `SplitButton`, `ContextMenu` |
 

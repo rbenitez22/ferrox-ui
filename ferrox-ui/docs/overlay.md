@@ -12,7 +12,9 @@ the same behaviour:
   and the element never disagree. An affirm action closes it by setting
   `open` false when its work is done (after any saving state).
 - **Focus** goes to an element marked `autofocus`, otherwise the first
-  control (the ×). On close it returns to whatever opened the modal.
+  control (the ×). On close it returns to whatever opened the modal,
+  unless something else has taken it meanwhile (a new page's title, after
+  a side menu's link).
 - **The page doesn't scroll** while a modal is open (`<html>` and `<body>`
   get `.dialog-open`: a phone browser may scroll either). This is counted,
   so a confirm opened from a dialog keeps the page locked until both close.

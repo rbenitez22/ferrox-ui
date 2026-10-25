@@ -58,6 +58,10 @@ From the names audit in `plans/agent-first.md` (piece 3).
   sub-agent, a `CLAUDE.md` block), `--copilot` (prompt files, an
   instructions block), `--agents-md` (an `AGENTS.md` block), generated from
   templates and `kit.tsv`; `--update` lists and applies only what changed.
+- `Page` (`layout`): `PageGrid` with the page's own H1 `Panel`; sets the
+  tab's title ("{page} · {app}") and, after a navigation inside an
+  `AppShell`, moves focus to its title. A modal now gives focus back to its
+  opener only if nothing else has taken it.
 - `AppShell` (`navigation`, which now turns on `layout`): the app's frame,
   with a skip link, the bar and its menu button, the side menu, and one
   `<main>`. `PageGrid`'s `landmark` is automatic: no `<main>` of its own

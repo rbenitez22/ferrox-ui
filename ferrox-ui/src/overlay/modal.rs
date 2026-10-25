@@ -79,10 +79,15 @@ impl Modal {
 
     /// The dialog has closed, by `close()` or by the browser: give back the
     /// scroll lock and focus, and tell the app if it still thinks it is open.
+    /// Focus goes back to the opener only if nothing else has taken it: a
+    /// new page's title, after a side menu's link, keeps it.
     pub fn on_closed(self) -> impl Fn(Event) + 'static {
         move |_: Event| {
             unlock_scroll(self.locked);
-            if let Some(opener) = self.opener.try_update_value(Option::take).flatten() {
+            let opener = self.opener.try_update_value(Option::take).flatten();
+            if let Some(opener) = opener
+                && focus_is_free(self.node_ref.get_untracked())
+            {
                 let _ = opener.focus();
             }
             if self.open.get_untracked() {
@@ -161,6 +166,16 @@ fn unlock_scroll(locked: StoredValue<bool>) {
 
 /// On `<html>` as well as `<body>`: the page scrolls whichever of the two is
 /// the viewport's scroller, and a phone browser may scroll the other.
+/// Whether focus is nowhere in particular: on `<body>`, or still in the
+/// closed dialog.
+fn focus_is_free(dialog: Option<HtmlDialogElement>) -> bool {
+    let document = document();
+    let Some(active) = document.active_element() else { return true };
+    let on_body = document.body().is_some_and(|body| *body == active);
+    let in_dialog = dialog.is_some_and(|dialog| dialog.contains(Some(&active)));
+    on_body || in_dialog
+}
+
 fn set_body_class(on: bool) {
     let document = document();
     let roots = [document.document_element(), document.body().map(Into::into)];

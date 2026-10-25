@@ -4,7 +4,7 @@
 //! loading, or deleted). Deleting asks, then goes back to the list.
 
 use ferrox_ui::{
-    ButtonFamily, ConfirmDialog, Fact, Facts, HeadingLevel, MenuDivider, MenuItem, PageGrid, PageWidth, Panel, Spinner, SplitButton,
+    ButtonFamily, ConfirmDialog, Fact, Facts, MenuDivider, MenuItem, Page, PageGrid, PageWidth, Panel, Spinner, SplitButton,
 };
 use leptos::prelude::*;
 use leptos_router::hooks::{use_navigate, use_params_map};
@@ -66,36 +66,32 @@ pub fn DetailPage() -> impl IntoView {
         <Show
             when=move || recipe.get().is_some()
             fallback=move || view! {
-                <PageGrid width=PageWidth::Narrow>
-                    {move || if store.loading.get() {
-                        view! { <Spinner label="Loading the recipe" /> }.into_any()
-                    } else {
-                        view! {
-                            <Panel title="Not found" heading_level=HeadingLevel::H1>
-                                <p>"There's no such recipe; it may have been deleted."</p>
-                                <a href="/recipes">"All recipes"</a>
-                            </Panel>
-                        }.into_any()
-                    }}
-                </PageGrid>
+                {move || if store.loading.get() {
+                    view! { <PageGrid width=PageWidth::Narrow><Spinner label="Loading the recipe" /></PageGrid> }.into_any()
+                } else {
+                    view! {
+                        <Page title="Not found" width=PageWidth::Narrow>
+                            <p>"There's no such recipe; it may have been deleted."</p>
+                            <a href="/recipes">"All recipes"</a>
+                        </Page>
+                    }.into_any()
+                }}
             }
         >
-            <PageGrid side=move || view! { <Panel title="At a glance" compact=true>{facts}</Panel> }>
-                <Panel
-                    title=name
-                    heading_level=HeadingLevel::H1
-                    actions=move || view! {
-                        <SplitButton text="Edit" family=ButtonFamily::Secondary on_click=move || edit() menu_label="More recipe actions">
-                            <MenuItem on_select=move || duplicate()>"Duplicate"</MenuItem>
-                            <MenuDivider />
-                            <MenuItem danger=true on_select=move || confirming.set(true)>"Delete"</MenuItem>
-                        </SplitButton>
-                    }
-                >
-                    <p>{move || recipe.get().map(|r| r.notes).unwrap_or_default()}</p>
-                    <a href="/recipes">"All recipes"</a>
-                </Panel>
-            </PageGrid>
+            <Page
+                title=name
+                side=move || view! { <Panel title="At a glance" compact=true>{facts}</Panel> }
+                actions=move || view! {
+                    <SplitButton text="Edit" family=ButtonFamily::Secondary on_click=move || edit() menu_label="More recipe actions">
+                        <MenuItem on_select=move || duplicate()>"Duplicate"</MenuItem>
+                        <MenuDivider />
+                        <MenuItem danger=true on_select=move || confirming.set(true)>"Delete"</MenuItem>
+                    </SplitButton>
+                }
+            >
+                <p>{move || recipe.get().map(|r| r.notes).unwrap_or_default()}</p>
+                <a href="/recipes">"All recipes"</a>
+            </Page>
         </Show>
         <RecipeDialog open=dialog_open editing=editing on_saved=go_to />
         <ConfirmDialog open=confirming title="Delete recipe?" confirm_label="Delete" saving=deleting on_confirm=delete>

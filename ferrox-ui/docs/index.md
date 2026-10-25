@@ -517,6 +517,16 @@ Children side by side, wrapping onto the next line when they don't fit, a token 
 ### `HeadingLevel` (enum)
 Which heading element a titled component renders, so it sits at the right place in the page's outline. Variants: H1, H2, H3, H4.
 
+### `Page` (component)
+A page: a [`PageGrid`] holding the page's own [`Panel`] (its `<h1>`, with `actions` and `help` beside it, the children as its body), then `more`.
+- `title: Signal<String>`
+- `width: PageWidth`, optional
+- `actions: Option<ViewFnOnce>`, optional
+- `side: Option<ViewFnOnce>`, optional
+- `help: MaybeHelp`, optional
+- `more: Option<ViewFnOnce>`, optional
+- `children: Children`
+
 ### `PageWidth` (enum)
 How wide a page's content may grow. Variants: Narrow, Medium, Wide, Full.
 

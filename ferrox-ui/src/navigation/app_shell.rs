@@ -1,5 +1,6 @@
 use leptos::context::Provider;
 use leptos::html;
+use leptos_router::hooks::use_location;
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
@@ -48,6 +49,8 @@ pub fn AppShell(
     children: Children,
 ) -> impl IntoView {
     let menu = RwSignal::new(false);
+    let location = use_location();
+    let path = Signal::derive(move || location.pathname.get());
     let main_id = unique_id("ferrox-main");
     let skip_to = format!("#{main_id}");
     let main_ref = NodeRef::<html::Main>::new();
@@ -74,7 +77,7 @@ pub fn AppShell(
             {bar}
             {side_menu}
             <main class="app-shell__main" id=main_id tabindex="-1" node_ref=main_ref>
-                <Provider value=ShellContext::new(title)>{children()}</Provider>
+                <Provider value=ShellContext::new(title, path)>{children()}</Provider>
             </main>
         </div>
     }

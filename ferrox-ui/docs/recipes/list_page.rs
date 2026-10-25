@@ -1,13 +1,13 @@
-//! Recipe: a list page. A page panel (its title, a layout switch and an
-//! add button), the records as cards in a `DataView`, each card a link to
+//! Recipe: a list page. A `Page` (its title, a layout switch and an add
+//! button), the records as cards in a `DataView`, each card a link to
 //! its record and its actions in a row menu, the add / edit dialog, and a
 //! confirmation before deleting. Loading, error (with Retry) and empty
 //! states come from the `DataView`.
 
 use ferrox_icons::{Icon, DELETE, EDIT, MORE_VERTICAL, PLUS};
 use ferrox_ui::{
-    Align, Button, Card, ConfirmDialog, DataLayout, DataLayoutSwitch, DataView, Gap, HeadingLevel, IconButton, Menu, MenuDivider,
-    MenuItem, MenuTrigger, PageGrid, PageWidth, Panel, Stack,
+    Align, Button, Card, ConfirmDialog, DataLayout, DataLayoutSwitch, DataView, Gap, IconButton, Menu, MenuDivider, MenuItem,
+    MenuTrigger, Page, PageWidth, Stack,
 };
 use leptos::prelude::*;
 
@@ -76,34 +76,32 @@ pub fn ListPage() -> impl IntoView {
     };
 
     view! {
-        <PageGrid width=PageWidth::Wide>
-            <Panel
-                title="Recipes"
-                heading_level=HeadingLevel::H1
-                actions=move || view! {
-                    <DataLayoutSwitch layout=layout />
-                    <IconButton label="Add recipe" on_click=move || add()><Icon icon=PLUS /></IconButton>
+        <Page
+            title="Recipes"
+            width=PageWidth::Wide
+            actions=move || view! {
+                <DataLayoutSwitch layout=layout />
+                <IconButton label="Add recipe" on_click=move || add()><Icon icon=PLUS /></IconButton>
+            }
+        >
+            <DataView
+                items=store.recipes
+                key_of=|recipe: &Recipe| recipe.id.to_string()
+                item=card
+                label="Recipes"
+                layout=layout
+                loading=store.loading
+                loading_label="Loading recipes…"
+                error=store.error
+                on_retry=move || store.load()
+                empty_view=move || view! {
+                    <Stack gap=Gap::Sm align=Align::Start>
+                        <p>"No recipes yet."</p>
+                        <Button on_click=move || add()>"Add a recipe"</Button>
+                    </Stack>
                 }
-            >
-                <DataView
-                    items=store.recipes
-                    key_of=|recipe: &Recipe| recipe.id.to_string()
-                    item=card
-                    label="Recipes"
-                    layout=layout
-                    loading=store.loading
-                    loading_label="Loading recipes…"
-                    error=store.error
-                    on_retry=move || store.load()
-                    empty_view=move || view! {
-                        <Stack gap=Gap::Sm align=Align::Start>
-                            <p>"No recipes yet."</p>
-                            <Button on_click=move || add()>"Add a recipe"</Button>
-                        </Stack>
-                    }
-                />
-            </Panel>
-        </PageGrid>
+            />
+        </Page>
         <RecipeDialog open=dialog_open editing=editing />
         <ConfirmDialog open=confirming title="Delete recipe?" confirm_label="Delete" saving=deleting on_confirm=delete>
             <p>{move || format!("This deletes “{}”.", to_delete.get().map(|r| r.name).unwrap_or_default())}</p>

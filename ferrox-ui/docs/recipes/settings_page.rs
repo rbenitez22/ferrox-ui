@@ -3,8 +3,7 @@
 //! collapsible panel, and a danger zone that asks before it destroys.
 
 use ferrox_ui::{
-    Button, ButtonFamily, ConfirmDialog, Field, Gap, HeadingLevel, PageGrid, PageWidth, Panel, PanelTone, Select, SelectOption, Stack,
-    Switch,
+    Button, ButtonFamily, ConfirmDialog, Field, Gap, Page, PageWidth, Panel, PanelTone, Select, SelectOption, Stack, Switch,
 };
 use leptos::prelude::*;
 
@@ -27,27 +26,30 @@ pub fn SettingsPage() -> impl IntoView {
     };
 
     view! {
-        <PageGrid width=PageWidth::Narrow>
-            <Panel title="Settings" heading_level=HeadingLevel::H1>
-                <Stack gap=Gap::Lg>
-                    <Switch checked=settings.show_minutes label="Show cooking times on cards" />
-                    <Field label="Units" hint="Used on each recipe's page">
-                        <Select value=settings.units options=units />
-                    </Field>
-                </Stack>
-            </Panel>
-            <Panel title="Advanced" collapsible=true summary="Deleting">
-                <Switch checked=settings.confirm_delete label="Ask before deleting a recipe" />
-            </Panel>
-            <Panel title="Danger zone" tone=PanelTone::Danger collapsible=true summary="Delete every recipe">
-                <Stack gap=Gap::Sm>
-                    <p>"Deletes every recipe. There's no undo."</p>
-                    <div>
-                        <Button family=ButtonFamily::Danger on_click=move || confirming.set(true)>"Delete all recipes…"</Button>
-                    </div>
-                </Stack>
-            </Panel>
-        </PageGrid>
+        <Page
+            title="Settings"
+            width=PageWidth::Narrow
+            more=move || view! {
+                <Panel title="Advanced" collapsible=true summary="Deleting">
+                    <Switch checked=settings.confirm_delete label="Ask before deleting a recipe" />
+                </Panel>
+                <Panel title="Danger zone" tone=PanelTone::Danger collapsible=true summary="Delete every recipe">
+                    <Stack gap=Gap::Sm>
+                        <p>"Deletes every recipe. There's no undo."</p>
+                        <div>
+                            <Button family=ButtonFamily::Danger on_click=move || confirming.set(true)>"Delete all recipes…"</Button>
+                        </div>
+                    </Stack>
+                </Panel>
+            }
+        >
+            <Stack gap=Gap::Lg>
+                <Switch checked=settings.show_minutes label="Show cooking times on cards" />
+                <Field label="Units" hint="Used on each recipe's page">
+                    <Select value=settings.units options=units />
+                </Field>
+            </Stack>
+        </Page>
         <ConfirmDialog open=confirming title="Delete every recipe?" confirm_label="Delete all" saving=deleting on_confirm=delete_all>
             <p>{move || format!("This deletes all {} recipes.", store.recipes.with(Vec::len))}</p>
         </ConfirmDialog>

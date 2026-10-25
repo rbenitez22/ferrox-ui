@@ -717,6 +717,26 @@ mod layout {
         // endregion
     }
 
+    fn page() -> impl IntoView {
+        let add = noop;
+        // region: page
+        use ferrox_icons::{Icon, PLUS};
+        use ferrox_ui::{IconButton, Page, PageWidth, Panel};
+
+        view! {
+            <Page
+                title="Recipes"
+                width=PageWidth::Wide
+                actions=move || view! { <IconButton label="Add recipe" on_click=move || add()><Icon icon=PLUS /></IconButton> }
+                side=move || view! { <Panel title="Filters">"…"</Panel> }
+                more=move || view! { <Panel title="Recently made">"…"</Panel> }
+            >
+                "The page's own panel's body: the recipes."
+            </Page>
+        }
+        // endregion
+    }
+
     #[cfg(feature = "forms")]
     fn stack_cluster() -> impl IntoView {
         let (cancel, save) = (noop, noop);
