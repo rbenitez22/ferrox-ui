@@ -163,6 +163,15 @@ Each passes `scripts/release-check.sh` and is reviewed on its own.
    is `APP_NAME` in `src/app.rs` (`setup.md` says to rename it). Its pins
    moved to `ce70859`, the first commit with `AppShell` and `Page`: a
    copied starter resolves once that commit is pushed.
+   *Measured* (the piece-10 prompt, Sonnet, fresh folder): 62,641 tokens,
+   10 tool calls, 1 min 35 s, one clean build, no drift; it read no
+   component page, and its app is an `AppShell` (from the starter) with
+   the list recipe as a `Page`. Against piece 10's last run (60,793
+   tokens, 11 calls, 1 min 59 s) the cost is level; what it gains is the
+   frame for free. Left to guess: how the starter and a copied recipe
+   combine (replace `ItemsPage` and `Item`, the route renders the
+   recipe's page, `Store::provide()` in `App`), and deleting the git lines
+   leaves the starter's `# data, menus.` comment orphaned.
 
 ## Open points (all approved as recommended, 2026-10-25)
 
