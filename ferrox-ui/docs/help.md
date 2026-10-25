@@ -65,6 +65,38 @@ view! {
 `Option<HelpTopic>`. `help_skip_tab` keeps the `?` out of the Tab order for a
 field in a row (it stays clickable and reachable by a screen reader).
 
+## `HelpReveal`: only while in use
+
+A form with help on every field shows a column of `?`s. With
+`HelpReveal::WhileActive`, a control's `?` shows only while the control
+holds focus or the pointer, or its topic is open. Set it on a `HelpScope`
+for every Field, Checkbox and Switch inside, or on one control with
+`help_reveal`; the control's own wins.
+
+<!-- example: help-reveal -->
+```rust
+use ferrox_ui::{Field, HelpReveal, HelpScope, Input};
+
+view! {
+    <HelpScope reveal=HelpReveal::WhileActive>
+        <Field label="Payee" help=PAYEE.clone()>
+            <Input value=payee />
+        </Field>
+        <Field label="Category" help=CATEGORY.clone() help_reveal=HelpReveal::Always>
+            <Input value=category />
+        </Field>
+    </HelpScope>
+}
+```
+<!-- /example -->
+
+- A hidden `?` is transparent, not removed: nothing moves when it appears,
+  Tab still reaches it (and reaching it shows it), a screen reader finds it,
+  and on touch, tapping the control shows it.
+- Only the controls that repeat down a form take it. A Dialog's, Sheet's,
+  Panel's or Toolbar's `?` is always shown: it's the screen part's main help.
+- Default: `HelpReveal::Always`, so nothing changes until you ask.
+
 ## `HelpButton`
 
 The `?` on its own, for anywhere else: beside a heading, in a table header.

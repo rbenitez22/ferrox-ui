@@ -65,9 +65,13 @@ What "Ask about this" hands the app's assistant: which topic, on which component
 ### `HelpContext` (struct)
 Key/value pairs a `HelpScope` adds to every help request inside it: a fixed list, or a closure that follows the page.
 
+### `HelpReveal` (enum)
+When a control's `?` shows: always, or only while the control is in use. Variants: Always, WhileActive.
+
 ### `HelpScope` (component)
 Declares what an assistant should know about everything inside it: this screen, this account, this section.
-- `context: HelpContext`
+- `context: HelpContext`, optional
+- `reveal: Option<HelpReveal>`, optional
 - `children: Children`
 
 ### `HelpAssistant` (component)
@@ -204,6 +208,7 @@ A checkbox and its words, as one `<label>` (the words are part of the target), b
 - `disabled: Signal<bool>`, optional
 - `help: MaybeHelp`, optional
 - `help_skip_tab: bool`, optional
+- `help_reveal: Option<HelpReveal>`, optional
 - `help_shares_value: bool`, optional
 - `class: MaybeProp<String>`, optional
 
@@ -245,6 +250,7 @@ A label, one control, and at most one message under it.
 - `error: MaybeProp<String>`, optional
 - `help: MaybeHelp`, optional
 - `help_skip_tab: bool`, optional
+- `help_reveal: Option<HelpReveal>`, optional
 - `help_shares_value: bool`, optional
 - `class: MaybeProp<String>`, optional
 - `children: Children`
@@ -329,6 +335,7 @@ A setting said as a switch: on or off, taking effect as it is flipped (`<button 
 - `disabled: Signal<bool>`, optional
 - `help: MaybeHelp`, optional
 - `help_skip_tab: bool`, optional
+- `help_reveal: Option<HelpReveal>`, optional
 - `class: MaybeProp<String>`, optional
 
 ### `Textarea` (component)

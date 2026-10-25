@@ -17,6 +17,12 @@ use super::help_request::HelpRequest;
 #[derive(Clone, Copy)]
 pub struct HelpContext(Signal<Vec<(String, String)>>);
 
+impl Default for HelpContext {
+    fn default() -> Self {
+        Self(Signal::stored(Vec::new()))
+    }
+}
+
 impl HelpContext {
     #[cfg(test)]
     fn pairs(&self) -> Vec<(String, String)> {
@@ -46,6 +52,34 @@ where
 }
 
 // ---------------------------------------------------------------------------
+// HelpReveal
+// ---------------------------------------------------------------------------
+
+/// When a control's `?` shows: always, or only while the control is in use.
+///
+/// For a form with help on many fields, where a `?` by every one is noise.
+/// A hidden `?` is only transparent: it keeps its place, Tab still reaches
+/// it (and shows it), and a screen reader still finds it.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum HelpReveal {
+    #[default]
+    Always,
+    /// Shown while the control holds focus or the pointer, or its help is
+    /// open.
+    WhileActive,
+}
+
+/// The nearest enclosing scope's `reveal`.
+#[derive(Clone, Copy)]
+struct ScopeReveal(HelpReveal);
+
+/// Whether a control's `?` shows only while it's active: its own choice,
+/// else the nearest scope's, else always shown.
+pub(crate) fn reveals_while_active(own: Option<HelpReveal>) -> bool {
+    own.or_else(|| use_context::<ScopeReveal>().map(|scope| scope.0)).unwrap_or_default() == HelpReveal::WhileActive
+}
+
+// ---------------------------------------------------------------------------
 // HelpScope
 // ---------------------------------------------------------------------------
 
@@ -64,6 +98,10 @@ pub(crate) fn scope_context() -> Signal<Vec<(String, String)>> {
 /// this screen, this account, this section. Scopes nest; a request gathers
 /// them outermost first. A scope reaches only its own children.
 ///
+/// `reveal` sets when the `?`s of the controls inside it (Field, Checkbox,
+/// Switch) show, unless a control sets its own `help_reveal`; an inner
+/// scope's wins.
+///
 /// ```ignore
 /// <HelpScope context=[("screen", "reconcile")]>
 ///     <HelpScope context=move || vec![("account".to_string(), account.get())]>
@@ -72,14 +110,26 @@ pub(crate) fn scope_context() -> Signal<Vec<(String, String)>> {
 /// </HelpScope>
 /// ```
 #[component]
-pub fn HelpScope(#[prop(into)] context: HelpContext, children: Children) -> impl IntoView {
+pub fn HelpScope(
+    #[prop(optional, into)] context: HelpContext,
+    /// When the `?`s of the controls inside show (unset: as outside).
+    #[prop(optional)] reveal: Option<HelpReveal>,
+    children: Children,
+) -> impl IntoView {
     let parent = use_context::<ScopeContext>();
     let gathered = Signal::derive(move || {
         let mut pairs = parent.map(|p| p.0.get()).unwrap_or_default();
         pairs.extend(context.0.get());
         pairs
     });
-    view! { <Provider value=ScopeContext(gathered)>{children()}</Provider> }
+    match reveal {
+        Some(reveal) => view! {
+            <Provider value=ScopeContext(gathered)>
+                <Provider value=ScopeReveal(reveal)>{children()}</Provider>
+            </Provider>
+        }.into_any(),
+        None => view! { <Provider value=ScopeContext(gathered)>{children()}</Provider> }.into_any(),
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -135,6 +185,17 @@ mod tests {
         Owner::new().with(|| {
             assert!(scope_context().get_untracked().is_empty());
             assert!(assistant().is_none());
+        });
+    }
+
+    #[test]
+    fn a_controls_own_reveal_wins_over_its_scopes() {
+        Owner::new().with(|| {
+            assert!(!reveals_while_active(None));
+            assert!(reveals_while_active(Some(HelpReveal::WhileActive)));
+            provide_context(ScopeReveal(HelpReveal::WhileActive));
+            assert!(reveals_while_active(None));
+            assert!(!reveals_while_active(Some(HelpReveal::Always)));
         });
     }
 }

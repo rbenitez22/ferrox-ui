@@ -175,7 +175,7 @@ pub fn Dialog(
     };
 
     let kind = if alert { "alertdialog" } else { "dialog" };
-    let help = component_help(help, kind, title, Signal::stored(None), false, "dialog__help");
+    let help = component_help(help, kind, title, Signal::stored(None), false, "dialog__help", false);
 
     let has_footer = !no_cancel || alternate.is_some() || affirm.is_some();
     let footer = has_footer.then(|| view! {

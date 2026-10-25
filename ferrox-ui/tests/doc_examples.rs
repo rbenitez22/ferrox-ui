@@ -128,6 +128,8 @@ mod core {
     // endregion
 
     static STATEMENT_BALANCE: LazyLock<HelpTopic> = LazyLock::new(|| HelpTopic::new("statement-balance", "Statement balance"));
+    static PAYEE: LazyLock<HelpTopic> = LazyLock::new(|| HelpTopic::new("payee", "Payee"));
+    static CATEGORY: LazyLock<HelpTopic> = LazyLock::new(|| HelpTopic::new("category", "Category"));
 
     #[cfg(feature = "forms")]
     fn help_prop() -> impl IntoView {
@@ -139,6 +141,25 @@ mod core {
             <Field label="Amount" help=SPLIT_AMOUNT.clone()>
                 <Input value=amount />
             </Field>
+        }
+        // endregion
+    }
+
+    #[cfg(feature = "forms")]
+    fn help_reveal() -> impl IntoView {
+        let (payee, category) = (RwSignal::new(String::new()), RwSignal::new(String::new()));
+        // region: help-reveal
+        use ferrox_ui::{Field, HelpReveal, HelpScope, Input};
+
+        view! {
+            <HelpScope reveal=HelpReveal::WhileActive>
+                <Field label="Payee" help=PAYEE.clone()>
+                    <Input value=payee />
+                </Field>
+                <Field label="Category" help=CATEGORY.clone() help_reveal=HelpReveal::Always>
+                    <Input value=category />
+                </Field>
+            </HelpScope>
         }
         // endregion
     }

@@ -20,7 +20,7 @@ view! {
 | `checked` | required | `RwSignal<bool>` |
 | `label` | required | the words beside the box |
 | `hint`, `error` | none | one message under it, as a `Field`'s (never both); an error also marks the box |
-| `help`, `help_skip_tab`, `help_shares_value` | | a `?` after the words, outside the `<label>`, so clicking it never ticks the box. A shared value is `"true"` / `"false"` |
+| `help`, `help_skip_tab`, `help_shares_value`, `help_reveal` | | a `?` after the words, outside the `<label>`, so clicking it never ticks the box. A shared value is `"true"` / `"false"`. `help_reveal`: see [`HelpReveal`](help.md#helpreveal-only-while-in-use) |
 | `name`, `required`, `disabled`, `class` | | |
 
 It's the native checkbox, coloured with `accent-color` and showing the

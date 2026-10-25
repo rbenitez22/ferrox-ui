@@ -111,6 +111,58 @@ test('skip_tab: Tab goes field to field, past the ?; a click still opens it', as
   await expect(topic(page, 'Amounts on a split')).toBeVisible();
 });
 
+test.describe('only while in use (HelpReveal::WhileActive)', () => {
+  const form = (page: Page) => page.locator('section', { has: page.getByRole('heading', { name: 'Only while in use' }) });
+  const q = (page: Page, title: string) => form(page).getByRole('button', { name: `Help: ${title}` });
+
+  test.beforeEach(async ({ page }) => {
+    // The pointer away from the form, so hover reveals nothing.
+    await page.mouse.move(0, 0);
+  });
+
+  test('hidden at rest but in place, unless the field says always', async ({ page }) => {
+    await expect(q(page, 'Reference numbers')).toHaveCSS('opacity', '0');
+    await expect(q(page, 'Reference numbers')).toHaveClass(/help-btn--reveal/);
+    await expect(q(page, 'Reminders')).toHaveCSS('opacity', '0');
+    await expect(q(page, 'Reviewed entries')).toHaveCSS('opacity', '0');
+    await expect(q(page, 'Categories')).toHaveCSS('opacity', '1');
+    await expect(q(page, 'Categories')).not.toHaveClass(/help-btn--reveal/);
+    // A dialog's or toolbar's `?` is never hidden this way.
+    await expect(page.getByRole('button', { name: 'Help: Accounts' })).not.toHaveClass(/help-btn--reveal/);
+  });
+
+  test("focusing a control shows its ? and no other's", async ({ page }) => {
+    await form(page).getByRole('textbox', { name: 'Reference', exact: true }).focus();
+    await expect(q(page, 'Reference numbers')).toHaveCSS('opacity', '1');
+    await expect(q(page, 'Amounts on a split')).toHaveCSS('opacity', '0');
+    await form(page).getByRole('checkbox', { name: 'Send a reminder' }).focus();
+    await expect(q(page, 'Reminders')).toHaveCSS('opacity', '1');
+    await expect(q(page, 'Reference numbers')).toHaveCSS('opacity', '0');
+    await form(page).getByRole('switch', { name: 'Reviewed' }).focus();
+    await expect(q(page, 'Reviewed entries')).toHaveCSS('opacity', '1');
+  });
+
+  test('pointing at a control shows its ?', async ({ page }) => {
+    await form(page).getByRole('textbox', { name: 'Amount', exact: true }).hover();
+    await expect(q(page, 'Amounts on a split')).toHaveCSS('opacity', '1');
+  });
+
+  test('the keyboard reaches it, and reaching it shows it', async ({ page }) => {
+    await form(page).getByRole('textbox', { name: 'Reference', exact: true }).focus();
+    await page.keyboard.press('Shift+Tab');
+    await expect(q(page, 'Reference numbers')).toBeFocused();
+    await expect(q(page, 'Reference numbers')).toHaveCSS('opacity', '1');
+  });
+
+  test('stays shown while its topic is open', async ({ page }) => {
+    await q(page, 'Reference numbers').click();
+    await expect(topic(page, 'Reference numbers')).toBeVisible();
+    await page.mouse.move(0, 0);
+    await expect(q(page, 'Reference numbers')).toHaveAttribute('aria-expanded', 'true');
+    await expect(q(page, 'Reference numbers')).toHaveCSS('opacity', '1');
+  });
+});
+
 test.describe('placement', () => {
   test('at the right edge, it stays inside the viewport', async ({ page }) => {
     const button = page.locator('.demo-help-right');

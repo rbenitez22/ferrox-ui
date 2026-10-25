@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
-use crate::core::component_help;
+use crate::core::{component_help, reveals_while_active, with_reveal, HelpReveal};
 use crate::MaybeHelp;
 
 /// The class list for a `.switch`.
@@ -33,10 +33,13 @@ pub fn Switch(
     /// A help topic: a `?` beside the switch.
     #[prop(optional, into)] help: MaybeHelp,
     #[prop(optional)] help_skip_tab: bool,
+    /// When the `?` shows (unset: as its `HelpScope` says, else always).
+    #[prop(optional)] help_reveal: Option<HelpReveal>,
     /// Extra classes, appended to `switch`. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
 ) -> impl IntoView {
-    let help = component_help(help, "switch", label, Signal::stored(None), help_skip_tab, "switch__help");
+    let reveal = help.0.is_some() && reveals_while_active(help_reveal);
+    let help = component_help(help, "switch", label, Signal::stored(None), help_skip_tab, "switch__help", reveal);
     let button = view! {
         <button
             type="button"
@@ -51,7 +54,7 @@ pub fn Switch(
         </button>
     };
     match help {
-        Some(help) => view! { <span class="switch-line">{button}{help}</span> }.into_any(),
+        Some(help) => view! { <span class=with_reveal("switch-line".to_string(), reveal)>{button}{help}</span> }.into_any(),
         None => button.into_any(),
     }
 }

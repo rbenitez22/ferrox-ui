@@ -268,6 +268,8 @@ The demo gets a `/help` page.
 
 After this, forms piece 4 (Combobox) builds on `core/anchor.rs`.
 
+Designed together in `plans/help-followups.md` (2026-10-25).
+
 ### Follow-up: F1 (proposed by the user 2026-10-23, not started)
 
 F1 opens the help for whatever has focus; Shift+F1 asks the assistant

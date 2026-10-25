@@ -4,7 +4,7 @@ use leptos::context::Provider;
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
-use crate::core::component_help;
+use crate::core::{component_help, reveals_while_active, with_reveal, HelpReveal};
 use crate::ids::unique_id;
 use crate::MaybeHelp;
 
@@ -77,7 +77,8 @@ pub fn field_classes(extra: &str) -> String {
 /// - `help` puts a `?` after the label (outside the `<label>`). A help
 ///   request names the field by its label; it carries the control's value
 ///   only with `help_shares_value` (a password's, never). `help_skip_tab`
-///   keeps the `?` out of the Tab order, for a field in a row.
+///   keeps the `?` out of the Tab order, for a field in a row;
+///   `help_reveal` shows it only while the field is in use.
 ///
 /// ```ignore
 /// <Field label="Email" hint="Where receipts go" error=email_error>
@@ -93,6 +94,8 @@ pub fn Field(
     /// A help topic: a `?` after the label.
     #[prop(optional, into)] help: MaybeHelp,
     #[prop(optional)] help_skip_tab: bool,
+    /// When the `?` shows (unset: as its `HelpScope` says, else always).
+    #[prop(optional)] help_reveal: Option<HelpReveal>,
     /// Send the control's value with a help request.
     #[prop(optional)] help_shares_value: bool,
     /// Extra classes, appended to `field`. May be reactive.
@@ -116,7 +119,8 @@ pub fn Field(
     let shared = Signal::derive(move || {
         if help_shares_value { value.get_value().map(|v| v.get()) } else { None }
     });
-    let help = component_help(help, "field", label, shared, help_skip_tab, "field__help");
+    let reveal = help.0.is_some() && reveals_while_active(help_reveal);
+    let help = component_help(help, "field", label, shared, help_skip_tab, "field__help", reveal);
     let label_tag = view! { <label class="field__label" for=id.to_string()>{move || label.get()}</label> };
     // With help, the label and its `?` share a row; the `?` stays outside the
     // `<label>` (a button inside one is a control inside a control).
@@ -132,7 +136,7 @@ pub fn Field(
     };
 
     view! {
-        <div class=move || field_classes(&class.get().unwrap_or_default())>
+        <div class=move || with_reveal(field_classes(&class.get().unwrap_or_default()), reveal)>
             {label_row}
             <Provider value=context>{children()}</Provider>
             {message}

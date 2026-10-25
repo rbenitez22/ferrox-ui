@@ -149,8 +149,16 @@ pub fn HelpButton(
     }
 }
 
+/// A component's container classes, plus `help-reveal` when its `?` shows
+/// only while it's active.
+pub(crate) fn with_reveal(classes: String, reveal: bool) -> String {
+    if reveal { format!("{classes} help-reveal") } else { classes }
+}
+
 /// The `?` a component places for its `help` prop, if it has a topic:
 /// labelled for the request by `about`, sending `value` only if given.
+/// `reveal`: shown only while the component's `.help-reveal` container is
+/// active (the container's class is the component's to add).
 pub(crate) fn component_help(
     help: MaybeHelp,
     kind: &'static str,
@@ -158,7 +166,9 @@ pub(crate) fn component_help(
     value: Signal<Option<String>>,
     skip_tab: bool,
     class: &'static str,
+    reveal: bool,
 ) -> Option<impl IntoView> {
+    let class = if reveal { format!("{class} help-btn--reveal") } else { class.to_string() };
     help.0.map(|topic| view! {
         <HelpButton topic=topic kind=kind about=about value=value skip_tab=skip_tab class=class />
     })
@@ -195,5 +205,7 @@ mod tests {
     fn classes() {
         assert_eq!(help_button_classes(""), "icon-btn help-btn");
         assert_eq!(help_button_classes("x"), "icon-btn help-btn x");
+        assert_eq!(with_reveal("field".into(), false), "field");
+        assert_eq!(with_reveal("field".into(), true), "field help-reveal");
     }
 }

@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 
-use crate::core::component_help;
+use crate::core::{component_help, reveals_while_active, with_reveal, HelpReveal};
 use crate::ids::unique_id;
 use crate::MaybeHelp;
 
@@ -41,6 +41,8 @@ pub fn Checkbox(
     /// A help topic: a `?` after the words.
     #[prop(optional, into)] help: MaybeHelp,
     #[prop(optional)] help_skip_tab: bool,
+    /// When the `?` shows (unset: as its `HelpScope` says, else always).
+    #[prop(optional)] help_reveal: Option<HelpReveal>,
     /// Send whether it is ticked ("true" / "false") with a help request.
     #[prop(optional)] help_shares_value: bool,
     /// Extra classes, appended to the generated ones. May be reactive.
@@ -63,7 +65,8 @@ pub fn Checkbox(
     };
 
     let shared = Signal::derive(move || help_shares_value.then(|| checked.get().to_string()));
-    let help = component_help(help, "checkbox", label, shared, help_skip_tab, "checkbox__help");
+    let reveal = help.0.is_some() && reveals_while_active(help_reveal);
+    let help = component_help(help, "checkbox", label, shared, help_skip_tab, "checkbox__help", reveal);
 
     let row = view! {
         <label class="checkbox__row">
@@ -89,7 +92,7 @@ pub fn Checkbox(
     };
 
     view! {
-        <div class=move || checkbox_classes(invalid.get(), &class.get().unwrap_or_default())>
+        <div class=move || with_reveal(checkbox_classes(invalid.get(), &class.get().unwrap_or_default()), reveal)>
             {line}
             {message}
         </div>

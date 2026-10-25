@@ -115,7 +115,7 @@ pub fn Panel(
     } else {
         heading(heading_level, "panel__title", Some(title_id), (move || title.get()).into_any())
     };
-    let help = component_help(help, "panel", title, Signal::stored(None), false, "panel__help");
+    let help = component_help(help, "panel", title, Signal::stored(None), false, "panel__help", false);
 
     view! {
         <section

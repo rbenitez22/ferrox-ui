@@ -60,6 +60,9 @@ From the names audit in `plans/agent-first.md` (piece 3).
   templates and `kit.tsv`; `--update` lists and applies only what changed.
 - The installed kit carries the starter (`.ferrox/starter`), so `setup`
   starts a new app before it has any docs to find.
+- `HelpReveal`: `help_reveal` on Field, Checkbox and Switch, and `reveal` on
+  `HelpScope` for the controls inside, show a `?` only while its control is
+  in use. `HelpScope`'s `context` is now optional.
 - The drift check (`ferrox-ui/agent-kit/check/`): `ferrox-check` lists
   where an app drifts from ferrox-ui, with the fix; `ferrox-docs` prints
   the docs of the ferrox-ui an app builds against. Each in bash and

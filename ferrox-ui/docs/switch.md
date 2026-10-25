@@ -15,6 +15,7 @@ view! { <Switch checked=show_archived label="Show archived accounts" /> }
 
 Props: `checked` (required, `RwSignal<bool>`), `label` (required), `disabled`
 (off and unusable: still loading, or not this user's to change), `help` and
-`help_skip_tab` (a `?` beside the switch, not inside it), `class`. A click or
+`help_skip_tab` (a `?` beside the switch, not inside it), `help_reveal`
+(see [`HelpReveal`](help.md#helpreveal-only-while-in-use)), `class`. A click or
 Space flips it, and the knob slides across. `switch_classes(extra)` returns
 the class list.

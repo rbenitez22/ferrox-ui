@@ -17,7 +17,7 @@ view! {
 | `label` | required | the `<label>`, pointing at the control |
 | `hint` | none | guidance while the field is fine; hidden while there's an error |
 | `error` | none | the field's problem. Present and not empty means invalid |
-| `help`, `help_skip_tab`, `help_shares_value` | | a `?` after the label (see [the `help` prop](help.md#the-help-prop)) |
+| `help`, `help_skip_tab`, `help_shares_value`, `help_reveal` | | a `?` after the label (see [the `help` prop](help.md#the-help-prop)); `help_reveal` shows it only while the field is in use ([`HelpReveal`](help.md#helpreveal-only-while-in-use)) |
 | `class` | | appended to `.field` |
 | children | | the one control |
 

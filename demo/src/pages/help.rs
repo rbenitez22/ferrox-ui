@@ -1,13 +1,14 @@
 //! Help: `?` buttons opening topics (a paragraph, a list, a table, a guide
-//! link), one out of the Tab order in a row of fields, `?`s at the
+//! link), one out of the Tab order in a row of fields, a form whose `?`s
+//! show only while their control is in use, `?`s at the
 //! viewport's edges for placement, and a section with a fake assistant that
 //! shows the request "Ask about this" sends.
 
 use std::sync::LazyLock;
 
 use ferrox_ui::{
-    Button, ButtonFamily, Checkbox, ConfirmDialog, Dialog, Field, HelpAssistant, HelpButton, HelpRequest, HelpScope,
-    HelpTopic, Input, PasswordInput, Sheet, SheetSide, Switch, Toolbar,
+    Button, ButtonFamily, Checkbox, ConfirmDialog, Dialog, Field, HelpAssistant, HelpButton, HelpRequest, HelpReveal,
+    HelpScope, HelpTopic, Input, PasswordInput, Sheet, SheetSide, Switch, Toolbar,
 };
 use leptos::prelude::*;
 
@@ -47,6 +48,7 @@ pub fn HelpPage() -> impl IntoView {
         <Asking />
         <OnComponents />
         <RowOfFields />
+        <WhileActive />
         <Edges />
     }
 }
@@ -83,6 +85,31 @@ fn RowOfFields() -> impl IntoView {
                 <Input value=amount name="amount" placeholder="Amount" />
                 <HelpButton topic=SPLIT_AMOUNT.clone() skip_tab=true />
             </div>
+        </Section>
+    }
+}
+
+/// A form whose `?`s show only while their control is in use: the scope
+/// sets it for everything inside; one field keeps its `?` always shown.
+#[component]
+fn WhileActive() -> impl IntoView {
+    let (reference, amount, category) = (RwSignal::new(String::new()), RwSignal::new(String::new()), RwSignal::new(String::new()));
+    let (remind, reviewed) = (RwSignal::new(false), RwSignal::new(false));
+    view! {
+        <Section title="Only while in use">
+            <HelpScope reveal=HelpReveal::WhileActive>
+                <Field label="Reference" help=about("reference", "Reference numbers")>
+                    <Input value=reference />
+                </Field>
+                <Field label="Amount" help=SPLIT_AMOUNT.clone()>
+                    <Input value=amount />
+                </Field>
+                <Field label="Category" help=about("category", "Categories") help_reveal=HelpReveal::Always>
+                    <Input value=category />
+                </Field>
+                <Checkbox checked=remind label="Send a reminder" help=about("reminders", "Reminders") />
+                <Switch checked=reviewed label="Reviewed" help=about("reviewed", "Reviewed entries") />
+            </HelpScope>
         </Section>
     }
 }

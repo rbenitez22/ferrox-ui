@@ -12,6 +12,33 @@
   vertical-align: middle;
 }
 
+/* ── Shown only while active (`HelpReveal::WhileActive`) ──
+   The control's container is `.help-reveal`; its `?` is
+   `.help-btn--reveal`. Transparent, not removed: it keeps its place, Tab
+   still reaches it (and focusing it shows it), a screen reader finds it. */
+
+.help-btn--reveal {
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.help-reveal:focus-within .help-btn--reveal,
+.help-btn--reveal[aria-expanded="true"] {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .help-reveal:hover .help-btn--reveal {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .help-btn--reveal {
+    transition: none;
+  }
+}
+
 /* ── The popover ──
    The browser's own popover, in the top layer; placed by the anchor module
    (`left` / `top` set from script, `data-side` below or above). The
