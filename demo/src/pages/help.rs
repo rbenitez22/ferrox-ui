@@ -1,15 +1,16 @@
 //! Help: `?` buttons opening topics (a paragraph, a list, a table, a guide
 //! link), one out of the Tab order in a row of fields, a form whose `?`s
 //! show only while their control is in use (F1 opens the focused control's
-//! help, Shift+F1 asks: the page is inside `HelpKeys`), `?`s at the
+//! help, Shift+F1 asks: the page is inside `HelpKeys`), a log of the help
+//! signals the page reports (it is inside `HelpSignals`), `?`s at the
 //! viewport's edges for placement, and a section with a fake assistant that
 //! shows the request "Ask about this" sends.
 
 use std::sync::LazyLock;
 
-use ferrox_ui::{
+use ferrox_ui::{help_signals, 
     Button, ButtonFamily, Checkbox, ConfirmDialog, Dialog, Field, HelpAssistant, HelpButton, HelpKeys, HelpRequest, HelpReveal,
-    HelpScope, HelpTopic, Input, PasswordInput, Sheet, SheetSide, Switch, Toolbar,
+    HelpScope, HelpSignal, HelpSignals, HelpTopic, Input, PasswordInput, Sheet, SheetSide, Switch, Toolbar,
 };
 use leptos::prelude::*;
 
@@ -44,15 +45,19 @@ static ACCOUNT_KINDS: LazyLock<HelpTopic> = LazyLock::new(|| {
 
 #[component]
 pub fn HelpPage() -> impl IntoView {
+    let log = RwSignal::new(Vec::<HelpSignal>::new());
     view! {
-        <HelpKeys>
-            <Topics />
-            <Asking />
-            <OnComponents />
-            <RowOfFields />
-            <WhileActive />
-            <Edges />
-        </HelpKeys>
+        <HelpSignals on_signal=move |signal: HelpSignal| log.update(|l| l.push(signal))>
+            <HelpKeys>
+                <Topics />
+                <Asking />
+                <OnComponents />
+                <RowOfFields />
+                <WhileActive />
+                <Signals log=log />
+                <Edges />
+            </HelpKeys>
+        </HelpSignals>
     }
 }
 
@@ -114,6 +119,48 @@ fn WhileActive() -> impl IntoView {
                 <Switch checked=reviewed label="Reviewed" help=about("reviewed", "Reviewed entries") />
             </HelpScope>
         </Section>
+    }
+}
+
+/// What `HelpSignals` received, newest last, and a button that reports the
+/// app's own signal from inside a scope.
+#[component]
+fn Signals(log: RwSignal<Vec<HelpSignal>>) -> impl IntoView {
+    view! {
+        <Section title="Help signals">
+            <HelpScope context=[("screen", "signals")]>
+                <ReportImbalance />
+            </HelpScope>
+            <Button family=ButtonFamily::Secondary on_click=move || log.set(Vec::new())>"Clear the log"</Button>
+            <ol class="demo-signals">
+                {move || log.get().into_iter().map(|s| {
+                    let context = s.context.iter().map(|(k, v)| format!("{k}={v}")).collect::<Vec<_>>().join(" ");
+                    view! {
+                        <li
+                            data-signal=s.kind.name().to_string()
+                            data-component=s.component.clone()
+                            data-about=s.about.clone()
+                            data-topic=s.topic_id.clone().unwrap_or_default()
+                            data-detail=s.detail.clone().unwrap_or_default()
+                            data-context=context.clone()
+                        >
+                            {format!("{} · {} {} {}", s.kind.name(), s.component, s.about, context)}
+                        </li>
+                    }
+                }).collect_view()}
+            </ol>
+        </Section>
+    }
+}
+
+/// The app's own signal: a check the app knows failed.
+#[component]
+fn ReportImbalance() -> impl IntoView {
+    let signals = help_signals();
+    view! {
+        <Button family=ButtonFamily::Secondary on_click=move || signals.report("imbalance", Some("0.50".into()))>
+            "Report an imbalance"
+        </Button>
     }
 }
 

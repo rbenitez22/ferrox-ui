@@ -76,6 +76,7 @@ a `Panel` (`heading_level=HeadingLevel::H1`), and a list of records is a
 | help on a component | its `help` prop (a `HelpTopic`), or a `HelpButton` |
 | many `?`s down a form | `HelpReveal::WhileActive` on their `HelpScope` |
 | help from the keyboard (F1) | `HelpKeys`, once around the app |
+| noticing a user may need help | `HelpSignals` around the app; the app's own through `help_signals()` |
 
 ### overlay
 

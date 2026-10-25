@@ -223,6 +223,31 @@ mod core {
         // endregion
     }
 
+    fn help_signals_observer() -> impl IntoView {
+        let observe = |_signal: ferrox_ui::HelpSignal| {};
+        // region: help-signals
+        use ferrox_ui::{HelpSignal, HelpSignals};
+
+        view! {
+            <HelpSignals on_signal=move |signal: HelpSignal| observe(signal)>
+                <p>"The app: what its components report arrives in on_signal."</p>
+            </HelpSignals>
+        }
+        // endregion
+    }
+
+    fn help_signals_report() -> impl IntoView {
+        let difference = || String::from("0.50");
+        // region: help-signals-report
+        use ferrox_ui::{help_signals, Button};
+
+        let signals = help_signals();
+        view! {
+            <Button on_click=move || signals.report("imbalance", Some(difference()))>"Check"</Button>
+        }
+        // endregion
+    }
+
     fn help_keys_bare_button() -> impl IntoView {
         // region: help-keys-bare
         use ferrox_ui::HelpButton;

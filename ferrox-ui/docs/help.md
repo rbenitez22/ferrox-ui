@@ -262,6 +262,54 @@ view! {
 ```
 <!-- /example -->
 
+## `HelpSignals`: noticing when help is needed
+
+Components report facts that may mean the user is stuck; the app decides
+what they mean. Wrap the app once; without it, nothing is recorded.
+
+<!-- example: help-signals -->
+```rust
+use ferrox_ui::{HelpSignal, HelpSignals};
+
+view! {
+    <HelpSignals on_signal=move |signal: HelpSignal| observe(signal)>
+        <p>"The app: what its components report arrives in on_signal."</p>
+    </HelpSignals>
+}
+```
+<!-- /example -->
+
+Each `HelpSignal` has its `kind`, what reported it (`component`, `about`),
+the `topic_id` of its `?` if it has help, the enclosing scopes' `context`,
+and a `detail` only the app sets. `kind.name()` is a stable name for a
+policy or a log:
+
+| `HelpSignalKind` | `name()` | Reported by |
+|---|---|---|
+| `HelpOpened` | `help_opened` | a `?`, as its topic opens |
+| `HelpDismissed` | `help_dismissed` | a `?` closed within a second (not by asking) |
+| `App(kind)` | the app's `kind` | the app, through `help_signals()` |
+
+The app's own signals are the strongest: only it knows that an entry won't
+balance. Make a reporter in a component's body (that's where it finds the
+observer and the scopes), and report from anywhere later:
+
+<!-- example: help-signals-report -->
+```rust
+use ferrox_ui::{help_signals, Button};
+
+let signals = help_signals();
+view! {
+    <Button on_click=move || signals.report("imbalance", Some(difference()))>"Check"</Button>
+}
+```
+<!-- /example -->
+
+- **Facts, not judgments.** Nothing here guesses from dwell time or
+  clicks. Thresholds, cool-downs and the offer itself belong to the app's
+  `on_signal`.
+- Signals stay in the page; only what `on_signal` does with them leaves it.
+
 ## Privacy
 
 A request carries only what the developer declared: the topic, the

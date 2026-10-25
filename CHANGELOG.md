@@ -66,6 +66,9 @@ From the names audit in `plans/agent-first.md` (piece 3).
 - `HelpKeys`: F1 opens the focused control's help, Shift+F1 asks the
   assistant about it. Components with help mark themselves `data-help`;
   `HelpButton` takes an `id`.
+- `HelpSignals`, `HelpSignal`, `HelpSignalKind`, `help_signals()` /
+  `HelpReporter`: facts that may mean a user needs help (a `?` opened, or
+  dismissed at once; the app's own reports), for the app's policy.
 - The drift check (`ferrox-ui/agent-kit/check/`): `ferrox-check` lists
   where an app drifts from ferrox-ui, with the fix; `ferrox-docs` prints
   the docs of the ferrox-ui an app builds against. Each in bash and

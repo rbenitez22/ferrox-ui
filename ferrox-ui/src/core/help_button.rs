@@ -1,4 +1,5 @@
 use ferrox_icons::{Icon, HELP};
+use leptos::ev::{on, Custom};
 use leptos::html;
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
@@ -9,6 +10,7 @@ use super::anchor::{follow, place, Align};
 use super::help_request::HelpRequest;
 use super::help_keys::help_keys_shortcuts;
 use super::help_scope::{assistant, scope_context};
+use super::help_signals::{help_signals, HelpSignalKind};
 use super::help_topic::{HelpBlock, HelpTopic, MaybeHelp};
 use crate::ids::unique_id;
 
@@ -32,6 +34,9 @@ pub fn help_button_classes(extra: &str) -> String {
 ///   [`HelpRequest`]: the topic, `kind` and `about` (what carries the `?`),
 ///   the enclosing [`HelpScope`](crate::HelpScope)s' context, and `value`
 ///   only if one is given.
+/// - Inside a [`HelpSignals`](crate::HelpSignals) it reports
+///   `HelpOpened`, and `HelpDismissed` when closed within a second (not by
+///   asking).
 /// - `skip_tab` leaves the Tab order: for a `?` in a row of fields, where it
 ///   would cost a stop on every entry. It stays clickable and reachable by a
 ///   screen reader.
@@ -74,6 +79,17 @@ pub fn HelpButton(
     let scope_context_here = scope_context();
     let button_ref = NodeRef::<html::Button>::new();
     let shortcuts = help_keys_shortcuts(assistant().is_some());
+    // For `HelpSignals`: opened, and closed again at once (not by asking).
+    let signals = help_signals();
+    let opened_at = StoredValue::new(0.0_f64);
+    let asked = StoredValue::new(false);
+    let signal = {
+        let (topic_id, title) = (topic.id().to_string(), topic.title().to_string());
+        move |what: HelpSignalKind| {
+            let about = about.get_untracked().unwrap_or_else(|| title.clone());
+            signals.emit(what, kind, about, Some(topic_id.clone()), None);
+        }
+    };
     let popover_ref = NodeRef::<html::Div>::new();
 
     let title = topic.title().to_string();
@@ -95,6 +111,21 @@ pub fn HelpButton(
         }
     };
 
+    // The signals come from `beforetoggle`, which fires as it happens:
+    // Chromium merges an open and a close that come before its `toggle`
+    // event into one closed-to-closed `toggle`.
+    let on_before_toggle = move |event: Event| {
+        let opening = js_sys::Reflect::get(&event, &"newState".into()).ok().and_then(|s| s.as_string()).as_deref() == Some("open");
+        let now = js_sys::Date::now();
+        if opening {
+            opened_at.set_value(now);
+            asked.set_value(false);
+            signal(HelpSignalKind::HelpOpened);
+        } else if !asked.get_value() && now - opened_at.get_value() < 1000.0 {
+            signal(HelpSignalKind::HelpDismissed);
+        }
+    };
+
     let blocks = topic.blocks().iter().map(render_block).collect_view();
     let guide = topic.guide_href().map(|href| view! {
         <a class="help-popover__link" href=href.to_string()>{move || guide_label.get()}</a>
@@ -103,6 +134,7 @@ pub fn HelpButton(
         let topic = topic.clone();
         let closes = popover_id.clone();
         let ask = move |_| {
+            asked.set_value(true);
             let label = about.get_untracked().unwrap_or_else(|| topic.title().to_string());
             let request = HelpRequest::new(&topic, kind, label)
                 .with_context(scope_context_here.get_untracked())
@@ -125,6 +157,27 @@ pub fn HelpButton(
         <div class="help-popover__actions">{guide}{ask}</div>
     });
 
+    let popover = view! {
+        <div
+            popover="auto"
+            id=popover_id
+            node_ref=popover_ref
+            class="help-popover"
+            role="dialog"
+            aria-labelledby=labelled_by
+            tabindex="-1"
+            on:toggle=on_toggle
+        >
+            <h3 class="help-popover__title" id=title_id>{title}</h3>
+            <div class="help-popover__body">{blocks}</div>
+            {actions}
+        </div>
+    }
+    // Not `on:beforetoggle`: Leptos takes it for a bubbling event and
+    // listens on the document, which it never reaches. A custom event is
+    // listened for on the element.
+    .add_any_attr(on(Custom::<Event>::new("beforetoggle"), on_before_toggle));
+
     view! {
         <button
             type="button"
@@ -141,20 +194,7 @@ pub fn HelpButton(
         >
             <Icon icon=HELP />
         </button>
-        <div
-            popover="auto"
-            id=popover_id
-            node_ref=popover_ref
-            class="help-popover"
-            role="dialog"
-            aria-labelledby=labelled_by
-            tabindex="-1"
-            on:toggle=on_toggle
-        >
-            <h3 class="help-popover__title" id=title_id>{title}</h3>
-            <div class="help-popover__body">{blocks}</div>
-            {actions}
-        </div>
+        {popover}
     }
 }
 

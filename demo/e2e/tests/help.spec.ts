@@ -190,12 +190,19 @@ test.describe('F1 and Shift+F1 (HelpKeys)', () => {
   test('the innermost help wins: a field in a dialog, then the dialog', async ({ page }) => {
     await page.getByRole('button', { name: 'Dialog with help…' }).click();
     const dialog = page.getByRole('dialog', { name: 'Edit split' });
-    await dialog.locator('input[name=help-split]').focus();
+    await expect(dialog).toBeVisible();
+    // The dialog places its own first focus as it opens; then the field.
+    const input = dialog.locator('input[name=help-split]');
+    await expect(async () => {
+      await input.focus();
+      await expect(input).toBeFocused({ timeout: 200 });
+    }).toPass();
     await page.keyboard.press('F1');
     await expect(topic(page, 'Split lines')).toBeVisible();
     await expect(topic(page, 'Editing a split')).toBeHidden();
     await page.keyboard.press('Escape');
     await dialog.getByRole('button', { name: 'Close' }).focus();
+    await expect(dialog.getByRole('button', { name: 'Close' })).toBeFocused();
     await page.keyboard.press('F1');
     await expect(topic(page, 'Editing a split')).toBeVisible();
   });
@@ -236,6 +243,57 @@ test.describe('F1 and Shift+F1 (HelpKeys)', () => {
   test('every ? inside names its shortcuts', async ({ page }) => {
     await expect(help(page, 'Statement balance')).toHaveAttribute('aria-keyshortcuts', 'F1');
     await expect(components(page).getByRole('button', { name: 'Help: Payee' })).toHaveAttribute('aria-keyshortcuts', 'F1 Shift+F1');
+  });
+});
+
+test.describe('help signals (HelpSignals)', () => {
+  const entries = (page: Page) => page.locator('.demo-signals li');
+  const entry = (page: Page, kind: string) => page.locator(`.demo-signals li[data-signal="${kind}"]`);
+  const asking = (page: Page) => page.locator('section', { has: page.getByRole('heading', { name: 'Asking an assistant' }) });
+
+  test('opening a ? reports it, with what carries it, its topic and its context', async ({ page }) => {
+    await asking(page).getByRole('button', { name: 'Help: Statement balance' }).click();
+    const opened = entry(page, 'help_opened');
+    await expect(opened).toHaveCount(1);
+    await expect(opened).toHaveAttribute('data-component', 'field');
+    await expect(opened).toHaveAttribute('data-about', 'Statement balance');
+    await expect(opened).toHaveAttribute('data-topic', 'statement-balance');
+    await expect(opened).toHaveAttribute('data-context', 'screen=reconcile account=checking');
+  });
+
+  test('closed at once: dismissed', async ({ page }) => {
+    await help(page, 'Statement balance').click();
+    await expect(topic(page, 'Statement balance')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(entry(page, 'help_dismissed')).toHaveCount(1);
+    await expect(entry(page, 'help_dismissed')).toHaveAttribute('data-topic', 'statement-balance');
+  });
+
+  test('read for a while, then closed: not dismissed', async ({ page }) => {
+    await help(page, 'Statement balance').click();
+    await expect(topic(page, 'Statement balance')).toBeVisible();
+    await page.waitForTimeout(1100);
+    await page.keyboard.press('Escape');
+    await expect(topic(page, 'Statement balance')).toBeHidden();
+    await expect(entry(page, 'help_opened')).toHaveCount(1);
+    await expect(entry(page, 'help_dismissed')).toHaveCount(0);
+  });
+
+  test('closed by asking: not dismissed', async ({ page }) => {
+    await asking(page).getByRole('button', { name: 'Help: Statement balance' }).click();
+    await page.getByRole('button', { name: 'Ask about this' }).click();
+    await expect(page.getByRole('dialog', { name: 'Assistant' })).toBeVisible();
+    await expect(entry(page, 'help_opened')).toHaveCount(1);
+    await expect(entry(page, 'help_dismissed')).toHaveCount(0);
+  });
+
+  test("the app's own signal, with its detail and its scope's context", async ({ page }) => {
+    await page.getByRole('button', { name: 'Report an imbalance' }).click();
+    const imbalance = entry(page, 'imbalance');
+    await expect(imbalance).toHaveAttribute('data-component', 'app');
+    await expect(imbalance).toHaveAttribute('data-detail', '0.50');
+    await expect(imbalance).toHaveAttribute('data-context', 'screen=signals');
+    await expect(entries(page)).toHaveCount(1);
   });
 });
 

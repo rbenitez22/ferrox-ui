@@ -84,6 +84,23 @@ Turns on "Ask about this" in every help popover inside it, usually once around t
 - `on_ask: UnsyncCallback<HelpRequest>`
 - `children: Children`
 
+### `HelpSignal` (struct)
+A fact that may mean the user needs help: reported by a component, or by the app. Fields: kind, component, about, topic_id, context, detail.
+
+### `HelpSignalKind` (enum)
+What happened. Variants: ErrorShown, ErrorCleared, ErrorPersisted, SubmitRefused, HelpOpened, HelpDismissed, NoMatch, App.
+
+### `HelpSignals` (component)
+Receives every [`HelpSignal`] reported inside it: by its components (an error that persists, a refused submit, help dismissed at once, …) and by the app ([`help_signals`]).
+- `on_signal: UnsyncCallback<HelpSignal>`
+- `children: Children`
+
+### `HelpReporter` (struct)
+Reports signals to the enclosing [`HelpSignals`], with the context of the `HelpScope`s where it was made.
+
+### `help_signals` (function)
+`fn help_signals() -> HelpReporter`: A reporter for here: call it in a component's body, keep it, and report from handlers.
+
 ### `HelpBlock` (enum)
 One part of a help topic. Variants: Paragraph, List, Table.
 

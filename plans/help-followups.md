@@ -207,6 +207,13 @@ Each passes `scripts/release-check.sh` and is reviewed on its own.
 3. **C1: the observer.** `HelpSignals`, `HelpSignal`/`HelpSignalKind`,
    `help_signals()` and `report`, `HelpOpened`/`HelpDismissed` from
    HelpButton; the demo's signals log; e2e, docs.
+   *Done 2026-10-25:* the handle is `HelpReporter` (also
+   `is_observed()`); `HelpSignalKind::name()` gives stable names. The
+   `?` reports from `beforetoggle`, not `toggle`: Chromium merges an open
+   and a close that come before its `toggle` into one closed-to-closed
+   event. And `beforetoggle` is attached as a `Custom` event: Leptos
+   0.8 (tachys 0.2.19) lists it as bubbling, so `on:beforetoggle`
+   listens on the document and never fires.
 4. **C2: the components' facts.** Field's error kinds, Dialog's
    `SubmitRefused`, Combobox's `NoMatch`; e2e, docs.
 5. **C3: the suggested state.** `suggest` / `clear`, `data-suggested`,
