@@ -40,6 +40,7 @@ call adds nothing.
 | [`layout`](docs/layout.md) | `layout` | `AppBar`, `Page`, `PageGrid`, `Stack`, `Cluster` (with `PageWidth`, `SidePosition`, `Gap`, `Align`, `Justify`), `Panel` (also collapsible), `PanelTone`, `HeadingLevel`, `Card`, `Facts`, `Fact` |
 | [`data`](docs/data.md) | `data` | `DataView` (with infinite scroll), `DataLayout`, `CardSize`, `DataLayoutSwitch`, `DataLayoutLabels`, `Pagination`, `PaginationLabels`, `page_window`, `PageItem` |
 | [`menus`](docs/menus.md) | `menus` | `Menu`, `MenuTrigger`, `MenuAlign`, `MenuItem`, `MenuLink`, `MenuDivider`, `SplitButton`, `ContextMenu` |
+| [`media`](docs/media.md) | `media` | `Carousel` (also paging on a phone only), `CarouselLabels`, `carousel_pages`, `page_at`, `carousel_classes`, `track_classes` |
 
 ## Requirements
 
@@ -57,6 +58,8 @@ call adds nothing.
   114+, Firefox 125+, Safari 17+).
 - `data`: `IntersectionObserver` for `DataView`'s infinite scroll (every
   current browser). Uses `js-sys`.
+- `media`: CSS scroll snap and `display: contents` (every current
+  browser). With `phone_only`, `page_class` must be a grid.
 
 ## Testing
 
@@ -68,7 +71,7 @@ call adds nothing.
   specified output on the same fixtures; the PowerShell half needs
   `pwsh`).
 - The demo (`demo/`) shows every component: `/buttons`, `/feedback`,
-  `/overlay`, `/forms`, `/navigation`, `/layout`, `/data`, `/menus` and `/help` (with a fake assistant that shows the
+  `/overlay`, `/forms`, `/navigation`, `/layout`, `/data`, `/menus`, `/media` and `/help` (with a fake assistant that shows the
   request it receives). Its Playwright tests (`demo/e2e/tests/*.spec.ts`)
   run in Chromium and Firefox through `scripts/release-check.sh`.
 
@@ -91,7 +94,8 @@ records (one or many, with listbox or grid roles), Table and DataTable
 (columns, sorting, filtering) and virtualised rendering, when an app needs
 them. `menus` later gains checkable items (`menuitemcheckbox`,
 `menuitemradio`), submenus, a Menubar and a command palette, when an app
-needs them.
+needs them. `media` (added for garcon-dashboard's launcher) later gains
+autoplay, images with captions and a lightbox, when an app needs them.
 
 ## Licence
 

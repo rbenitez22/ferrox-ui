@@ -151,7 +151,7 @@ fn install_puts_the_same_kit_in_place_from_either_shell() {
         let app = scratch(&format!("install-{shell}"));
         let (out, code) = install(shell, &["--generic"], &app);
         assert_eq!(code, 0, "{shell}: {out}");
-        assert!(out.ends_with("ferrox-kit: installed 0.1.0 (generic) into .ferrox\n"), "{shell}: {out}");
+        assert!(out.ends_with("ferrox-kit: installed 0.1.1 (generic) into .ferrox\n"), "{shell}: {out}");
         let files = tree(&app);
         assert!(files.iter().any(|(p, _)| p == ".ferrox/core/AGENTS.md"));
         assert!(!files.iter().any(|(p, _)| p.contains("/tests/")), "{shell}: tests copied");
@@ -320,7 +320,7 @@ fn kit_rows() -> Vec<Vec<String>> {
 #[test]
 fn every_adapter_wraps_every_piece() {
     let (app, out) = install_everywhere("adapters", &["--claude", "--copilot", "--agents-md"]);
-    assert!(out.ends_with("ferrox-kit: installed 0.1.0 (generic, claude, copilot, agents-md) into .ferrox\n"), "{out}");
+    assert!(out.ends_with("ferrox-kit: installed 0.1.1 (generic, claude, copilot, agents-md) into .ferrox\n"), "{out}");
     let read = |p: &str| std::fs::read_to_string(app.join(p)).unwrap_or_else(|_| panic!("{p} is missing"));
     for row in kit_rows() {
         let (kind, id, path, purpose) = (&row[0], &row[1], &row[2], &row[3]);
@@ -380,10 +380,10 @@ fn update_changes_adds_and_removes_only_what_differs() {
         assert!(app.join(".ferrox/core/old.md").exists(), "{shell}: a dry run removed a file");
 
         let (out, _) = install(shell, &["--update"], &app);
-        assert!(out.ends_with("ferrox-kit: updated to 0.1.0 (generic, claude); 3 change(s)\n"), "{shell}: {out}");
+        assert!(out.ends_with("ferrox-kit: updated to 0.1.1 (generic, claude); 3 change(s)\n"), "{shell}: {out}");
         assert!(!app.join(".ferrox/core/old.md").exists());
         let (out, _) = install(shell, &["--update"], &app);
-        assert_eq!(out, "ferrox-kit: updated to 0.1.0 (generic, claude); 0 change(s)\n", "{shell}");
+        assert_eq!(out, "ferrox-kit: updated to 0.1.1 (generic, claude); 0 change(s)\n", "{shell}");
         std::fs::remove_dir_all(&app).unwrap();
     }
 }

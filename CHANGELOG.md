@@ -3,6 +3,26 @@
 All crates in this repo share one version and are released together under
 one git tag.
 
+## 0.1.1 (2026-10-28)
+
+### Added: the `media` group and its `Carousel`
+
+For garcon-dashboard's launcher, whose ninth tile didn't fit a phone
+(`plans/carousel.md`). Only adds: nothing else changes.
+
+- `Carousel` (feature `media`): items in pages of `per_page`, each a list
+  laid out by the app's `page_class`. The track scrolls sideways and snaps
+  a page at a time, so the swipe is the browser's; Previous, Next and a dot
+  per page scroll to a page, and the page follows the scroll position. An
+  optional two-way `page`; no controls for one page; labels in
+  `CarouselLabels`. Helpers `carousel_pages`, `page_at`, `carousel_classes`,
+  `track_classes`.
+- `phone_only`: pages on a phone (≤ 768px) only; above it every item flows
+  into one `page_class` grid and the controls hide.
+- Docs `carousel.md`, `media.md` and a choosing row (so the agent kit's
+  `AGENTS.md` too); demo `/media`; e2e in Chromium and Firefox.
+- The starter pins `tag = "v0.1.1"`; the agent kit is `0.1.1`.
+
 ## 0.1.0 (2026-10-25)
 
 The first release.
