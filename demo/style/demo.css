@@ -102,6 +102,18 @@
     gap: var(--space-sm);
 }
 
+/* ── A carousel page: three tiles a row, two on a phone ── */
+.demo-tiles {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-sm);
+}
+@media (max-width: 768px) {
+    .demo-tiles {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 /* ── Token chips ── */
 .demo-chips {
     display: grid;

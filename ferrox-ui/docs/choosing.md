@@ -71,6 +71,12 @@ One table per group. Each component's page has its props and example;
 | `DataLayoutSwitch` | lets the user pick the layout; sits in a `Panel`'s actions |
 | `Pagination` | pages of anything; the app slices or fetches the page |
 
+## media
+
+| Component | For |
+|---|---|
+| `Carousel` | items in pages swiped sideways: a launcher's tiles, a gallery; on a phone where a grid won't fit |
+
 ## menus
 
 | Need | Use |

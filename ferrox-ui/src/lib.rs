@@ -10,7 +10,8 @@
 //! `NavGroup`, `SideMenu`, `SideMenuButton`. Feature `layout`: `AppBar`, `PageGrid`,
 //! `Stack`, `Cluster`, `Panel` (also collapsible), `Card`, `Facts`. Feature `data`: `DataView`,
 //! `DataLayoutSwitch`, `Pagination`. Feature `menus`: `Menu`, `MenuItem`,
-//! `MenuLink`, `MenuDivider`, `SplitButton`, `ContextMenu`.
+//! `MenuLink`, `MenuDivider`, `SplitButton`, `ContextMenu`. Feature `media`:
+//! `Carousel`.
 //!
 //! Call [`init`] once at startup, before mounting, to add the components'
 //! CSS. The theme itself (tokens, themes, fonts) comes from ferrox-theme.
@@ -32,6 +33,8 @@ mod ids;
 mod once;
 #[cfg(feature = "layout")]
 mod layout;
+#[cfg(feature = "media")]
+mod media;
 #[cfg(feature = "menus")]
 mod menus;
 #[cfg(feature = "navigation")]
@@ -46,6 +49,8 @@ pub use data::*;
 pub use forms::*;
 #[cfg(feature = "layout")]
 pub use layout::*;
+#[cfg(feature = "media")]
+pub use media::*;
 #[cfg(feature = "menus")]
 pub use menus::*;
 #[cfg(feature = "navigation")]

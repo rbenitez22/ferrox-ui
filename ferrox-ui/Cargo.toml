@@ -25,6 +25,8 @@ layout = []
 data = []
 # Menu: actions behind a trigger.
 menus = []
+# Carousel: items in pages, swiped sideways.
+media = []
 
 [dependencies]
 ferrox-icons = { path = "../ferrox-icons" }

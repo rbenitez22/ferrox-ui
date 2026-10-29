@@ -7,6 +7,7 @@ pub mod forms;
 pub mod help;
 pub mod icons;
 pub mod layout;
+pub mod media;
 pub mod menus;
 pub mod navigation;
 pub mod overlay;

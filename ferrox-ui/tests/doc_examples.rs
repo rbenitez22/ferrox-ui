@@ -1054,3 +1054,41 @@ mod menus {
         // endregion
     }
 }
+
+// ---------------------------------------------------------------------------
+// media
+// ---------------------------------------------------------------------------
+
+#[cfg(all(feature = "media", feature = "layout"))]
+mod media {
+    use super::*;
+
+    /// A launcher's app, in the carousel example.
+    #[derive(Clone, Debug, PartialEq)]
+    struct App {
+        id: String,
+        name: String,
+        url: String,
+    }
+
+    fn apps() -> Signal<Vec<App>> {
+        Signal::stored(Vec::new())
+    }
+
+    fn carousel() -> impl IntoView {
+        // region: carousel
+        use ferrox_ui::{Card, Carousel};
+
+        view! {
+            <Carousel
+                items=apps()
+                key_of=|a: &App| a.id.clone()
+                item=|a: App| view! { <Card title=a.name href=a.url>"…"</Card> }
+                per_page=8
+                page_class="launcher__grid"
+                label="Apps"
+            />
+        }
+        // endregion
+    }
+}

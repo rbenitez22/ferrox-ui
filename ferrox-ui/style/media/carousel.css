@@ -1,0 +1,113 @@
+/* Carousel (`.carousel`): items in pages, swiped sideways. Part of
+   ferrox-ui `media`. Tokens only and class-only.
+
+   The track scrolls sideways and snaps one page at a time: the swipe is
+   the browser's. The dots and Previous / Next sit under it. */
+
+.carousel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  min-width: 0;
+}
+
+.carousel__track {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.carousel__track::-webkit-scrollbar {
+  display: none;
+}
+
+.carousel__page {
+  flex: 0 0 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+.carousel__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.carousel__item {
+  display: flex;
+}
+
+/* Previous, the dots, Next. */
+.carousel__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+}
+
+.carousel__dots {
+  display: flex;
+}
+
+/* A 2.25rem target around a small dot. */
+.carousel__dot {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: none;
+  cursor: pointer;
+}
+
+.carousel__dot::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  transition:
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.carousel__dot:hover::before {
+  background: var(--text-muted);
+}
+
+.carousel__dot:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: -2px;
+}
+
+.carousel__dot[aria-current='page']::before {
+  background: var(--primary-fill);
+  transform: scale(1.25);
+}
+
+.carousel__controls .icon-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+/* Phone: 44px targets, as Pagination's. */
+@media (max-width: 768px) {
+  .carousel__dot,
+  .carousel__controls .icon-btn {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+/* Paging glides, unless motion is turned down. */
+@media (prefers-reduced-motion: no-preference) {
+  .carousel__track {
+    scroll-behavior: smooth;
+  }
+}

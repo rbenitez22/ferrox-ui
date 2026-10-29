@@ -10,7 +10,7 @@ use leptos_router::path;
 
 use crate::menu::DemoMenu;
 use crate::recipes::{DetailPage, ListPage, RecipeShell, SettingsPage};
-use crate::pages::{buttons::ButtonsPage, data::DataPage, feedback::FeedbackPage, forms::FormsPage, help::HelpPage, icons::IconsPage, layout::LayoutPage, menus::MenusPage, navigation::NavigationPage, overlay::OverlayPage, themes::ThemesPage};
+use crate::pages::{buttons::ButtonsPage, data::DataPage, feedback::FeedbackPage, forms::FormsPage, help::HelpPage, icons::IconsPage, layout::LayoutPage, media::MediaPage, menus::MenusPage, navigation::NavigationPage, overlay::OverlayPage, themes::ThemesPage};
 use crate::theme_bar::ThemeBar;
 
 #[component]
@@ -39,6 +39,7 @@ pub fn App() -> impl IntoView {
                     <Route path=path!("/layout") view=LayoutPage />
                     <Route path=path!("/data") view=DataPage />
                     <Route path=path!("/menus") view=MenusPage />
+                    <Route path=path!("/media") view=MediaPage />
                 </ParentRoute>
             </Routes>
         </Router>
@@ -67,6 +68,7 @@ fn DemoShell() -> impl IntoView {
                     <A href="/layout">"Layout"</A>
                     <A href="/data">"Data"</A>
                     <A href="/menus">"Menus"</A>
+                    <A href="/media">"Media"</A>
                     <A href="/recipes">"Recipes"</A>
                 </nav>
             </header>

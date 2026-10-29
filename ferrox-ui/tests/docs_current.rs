@@ -31,6 +31,7 @@ const GROUPS: &[(&str, &str)] = &[
     ("layout", "feature `layout`"),
     ("data", "feature `data`"),
     ("menus", "feature `menus`"),
+    ("media", "feature `media`"),
 ];
 
 fn crate_dir() -> PathBuf {

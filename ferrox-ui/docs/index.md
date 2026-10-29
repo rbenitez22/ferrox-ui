@@ -688,3 +688,26 @@ A main action and, joined to it, a chevron that opens related actions: "Save ▾
 - `disabled: Signal<bool>`, optional
 - `class: MaybeProp<String>`, optional
 - `children: Children`
+
+## media (feature `media`)
+
+### `carousel_pages` (function)
+`fn carousel_pages(len: usize, per_page: usize) -> Vec<Range<usize>>`: The items on each page: `len` items, `per_page` to a page (`0` counts as `1`).
+
+### `page_at` (function)
+`fn page_at(scroll_left: f64, width: f64, count: usize) -> usize`: The page (1-based) a track scrolled to `scroll_left` shows, each page `width` wide: the nearest one, clamped into `1..=count`.
+
+### `CarouselLabels` (struct)
+The words of a [`Carousel`]. Fields: previous, next, page, slide.
+
+### `Carousel` (component)
+Items in pages, swiped sideways: a launcher's tiles, a gallery.
+- `items: Signal<Vec<T>>`
+- `key_of: impl Fn(&T) -> String + Clone + Send + Sync + 'static`
+- `item: impl Fn(T) -> IV + Clone + Send + Sync + 'static`
+- `per_page: usize`
+- `label: Signal<String>`
+- `page: Option<RwSignal<usize>>`, optional
+- `labels: CarouselLabels`, optional
+- `page_class: MaybeProp<String>`, optional
+- `class: MaybeProp<String>`, optional
