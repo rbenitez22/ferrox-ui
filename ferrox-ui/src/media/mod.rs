@@ -2,4 +2,4 @@
 
 mod carousel;
 
-pub use carousel::{carousel_pages, page_at, Carousel, CarouselLabels};
+pub use carousel::{carousel_classes, carousel_pages, page_at, track_classes, Carousel, CarouselLabels};

@@ -700,6 +700,12 @@ A main action and, joined to it, a chevron that opens related actions: "Save ▾
 ### `CarouselLabels` (struct)
 The words of a [`Carousel`]. Fields: previous, next, page, slide.
 
+### `carousel_classes` (function)
+`fn carousel_classes(phone_only: bool, extra: Option<String>) -> String`: The carousel's classes: `carousel`, `carousel--phone-only` when it pages on a phone only, then the app's.
+
+### `track_classes` (function)
+`fn track_classes(phone_only: bool, page_class: Option<String>) -> String`: The track's classes.
+
 ### `Carousel` (component)
 Items in pages, swiped sideways: a launcher's tiles, a gallery.
 - `items: Signal<Vec<T>>`
@@ -709,5 +715,6 @@ Items in pages, swiped sideways: a launcher's tiles, a gallery.
 - `label: Signal<String>`
 - `page: Option<RwSignal<usize>>`, optional
 - `labels: CarouselLabels`, optional
+- `phone_only: bool`, optional
 - `page_class: MaybeProp<String>`, optional
 - `class: MaybeProp<String>`, optional

@@ -81,3 +81,31 @@ test('one page: no controls', async ({ page }) => {
   await expect(few.getByRole('button', { name: 'Next page' })).toHaveCount(0);
   await expect(few.locator('.carousel__dot')).toHaveCount(0);
 });
+
+// phone_only: 9 tiles, 8 to a page on a phone; one three-column grid above it.
+const launcher = (page: Page) => page.getByRole('region', { name: 'Launcher tiles', exact: true });
+const launcherTile = (page: Page, n: number) => launcher(page).getByRole('button', { name: `Open ${n}`, exact: true });
+const top = async (page: Page, n: number) => (await launcherTile(page, n).boundingBox())!.y;
+
+test('phone only, above a phone: every item in one grid, no controls', async ({ page }) => {
+  await launcherTile(page, 9).scrollIntoViewIfNeeded();
+  await expect(launcherTile(page, 1)).toBeVisible();
+  await expect(launcherTile(page, 9)).toBeInViewport();
+  // One grid of three columns: 7, 8 and 9 share the last row (two grids
+  // would start 9 on a row of its own).
+  expect(await top(page, 9)).toBe(await top(page, 7));
+  await expect(launcher(page).getByRole('button', { name: 'Next page' })).toBeHidden();
+  await expect(launcher(page).locator('.carousel__dot').first()).toBeHidden();
+});
+
+test('phone only, on a phone: pages, and Next reaches the last item', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 800 });
+  await launcher(page).scrollIntoViewIfNeeded();
+  await expect(launcherTile(page, 1)).toBeInViewport();
+  await expect(launcherTile(page, 9)).not.toBeInViewport();
+  const next = launcher(page).getByRole('button', { name: 'Next page' });
+  await expect(next).toBeVisible();
+  await next.click();
+  await expect(launcherTile(page, 9)).toBeInViewport();
+  await expect(launcher(page).getByRole('button', { name: 'Page 2 of 2', exact: true })).toHaveAttribute('aria-current', 'page');
+});

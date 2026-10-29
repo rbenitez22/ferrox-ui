@@ -1,5 +1,6 @@
 //! Media: a carousel of 20 tiles, 6 to a page, with its page echoed and set
-//! from code, and one that fits on a single page (no controls).
+//! from code; one that fits on a single page (no controls); and 9 tiles, 8 to
+//! a page on a phone only (one grid above it).
 
 use ferrox_ui::{Button, ButtonFamily, Card, Carousel};
 use leptos::prelude::*;
@@ -25,6 +26,7 @@ pub fn MediaPage() -> impl IntoView {
     view! {
         <Paged />
         <OnePage />
+        <PhoneOnly />
     }
 }
 
@@ -63,6 +65,23 @@ fn OnePage() -> impl IntoView {
                 per_page=6
                 page_class="demo-tiles"
                 label="Few tiles"
+            />
+        </Section>
+    }
+}
+
+#[component]
+fn PhoneOnly() -> impl IntoView {
+    view! {
+        <Section title="Phone only">
+            <Carousel
+                items=Signal::stored(tiles(9))
+                key_of=|n: &usize| n.to_string()
+                item=tile
+                per_page=8
+                phone_only=true
+                page_class="demo-tiles"
+                label="Launcher tiles"
             />
         </Section>
     }

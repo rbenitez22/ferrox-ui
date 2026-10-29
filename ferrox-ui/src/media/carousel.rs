@@ -62,6 +62,27 @@ fn fill(template: &str, n: usize, count: usize) -> String {
     template.replace("{n}", &n.to_string()).replace("{count}", &count.to_string())
 }
 
+/// `base`, then `extra` when there is one.
+fn classes(base: &str, extra: Option<String>) -> String {
+    match extra {
+        Some(extra) if !extra.is_empty() => format!("{base} {extra}"),
+        _ => base.to_string(),
+    }
+}
+
+/// The carousel's classes: `carousel`, `carousel--phone-only` when it pages
+/// on a phone only, then the app's.
+pub fn carousel_classes(phone_only: bool, extra: Option<String>) -> String {
+    classes(if phone_only { "carousel carousel--phone-only" } else { "carousel" }, extra)
+}
+
+/// The track's classes. When it pages on a phone only, the track takes
+/// `page_class` too: above a phone the pages step aside and every item
+/// flows into that one layout.
+pub fn track_classes(phone_only: bool, page_class: Option<String>) -> String {
+    classes("carousel__track", page_class.filter(|_| phone_only))
+}
+
 /// Items in pages, swiped sideways: a launcher's tiles, a gallery.
 ///
 /// - The items are split into pages of `per_page`; each page is a `<ul>`
@@ -71,6 +92,8 @@ fn fill(template: &str, n: usize, count: usize) -> String {
 /// - Previous / Next and one dot per page scroll to a page, and follow a
 ///   swipe. With one page there are no controls.
 /// - `page` (1-based, two-way) is optional: pass one to own the page.
+/// - `phone_only`: above a phone (768px) it doesn't page; every item flows
+///   into one `page_class` layout and the controls hide.
 ///
 /// ```ignore
 /// <Carousel items=apps key_of=|a: &App| a.id.clone() item=|a: App| view! { <AppTile app=a /> }
@@ -90,7 +113,10 @@ pub fn Carousel<T, IV>(
     /// The current page, 1-based. Two-way; the carousel keeps its own if none.
     #[prop(optional)] page: Option<RwSignal<usize>>,
     #[prop(optional)] labels: CarouselLabels,
-    /// Classes on each page's `<ul>`: the app's layout for one page.
+    /// Pages on a phone only; above it, one layout of every item, no controls.
+    #[prop(optional)] phone_only: bool,
+    /// Classes on each page's `<ul>`: the app's layout for one page (and,
+    /// with `phone_only`, for every item above a phone).
     #[prop(optional, into)] page_class: MaybeProp<String>,
     /// Extra classes on the carousel. May be reactive.
     #[prop(optional, into)] class: MaybeProp<String>,
@@ -136,14 +162,11 @@ where
 
     view! {
         <section
-            class=move || match class.get() {
-                Some(extra) if !extra.is_empty() => format!("carousel {extra}"),
-                _ => "carousel".to_string(),
-            }
+            class=move || carousel_classes(phone_only, class.get())
             aria-roledescription="carousel"
             aria-label=move || label.get()
         >
-            <div class="carousel__track" node_ref=track on:scroll=on_scroll>
+            <div class=move || track_classes(phone_only, page_class.get()) node_ref=track on:scroll=on_scroll>
                 <For each=pages key=|n| *n let:n>
                     {
                         let key_of = key_of.clone();
@@ -155,10 +178,7 @@ where
                                 aria-roledescription="slide"
                                 aria-label=move || labels.with_value(|l| l.slide_label(n, count.get()))
                             >
-                                <ul class=move || match page_class.get() {
-                                    Some(extra) if !extra.is_empty() => format!("carousel__items {extra}"),
-                                    _ => "carousel__items".to_string(),
-                                }>
+                                <ul class=move || classes("carousel__items", page_class.get())>
                                     <For each=page_items(n) key=key_of.clone() let:entry>
                                         <li class="carousel__item">{item(entry)}</li>
                                     </For>
@@ -232,6 +252,15 @@ mod tests {
         assert_eq!(page_at(-40.0, 300.0, 3), 1);
         assert_eq!(page_at(100.0, 0.0, 3), 1);
         assert_eq!(page_at(0.0, 300.0, 0), 1);
+    }
+
+    #[test]
+    fn phone_only_marks_the_carousel_and_gives_the_track_the_page_layout() {
+        assert_eq!(carousel_classes(false, None), "carousel");
+        assert_eq!(carousel_classes(true, Some("launcher".into())), "carousel carousel--phone-only launcher");
+        assert_eq!(track_classes(false, Some("grid".into())), "carousel__track");
+        assert_eq!(track_classes(true, Some("grid".into())), "carousel__track grid");
+        assert_eq!(track_classes(true, None), "carousel__track");
     }
 
     #[test]

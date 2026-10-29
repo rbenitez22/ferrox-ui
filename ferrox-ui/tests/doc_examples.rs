@@ -1085,6 +1085,7 @@ mod media {
                 key_of=|a: &App| a.id.clone()
                 item=|a: App| view! { <Card title=a.name href=a.url>"…"</Card> }
                 per_page=8
+                phone_only=true
                 page_class="launcher__grid"
                 label="Apps"
             />

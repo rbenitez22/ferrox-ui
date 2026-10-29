@@ -105,6 +105,33 @@
   }
 }
 
+/* phone_only: pages on a phone; above it, the track (which carries
+   page_class too) is one grid of every item, laid out by page_class, and
+   the pages step aside. Two classes, so these win over page_class. */
+@media (max-width: 768px) {
+  .carousel--phone-only .carousel__track {
+    display: flex;
+    gap: 0;
+  }
+}
+
+@media (min-width: 769px) {
+  .carousel--phone-only .carousel__track {
+    display: grid;
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .carousel--phone-only .carousel__page,
+  .carousel--phone-only .carousel__items {
+    display: contents;
+  }
+
+  .carousel--phone-only .carousel__controls {
+    display: none;
+  }
+}
+
 /* Paging glides, unless motion is turned down. */
 @media (prefers-reduced-motion: no-preference) {
   .carousel__track {
