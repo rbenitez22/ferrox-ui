@@ -136,6 +136,42 @@
   font-weight: 600;
 }
 
+/* Related topics: shown in the same popover when chosen. */
+.help-popover__related {
+  margin-top: var(--space-md);
+}
+
+.help-popover__related-title {
+  margin: 0 0 var(--space-xs);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.help-popover__related-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.help-popover__related-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--primary-text);
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.help-popover__actions[hidden] {
+  display: none;
+}
+
 .help-popover__actions {
   display: flex;
   align-items: center;

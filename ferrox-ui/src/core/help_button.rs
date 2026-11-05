@@ -13,6 +13,7 @@ use super::help_scope::{assistant, scope_context};
 use super::help_signals::{help_signals, HelpSignalKind};
 use super::help_blocks::HelpBlocks;
 use super::help_topic::{HelpTopic, MaybeHelp};
+use super::help_topics::{use_help_topics, HelpTopics};
 use crate::ids::unique_id;
 
 /// The class list for a help button: an `.icon-btn` sized to sit by text.
@@ -30,6 +31,10 @@ pub fn help_button_classes(extra: &str) -> String {
 ///   viewport, and follows it while the page scrolls.
 /// - It shows the topic's title and blocks, and "Full guide" when the topic
 ///   has one.
+/// - With a registry above it ([`provide_help_topics`](crate::provide_help_topics)),
+///   it lists the topic's related topics; choosing one shows it in the same
+///   popover, and "Full guide" and "Ask about this" follow what's shown.
+///   Each opening starts again at the button's own topic.
 /// - Inside a [`HelpAssistant`](crate::HelpAssistant) it also offers "Ask
 ///   about this", which closes the popover and hands the assistant a
 ///   [`HelpRequest`]: the topic, `kind` and `about` (what carries the `?`),
@@ -58,6 +63,8 @@ pub fn HelpButton(
     #[prop(into, default = "Help".into())] help_label: Signal<String>,
     #[prop(into, default = "Full guide".into())] guide_label: Signal<String>,
     #[prop(into, default = "Ask about this".into())] ask_label: Signal<String>,
+    /// The heading over related topics.
+    #[prop(into, default = "Related".into())] related_label: Signal<String>,
     /// Added to the label while the app suggests this topic.
     #[prop(into, default = ", suggested".into())] suggested_label: Signal<String>,
     /// What carries the `?`, for the request ("field", "dialog", …).
@@ -97,6 +104,11 @@ pub fn HelpButton(
     };
     let popover_ref = NodeRef::<html::Div>::new();
 
+    // The topic on screen: the button's own, or a related one chosen in it.
+    let shown = RwSignal::new(topic.clone());
+    let registry = use_help_topics();
+    let title_ref = NodeRef::<html::H3>::new();
+
     let title = topic.title().to_string();
     let topic_key = topic.id().to_string();
     let suggested = Signal::derive({
@@ -127,10 +139,12 @@ pub fn HelpButton(
     // The signals come from `beforetoggle`, which fires as it happens:
     // Chromium merges an open and a close that come before its `toggle`
     // event into one closed-to-closed `toggle`.
+    let own_topic = topic.clone();
     let on_before_toggle = move |event: Event| {
         let opening = js_sys::Reflect::get(&event, &"newState".into()).ok().and_then(|s| s.as_string()).as_deref() == Some("open");
         let now = js_sys::Date::now();
         if opening {
+            shown.set(own_topic.clone());
             signals.clear(&topic_key);
             opened_at.set_value(now);
             asked.set_value(false);
@@ -140,20 +154,23 @@ pub fn HelpButton(
         }
     };
 
-    let blocks = topic.blocks().to_vec();
-    let guide = topic.guide_href().map(|href| view! {
-        <a class="help-popover__link" href=href.to_string()>{move || guide_label.get()}</a>
-    });
+    let body = move || view! { <HelpBlocks blocks=shown.get().blocks().to_vec() /> };
+    let related = related_list(registry, shown, related_label, move || refocus(button_ref, popover_ref, title_ref));
     let ask = assistant().map(|on_ask| {
-        let topic = topic.clone();
+        let own = topic.clone();
         let closes = popover_id.clone();
         let ask = move |_| {
             asked.set_value(true);
-            let label = about.get_untracked().unwrap_or_else(|| topic.title().to_string());
-            let request = HelpRequest::new(&topic, kind, label)
-                .with_context(scope_context_here.get_untracked())
-                .with_value(value.get_untracked());
-            on_ask.run(request);
+            let current = shown.get_untracked();
+            // `about` and `value` belong to what carries the `?`, so they go
+            // only with its own topic.
+            let request = if current.id() == own.id() {
+                let label = about.get_untracked().unwrap_or_else(|| current.title().to_string());
+                HelpRequest::new(&current, kind, label).with_value(value.get_untracked())
+            } else {
+                HelpRequest::new(&current, kind, current.title())
+            };
+            on_ask.run(request.with_context(scope_context_here.get_untracked()));
         };
         view! {
             <button
@@ -167,9 +184,14 @@ pub fn HelpButton(
             </button>
         }
     });
-    let actions = (guide.is_some() || ask.is_some()).then(|| view! {
-        <div class="help-popover__actions">{guide}{ask}</div>
+    let has_ask = ask.is_some();
+    let guide = move || shown.get().guide_href().map(|href| view! {
+        <a class="help-popover__link" href=href.to_string()>{move || guide_label.get()}</a>
     });
+    let has_guide = move || shown.with(|t| t.guide_href().is_some());
+    let actions = view! {
+        <div class="help-popover__actions" hidden=move || !has_ask && !has_guide()>{guide}{ask}</div>
+    };
 
     let popover = view! {
         <div
@@ -182,8 +204,9 @@ pub fn HelpButton(
             tabindex="-1"
             on:toggle=on_toggle
         >
-            <h3 class="help-popover__title" id=title_id>{title}</h3>
-            <div class="help-popover__body"><HelpBlocks blocks=blocks /></div>
+            <h3 class="help-popover__title" id=title_id node_ref=title_ref tabindex="-1">{move || shown.get().title().to_string()}</h3>
+            <div class="help-popover__body">{body}</div>
+            {related}
             {actions}
         </div>
     }
@@ -211,6 +234,56 @@ pub fn HelpButton(
         </button>
         {popover}
     }
+}
+
+/// The shown topic's related topics as buttons that show them in place;
+/// nothing without a registry or related ids.
+fn related_list(
+    registry: Option<HelpTopics>,
+    shown: RwSignal<HelpTopic>,
+    label: Signal<String>,
+    after_swap: impl Fn() + Clone + Send + Sync + 'static,
+) -> impl IntoView {
+    let heading_id = unique_id("ferrox-help-related");
+    move || {
+        let registry = registry.as_ref()?;
+        let related = registry.related(&shown.get());
+        if related.is_empty() {
+            return None;
+        }
+        let items = related.into_iter().map(|topic| {
+            let after_swap = after_swap.clone();
+            let name = topic.title().to_string();
+            let choose = move |_| {
+                shown.set(topic.clone());
+                after_swap();
+            };
+            view! {
+                <li><button type="button" class="help-popover__related-link" on:click=choose>{name}</button></li>
+            }
+        }).collect_view();
+        Some(view! {
+            <div class="help-popover__related">
+                <p class="help-popover__related-title" id=heading_id.clone()>{move || label.get()}</p>
+                <ul class="help-popover__related-list" aria-labelledby=heading_id.clone()>{items}</ul>
+            </div>
+        })
+    }
+}
+
+/// After a related topic is shown: keep the popover placed by its `?` (its
+/// size changed) and move focus to the new title.
+fn refocus(button: NodeRef<html::Button>, popover: NodeRef<html::Div>, title: NodeRef<html::H3>) {
+    request_animation_frame(move || {
+        if let (Some(button), Some(popover)) = (button.get_untracked(), popover.get_untracked()) {
+            let anchor: Element = button.unchecked_into();
+            let floating: HtmlElement = popover.unchecked_into();
+            place(&anchor, &floating, false, Align::Start);
+        }
+        if let Some(title) = title.get_untracked() {
+            let _ = title.focus();
+        }
+    });
 }
 
 /// A component's container classes, plus `help-reveal` when its `?` shows

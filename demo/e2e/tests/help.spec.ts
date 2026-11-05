@@ -54,7 +54,7 @@ test.describe('the ?', () => {
     await page.keyboard.press('Escape');
 
     await help(page, 'Amounts on a split').first().click();
-    await expect(topic(page, 'Amounts on a split').locator('li')).toHaveText([
+    await expect(topic(page, 'Amounts on a split').locator('.help-blocks li')).toHaveText([
       'Positive: money comes in',
       'Negative: money goes out',
       'The lines of an entry add up to zero',
@@ -576,4 +576,57 @@ test.describe('help on components', () => {
       await expectRequest(page, component, title);
     });
   }
+});
+
+test.describe('related topics', () => {
+  test('are listed by title; choosing one shows it in the same popover, with focus on its title', async ({ page }) => {
+    await help(page, 'Statement balance').click();
+    const popover = topic(page, 'Statement balance');
+    const related = popover.getByRole('list', { name: 'Related' });
+    await expect(related.getByRole('button')).toHaveText(['Amounts on a split', 'The five kinds of account']);
+
+    await related.getByRole('button', { name: 'Amounts on a split' }).click();
+    const swapped = topic(page, 'Amounts on a split');
+    await expect(swapped).toBeVisible();
+    expect(await swapped.evaluate((el) => el.matches(':popover-open'))).toBe(true);
+    await expect(swapped.locator('li', { hasText: 'Positive' })).toHaveCount(1);
+    await expect(swapped.locator('.help-popover__title')).toBeFocused();
+    await expect(swapped.getByRole('list', { name: 'Related' }).getByRole('button')).toHaveText(['The five kinds of account']);
+  });
+
+  test('the guide link follows the topic shown', async ({ page }) => {
+    await help(page, 'Statement balance').click();
+    const popover = topic(page, 'Statement balance');
+    await expect(popover.getByRole('link', { name: 'Full guide' })).toHaveCount(0);
+    await popover.getByRole('button', { name: 'The five kinds of account' }).click();
+    await expect(topic(page, 'The five kinds of account').getByRole('link', { name: 'Full guide' })).toHaveAttribute('href', '#account-kinds');
+  });
+
+  test('a topic with none shows no list', async ({ page }) => {
+    await help(page, 'The five kinds of account').click();
+    await expect(topic(page, 'The five kinds of account').getByRole('list', { name: 'Related' })).toHaveCount(0);
+  });
+
+  test('reopening starts again at the button\'s own topic', async ({ page }) => {
+    const button = help(page, 'Statement balance');
+    await button.click();
+    await topic(page, 'Statement balance').getByRole('button', { name: 'Amounts on a split' }).click();
+    await expect(topic(page, 'Amounts on a split')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(topic(page, 'Amounts on a split')).toBeHidden();
+    await button.click();
+    await expect(topic(page, 'Statement balance')).toBeVisible();
+  });
+
+  test('asking about a related topic sends that topic, without the field\'s label or value', async ({ page }) => {
+    const asking = page.locator('section', { has: page.getByRole('heading', { name: 'Asking an assistant' }) });
+    await asking.getByRole('button', { name: 'Help: Statement balance' }).click();
+    const popover = topic(page, 'Statement balance');
+    await popover.getByRole('button', { name: 'Amounts on a split' }).click();
+    await topic(page, 'Amounts on a split').getByRole('button', { name: 'Ask about this' }).click();
+    await expect(page.locator('[data-request="topic"]')).toHaveText('split-amount');
+    await expect(page.locator('[data-request="label"]')).toHaveText('Amounts on a split');
+    await expect(page.locator('[data-request="value"]')).toHaveText('(none)');
+    await expect(page.locator('[data-request="prompt"]')).toContainText('screen: reconcile');
+  });
 });

@@ -17,6 +17,11 @@ one git tag.
   `problems`), `HelpArea`, `provide_help_topics` / `use_help_topics`.
 - `HelpBlocks`: a topic's blocks as one component, shared by the popover
   and (next) the full guide.
+- `HelpButton`: with a registry provided, the popover lists the topic's
+  related topics ("Related", `related_label`); choosing one shows it in the
+  same popover with focus on its title, and "Full guide" and "Ask about
+  this" follow the topic shown. A related topic's request carries its own
+  title as the label and no value. Each opening starts at the `?`'s topic.
 
 ### Changed
 

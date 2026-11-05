@@ -8,7 +8,7 @@
 
 use std::sync::LazyLock;
 
-use ferrox_ui::{help_signals, 
+use ferrox_ui::{help_signals, provide_help_topics, HelpArea, HelpTopics, 
     Button, ButtonFamily, Checkbox, Combobox, ConfirmDialog, Dialog, DialogAction, Field, HelpAssistant, HelpButton, HelpKeys, HelpRequest, HelpReveal,
     HelpScope, HelpSignal, HelpSignals, HelpTopic, Input, PasswordInput, Sheet, SheetSide, Switch, Toolbar,
 };
@@ -20,12 +20,14 @@ static STATEMENT_BALANCE: LazyLock<HelpTopic> = LazyLock::new(|| {
     HelpTopic::new("statement-balance", "Statement balance")
         .paragraph("The closing balance printed on the bank's statement for this period.")
         .paragraph("Reconciling ticks off entries until the account agrees with it.")
+        .related(["split-amount", "account-kinds"])
 });
 
 static SPLIT_AMOUNT: LazyLock<HelpTopic> = LazyLock::new(|| {
     HelpTopic::new("split-amount", "Amounts on a split")
         .paragraph("Each line moves money into or out of one account.")
         .list(["Positive: money comes in", "Negative: money goes out", "The lines of an entry add up to zero"])
+        .related(["account-kinds"])
 });
 
 static ACCOUNT_KINDS: LazyLock<HelpTopic> = LazyLock::new(|| {
@@ -43,8 +45,14 @@ static ACCOUNT_KINDS: LazyLock<HelpTopic> = LazyLock::new(|| {
         .guide("#account-kinds")
 });
 
+/// The registry: related links in the popovers resolve through it.
+fn topics() -> HelpTopics {
+    HelpTopics::new([HelpArea::new("Accounts", [STATEMENT_BALANCE.clone(), SPLIT_AMOUNT.clone(), ACCOUNT_KINDS.clone()])])
+}
+
 #[component]
 pub fn HelpPage() -> impl IntoView {
+    provide_help_topics(topics());
     let log = RwSignal::new(Vec::<HelpSignal>::new());
     view! {
         <HelpSignals on_signal=move |signal: HelpSignal| log.update(|l| l.push(signal))>
