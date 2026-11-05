@@ -8,7 +8,7 @@
 
 use std::sync::LazyLock;
 
-use ferrox_ui::{help_signals, provide_help_topics, HelpArea, HelpTopics, 
+use ferrox_ui::{help_signals, provide_help_topics, HelpArea, HelpGuide, HelpTopics, 
     Button, ButtonFamily, Checkbox, Combobox, ConfirmDialog, Dialog, DialogAction, Field, HelpAssistant, HelpButton, HelpKeys, HelpRequest, HelpReveal,
     HelpScope, HelpSignal, HelpSignals, HelpTopic, Input, PasswordInput, Sheet, SheetSide, Switch, Toolbar,
 };
@@ -45,9 +45,35 @@ static ACCOUNT_KINDS: LazyLock<HelpTopic> = LazyLock::new(|| {
         .guide("#account-kinds")
 });
 
-/// The registry: related links in the popovers resolve through it.
-fn topics() -> HelpTopics {
-    HelpTopics::new([HelpArea::new("Accounts", [STATEMENT_BALANCE.clone(), SPLIT_AMOUNT.clone(), ACCOUNT_KINDS.clone()])])
+/// The registry: related links in the popovers resolve through it, and
+/// the guide page shows it.
+pub(crate) fn topics() -> HelpTopics {
+    HelpTopics::new([
+        HelpArea::new("Accounts", [STATEMENT_BALANCE.clone(), ACCOUNT_KINDS.clone()])
+            .intro("What an account is, and the kinds there are."),
+        HelpArea::new("Entries", [SPLIT_AMOUNT.clone()]),
+    ])
+}
+
+/// The full guide: every topic in the registry, inside an assistant whose
+/// requests the fake assistant shows.
+#[component]
+pub fn HelpGuidePage() -> impl IntoView {
+    let asked = RwSignal::new(None::<HelpRequest>);
+    let assistant_open = RwSignal::new(false);
+    let on_ask = move |request: HelpRequest| {
+        asked.set(Some(request));
+        assistant_open.set(true);
+    };
+    view! {
+        <h1>"Help guide"</h1>
+        <HelpAssistant on_ask=on_ask>
+            <HelpScope context=[("screen", "help")]>
+                <HelpGuide topics=topics() />
+            </HelpScope>
+        </HelpAssistant>
+        <FakeAssistant asked=asked open=assistant_open />
+    }
 }
 
 #[component]

@@ -189,3 +189,96 @@
   text-transform: uppercase;
   color: var(--primary-text);
 }
+
+/* HelpGuide: every topic on one page. */
+.help-guide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.help-guide__contents-list,
+.help-guide__contents-topics,
+.help-guide__related-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.help-guide__contents-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.help-guide__contents-title {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.help-guide__contents-topics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.help-guide__link {
+  color: var(--primary-text);
+}
+
+.help-guide__area {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.help-guide__area-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+.help-guide__intro {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.help-guide__topic {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  scroll-margin-top: var(--help-guide-scroll-margin, 4.5rem);
+}
+
+.help-guide__topic-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+.help-guide__related {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-xs) var(--space-sm);
+  font-size: 0.9rem;
+}
+
+.help-guide__related-title {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.help-guide__related-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+}
+
+.help-guide__ask {
+  align-self: flex-start;
+}

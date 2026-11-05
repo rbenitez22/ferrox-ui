@@ -14,7 +14,7 @@ pub struct HelpRequest {
     pub topic_id: String,
     pub topic_title: String,
     /// What carries the `?`: "field", "checkbox", "dialog", … ("help" for a
-    /// `HelpButton` on its own).
+    /// `HelpButton` on its own, "guide" for a topic in `HelpGuide`).
     pub component: &'static str,
     /// The component's label or title.
     pub label: String,

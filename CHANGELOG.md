@@ -22,6 +22,11 @@ one git tag.
   same popover with focus on its title, and "Full guide" and "Ask about
   this" follow the topic shown. A related topic's request carries its own
   title as the label and no value. Each opening starts at the `?`'s topic.
+- `HelpGuide`: every topic on one page, for an app's `/help` route: a
+  contents list, areas with intros, `<section id="{topic id}">` per topic
+  (arriving at `#id` scrolls there and focuses its title; links move in
+  place and update the hash), related links, and "Ask about this" (component
+  `"guide"`) inside an assistant. `--help-guide-scroll-margin` for a sticky bar.
 
 ### Changed
 
