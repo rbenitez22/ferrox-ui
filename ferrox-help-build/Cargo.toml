@@ -1,0 +1,15 @@
+[package]
+name        = "ferrox-help-build"
+description = "Build-script helper for ferrox-ui help: reads help topics written in a small Markdown subset, validates them, and writes HelpTopic statics an app includes."
+version.workspace    = true
+edition.workspace    = true
+license.workspace    = true
+repository.workspace = true
+authors.workspace    = true
+# One copy per build, as for ferrox-theme-build: two ferrox versions in one
+# app fail to resolve instead of generating code for the wrong runtime.
+# Not a native library.
+links = "ferrox-help-build"
+
+# Std only: an app's build script never compiles Leptos or web-sys.
+[dependencies]

@@ -15,6 +15,7 @@ struct Topic {
     id: String,
     title: String,
     blocks: Vec<HelpBlock>,
+    related: Vec<String>,
     guide: Option<String>,
 }
 
@@ -39,7 +40,7 @@ impl HelpTopic {
     /// A topic with an id (stable: an assistant and a guide find it by this)
     /// and a title (what the `?` is named after).
     pub fn new(id: impl Into<String>, title: impl Into<String>) -> Self {
-        Self(Arc::new(Topic { id: id.into(), title: title.into(), blocks: Vec::new(), guide: None }))
+        Self(Arc::new(Topic { id: id.into(), title: title.into(), blocks: Vec::new(), related: Vec::new(), guide: None }))
     }
 
     pub fn paragraph(self, text: impl Into<String>) -> Self {
@@ -60,6 +61,13 @@ impl HelpTopic {
         self.with_block(HelpBlock::Table { columns, rows })
     }
 
+    /// Other topics worth reading next, by id. Ids rather than topics, so
+    /// statics needn't refer to each other; a help registry resolves them.
+    pub fn related<I: Into<String>>(mut self, ids: impl IntoIterator<Item = I>) -> Self {
+        Arc::make_mut(&mut self.0).related = ids.into_iter().map(Into::into).collect();
+        self
+    }
+
     /// Where the same words sit among the rest ("Full guide").
     pub fn guide(mut self, href: impl Into<String>) -> Self {
         Arc::make_mut(&mut self.0).guide = Some(href.into());
@@ -76,6 +84,10 @@ impl HelpTopic {
 
     pub fn blocks(&self) -> &[HelpBlock] {
         &self.0.blocks
+    }
+
+    pub fn related_ids(&self) -> &[String] {
+        &self.0.related
     }
 
     pub fn guide_href(&self) -> Option<&str> {
@@ -128,6 +140,13 @@ mod tests {
                 rows: vec![vec!["+".into(), "in".into()], vec!["-".into(), "out".into()]],
             },
         ]);
+    }
+
+    #[test]
+    fn related_ids_keep_their_order() {
+        let topic = HelpTopic::new("a", "A").paragraph("text").related(["c", "b"]);
+        assert_eq!(topic.related_ids(), ["c".to_string(), "b".to_string()]);
+        assert!(HelpTopic::new("x", "X").related_ids().is_empty());
     }
 
     #[test]

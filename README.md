@@ -21,6 +21,7 @@ plan, with the decisions and the full component inventory, is
 |---|---|
 | `ferrox-theme` | Runtime theme switching (families, `system`/`light`/`dark`, stored choice), Leptos signals (feature `leptos`). *Moved in.* |
 | `ferrox-theme-build` | Build-script helper: the tokens, built-in themes and fonts; validates an app's theme files; writes the CSS file, fonts and pre-paint script the app links in `index.html`. *Moved in.* |
+| `ferrox-help-build` | Build-script helper for help: reads topics written in a small Markdown subset (an `ORDER` file plus area files), fails the build on any problem with `file:line`, and writes one `HelpTopic` static per topic (`recipe-search` → `RECIPE_SEARCH`) an app `include!`s. Std only. *New; the registry, related links in the popover and `HelpGuide` follow (plans/help-guide.md).* |
 | `ferrox-ui` | Primitives in feature groups: `core` (always on: `Button`, `IconButton`, `Toolbar`, `Spinner`, `LoadingOverlay`, `Alert`, help on any component (`HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`: a `?` with an offline topic, and context for an app's assistant); call `ferrox_ui::init()` before mounting to add their CSS), feature `overlay` (`Dialog`, `ConfirmDialog`, `Sheet`), feature `forms` (`Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox`), feature `navigation` (`AppShell`, `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton`), feature `layout` (`AppBar`, `Page`, `PageGrid`, `Stack`, `Cluster`, `Panel`, also collapsible, `Card`, `Facts`), feature `data` (`DataView` with infinite scroll, `DataLayoutSwitch`, `Pagination`), feature `menus` (`Menu`, `SplitButton`, `ContextMenu`), feature `media` (`Carousel`). *Every group done: core, overlay, forms, navigation, layout, data, menus and media.* [README](ferrox-ui/README.md) |
 | `ferrox-icons` | SVG icons (Lucide), checked at build time: each icon a const (`CLOSE`), drawn by one `Icon` component. 27 icons so far, added as components need them. [README](ferrox-icons/README.md) |
 | `ferrox-charts` | Charts on the theme's chart tokens (later) |
@@ -69,7 +70,8 @@ The kit works with any agent that reads files and runs commands; see
 same tag, through the same URL, for all of them, and the same one any
 library you use names (webapp-lib pins one). Two copies of ferrox in one
 build would compile and then mix types, theme state and CSS, so Cargo
-refuses them: `ferrox-theme`, `ferrox-icons` and `ferrox-theme-build` each
+refuses them: `ferrox-theme`, `ferrox-icons`, `ferrox-theme-build` and
+`ferrox-help-build` each
 declare a `links` value, and only one package may claim each. The error
 reads "package `ferrox-icons` links to the native library `ferrox-icons`,
 but it conflicts with a previous package"; it means two tags (or two URL
