@@ -37,3 +37,30 @@ fn missing_order() {
     let errors = Help::try_load(env!("CARGO_MANIFEST_DIR")).unwrap_err();
     assert!(errors[0].to_string().starts_with("ORDER: cannot read"));
 }
+
+#[test]
+fn json_round_trips() {
+    let help = Help::try_load(OK).unwrap().guide_prefix("/help#");
+    let doc: serde_json::Value = serde_json::from_str(&help.render_json()).unwrap();
+    let areas = doc["areas"].as_array().unwrap();
+    assert_eq!(areas.len(), 2);
+    assert_eq!(areas[0]["intro"], "An intro.");
+    assert_eq!(areas[1]["intro"], serde_json::Value::Null);
+    let one = &areas[0]["topics"][0];
+    assert_eq!(one["id"], "one");
+    assert_eq!(one["blocks"][0]["paragraph"], "The first topic.");
+    assert_eq!(one["blocks"][1]["list"][1], "b");
+    assert_eq!(one["related"][0], "two");
+    assert_eq!(one["guide"], "/help#one");
+    assert_eq!(areas[1]["topics"][0]["blocks"][1]["table"]["rows"][0][1], "2");
+}
+
+#[test]
+fn json_of_a_real_doc_set_parses() {
+    // Rusty Skillet's help, when it sits beside this repo.
+    let dir = concat!(env!("CARGO_MANIFEST_DIR"), "/../../rusty-skillet/docs/help");
+    let Ok(help) = Help::try_load(dir) else { return };
+    let doc: serde_json::Value = serde_json::from_str(&help.render_json()).unwrap();
+    let count: usize = doc["areas"].as_array().unwrap().iter().map(|a| a["topics"].as_array().unwrap().len()).sum();
+    assert!(count > 0);
+}

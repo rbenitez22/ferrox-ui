@@ -34,12 +34,16 @@
 //! - The first block of every topic is a paragraph that stands on its own.
 //! - Text is plain: `**`, backticks, `[..](..)` and HTML tags are rejected.
 //!
+//! An API's build script can write the same topics as JSON, for an
+//! assistant: `Help::load(dir).guide_prefix("/help#").write_json("help.json")`.
+//!
 //! Any problem fails the build, with every problem listed as `file:line`.
 //!
 //! Std only, so an app's build script never compiles ferrox-ui itself.
 
 mod check;
 mod error;
+mod json;
 mod model;
 mod parse;
 mod rust;
@@ -49,6 +53,7 @@ use std::path::{Path, PathBuf};
 
 pub use check::{check_areas, RESERVED_IDS};
 pub use error::HelpError;
+pub use json::render_json;
 pub use model::{Area, Block, Related, Topic};
 pub use parse::{is_valid_id, parse_area};
 pub use rust::{render_rust, static_name, RustOptions};
@@ -139,13 +144,29 @@ impl Help {
         })
     }
 
+    /// The same topics as JSON, for an API to serve to an assistant.
+    pub fn render_json(&self) -> String {
+        render_json(&self.areas, self.guide_prefix.as_deref())
+    }
+
     /// Writes the generated Rust into `$OUT_DIR/<file_name>` and returns its path.
     pub fn write_rust(&self, file_name: &str) -> PathBuf {
-        let out_dir = std::env::var("OUT_DIR").expect("OUT_DIR is set by cargo for build scripts");
-        let target = Path::new(&out_dir).join(file_name);
-        fs::write(&target, self.render_rust()).unwrap_or_else(|e| panic!("cannot write {}: {e}", target.display()));
-        target
+        write_out(file_name, &self.render_rust())
     }
+
+    /// Writes the JSON into `$OUT_DIR/<file_name>` and returns its path. An
+    /// API embeds it with `include_str!(concat!(env!("OUT_DIR"), "/help.json"))`.
+    pub fn write_json(&self, file_name: &str) -> PathBuf {
+        write_out(file_name, &self.render_json())
+    }
+}
+
+/// Writes `contents` into `$OUT_DIR/<file_name>`.
+fn write_out(file_name: &str, contents: &str) -> PathBuf {
+    let out_dir = std::env::var("OUT_DIR").expect("OUT_DIR is set by cargo for build scripts");
+    let target = Path::new(&out_dir).join(file_name);
+    fs::write(&target, contents).unwrap_or_else(|e| panic!("cannot write {}: {e}", target.display()));
+    target
 }
 
 /// The area file names from `ORDER`, checked for shape and repeats.

@@ -13,3 +13,6 @@ links = "ferrox-help-build"
 
 # Std only: an app's build script never compiles Leptos or web-sys.
 [dependencies]
+
+[dev-dependencies]
+serde_json = "1"
