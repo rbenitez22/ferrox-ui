@@ -3,6 +3,28 @@
 All crates in this repo share one version and are released together under
 one git tag.
 
+## Unreleased (0.2.0)
+
+### Added: help from Markdown, the topic registry (`plans/help-guide.md`)
+
+- `ferrox-help-build`, a new std-only build crate: reads help topics written
+  in a small Markdown subset (`ORDER` plus area files), fails the build with
+  every problem as `file:line`, and writes one `LazyLock<HelpTopic>` static
+  per topic (`recipe-search` → `RECIPE_SEARCH`) plus `TOPICS`, the registry.
+  `write_json` writes the same topics as JSON for an API to serve.
+- `HelpTopic::related(ids)` / `related_ids()`.
+- `HelpTopics` (areas of topics in reading order, `get`, `related`,
+  `problems`), `HelpArea`, `provide_help_topics` / `use_help_topics`.
+- `HelpBlocks`: a topic's blocks as one component, shared by the popover
+  and (next) the full guide.
+
+### Changed
+
+- The popover's block classes are now `help-blocks__paragraph`, `__list`,
+  `__table`, `__heading` and `__cell` (were `help-popover__…`), inside a
+  `.help-blocks` wrapper that holds the gap. A theme that styled the old
+  names needs the new ones. Table headings gained `scope="col"`.
+
 ## 0.1.1 (2026-10-28)
 
 ### Added: the `media` group and its `Carousel`

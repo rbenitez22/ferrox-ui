@@ -11,7 +11,8 @@ use super::help_request::HelpRequest;
 use super::help_keys::help_keys_shortcuts;
 use super::help_scope::{assistant, scope_context};
 use super::help_signals::{help_signals, HelpSignalKind};
-use super::help_topic::{HelpBlock, HelpTopic, MaybeHelp};
+use super::help_blocks::HelpBlocks;
+use super::help_topic::{HelpTopic, MaybeHelp};
 use crate::ids::unique_id;
 
 /// The class list for a help button: an `.icon-btn` sized to sit by text.
@@ -139,7 +140,7 @@ pub fn HelpButton(
         }
     };
 
-    let blocks = topic.blocks().iter().map(render_block).collect_view();
+    let blocks = topic.blocks().to_vec();
     let guide = topic.guide_href().map(|href| view! {
         <a class="help-popover__link" href=href.to_string()>{move || guide_label.get()}</a>
     });
@@ -182,7 +183,7 @@ pub fn HelpButton(
             on:toggle=on_toggle
         >
             <h3 class="help-popover__title" id=title_id>{title}</h3>
-            <div class="help-popover__body">{blocks}</div>
+            <div class="help-popover__body"><HelpBlocks blocks=blocks /></div>
             {actions}
         </div>
     }
@@ -240,29 +241,6 @@ pub(crate) fn component_help(
         };
         (view, id)
     })
-}
-
-fn render_block(block: &HelpBlock) -> AnyView {
-    match block {
-        HelpBlock::Paragraph(text) => view! { <p class="help-popover__paragraph">{text.clone()}</p> }.into_any(),
-        HelpBlock::List(items) => view! {
-            <ul class="help-popover__list">
-                {items.iter().map(|item| view! { <li>{item.clone()}</li> }).collect_view()}
-            </ul>
-        }.into_any(),
-        HelpBlock::Table { columns, rows } => view! {
-            <table class="help-popover__table">
-                <thead><tr>
-                    {columns.iter().map(|c| view! { <th class="help-popover__heading">{c.clone()}</th> }).collect_view()}
-                </tr></thead>
-                <tbody>
-                    {rows.iter().map(|row| view! {
-                        <tr>{row.iter().map(|cell| view! { <td class="help-popover__cell">{cell.clone()}</td> }).collect_view()}</tr>
-                    }).collect_view()}
-                </tbody>
-            </table>
-        }.into_any(),
-    }
 }
 
 #[cfg(test)]

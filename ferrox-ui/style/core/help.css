@@ -100,32 +100,38 @@
 .help-popover__body {
   display: flex;
   flex-direction: column;
+}
+
+/* A topic's blocks: shared by the popover and the full guide. */
+.help-blocks {
+  display: flex;
+  flex-direction: column;
   gap: var(--space-sm);
 }
 
-.help-popover__paragraph {
+.help-blocks__paragraph {
   margin: 0;
 }
 
-.help-popover__list {
+.help-blocks__list {
   margin: 0;
   padding-left: 1.25em;
 }
 
-.help-popover__table {
+.help-blocks__table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
 }
 
-.help-popover__heading,
-.help-popover__cell {
+.help-blocks__heading,
+.help-blocks__cell {
   padding: var(--space-xs) var(--space-sm);
   border-bottom: 1px solid var(--line);
   text-align: left;
 }
 
-.help-popover__heading {
+.help-blocks__heading {
   color: var(--text-muted);
   font-weight: 600;
 }

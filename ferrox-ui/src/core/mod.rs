@@ -3,17 +3,20 @@
 mod alert;
 pub(crate) mod anchor;
 mod button;
+mod help_blocks;
 mod help_button;
 mod help_keys;
 mod help_request;
 mod help_scope;
 mod help_signals;
 mod help_topic;
+mod help_topics;
 mod icon_button;
 mod spinner;
 mod toolbar;
 
 pub use alert::{alert_classes, Alert, AlertSeverity};
+pub use help_blocks::HelpBlocks;
 pub use help_button::{help_button_classes, HelpButton};
 pub use help_keys::HelpKeys;
 pub use help_request::HelpRequest;
@@ -22,6 +25,7 @@ pub use help_signals::{help_signals, HelpReporter, HelpSignal, HelpSignalKind, H
 pub(crate) use help_scope::reveals_while_active;
 pub(crate) use help_button::{component_help, with_reveal};
 pub use help_topic::{HelpBlock, HelpTopic, MaybeHelp};
+pub use help_topics::{provide_help_topics, use_help_topics, HelpArea, HelpTopics};
 pub use button::{button_classes, Button, ButtonFamily, ButtonSize};
 pub use icon_button::{icon_button_classes, IconButton};
 pub use spinner::{spinner_status_classes, LoadingOverlay, Spinner, SpinnerKind};

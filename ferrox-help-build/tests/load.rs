@@ -21,6 +21,7 @@ fn renders_statics_for_every_topic() {
     assert!(code.contains("pub static ONE: ::std::sync::LazyLock<::ferrox_ui::HelpTopic>"));
     assert!(code.contains(".related([\"two\"])"));
     assert!(code.contains(".guide(\"/help#two\")"));
+    assert!(code.contains("::ferrox_ui::HelpArea::new(\"First\", [ONE.clone()]).intro(\"An intro.\"),"));
 }
 
 #[test]

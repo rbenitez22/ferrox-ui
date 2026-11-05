@@ -50,7 +50,7 @@ test.describe('the ?', () => {
 
   test('renders paragraphs, lists, tables and the guide link', async ({ page }) => {
     await help(page, 'Statement balance').click();
-    await expect(topic(page, 'Statement balance').locator('.help-popover__paragraph')).toHaveCount(2);
+    await expect(topic(page, 'Statement balance').locator('.help-blocks__paragraph')).toHaveCount(2);
     await page.keyboard.press('Escape');
 
     await help(page, 'Amounts on a split').first().click();

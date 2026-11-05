@@ -1,6 +1,6 @@
 # Help from Markdown, related topics, and the full guide
 
-Status: approved 2026-11-05 (open questions as recommended). Piece 1 done: `ferrox-help-build` parses, validates and writes Rust; `HelpTopic::related` / `related_ids` added; 44 rusty-skillet topics generate and compile. Piece 2 done: `render_json` / `write_json`, round-trip tested with serde_json (dev-dependency only). Next: piece 3 (`HelpTopics` registry, `HelpBlocks`).
+Status: approved 2026-11-05 (open questions as recommended). Piece 1 done: `ferrox-help-build` parses, validates and writes Rust; `HelpTopic::related` / `related_ids` added; 44 rusty-skillet topics generate and compile. Piece 2 done: `render_json` / `write_json`, round-trip tested with serde_json (dev-dependency only). Piece 3 done: `HelpTopics` / `HelpArea` / context, `HelpBlocks` (classes renamed `help-blocks__*`), and the generator emits `TOPICS`; 234 help/layout/navigation e2e pass. Next: piece 4 (related links in the popover).
 
 This is Track A of the help roadmap in rusty-skillet's `plans/help-docs.md`. It builds the help work deferred in `plans/help.md` (open point 6: topic registry, checked `related`, a `/help` guide page) as reusable ferrox pieces. Rusty Skillet is the first consumer: its 44 topics are already written as Markdown in `rusty-skillet/docs/help/`.
 

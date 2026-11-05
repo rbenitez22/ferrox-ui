@@ -16,6 +16,9 @@
 //! // src/help.rs
 //! include!(concat!(env!("OUT_DIR"), "/help_topics.rs"));
 //!
+//! // the app root: related links in popovers, and the full guide
+//! ferrox_ui::provide_help_topics(crate::help::TOPICS.clone());
+//!
 //! // a view
 //! <Page title="Recipes" help=crate::help::RECIPE_LIST.clone()>
 //! ```
@@ -30,7 +33,8 @@
 //!   (two-space continuation lines), pipe tables, and an optional last line
 //!   `Related: #id, #id`. `<!-- -->` comment lines are dropped.
 //! - Ids are `^[a-z][a-z0-9-]*$`, unique across all files. The static is the
-//!   id upper-snake-cased: `recipe-search` → `RECIPE_SEARCH`.
+//!   id upper-snake-cased: `recipe-search` → `RECIPE_SEARCH`. `TOPICS` holds
+//!   them all, so `topics` is not a valid id.
 //! - The first block of every topic is a paragraph that stands on its own.
 //! - Text is plain: `**`, backticks, `[..](..)` and HTML tags are rejected.
 //!

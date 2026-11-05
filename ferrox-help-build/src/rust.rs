@@ -1,5 +1,6 @@
 //! Areas → Rust source: one `LazyLock<HelpTopic>` static per topic, built
-//! with ferrox-ui's `HelpTopic` builder. Nothing is parsed at runtime.
+//! with ferrox-ui's `HelpTopic` builder, and `TOPICS`, the `HelpTopics`
+//! registry of them all. Nothing is parsed at runtime.
 
 use std::fmt::Write;
 
@@ -30,7 +31,25 @@ pub fn render_rust(areas: &[Area], options: &RustOptions) -> String {
             render_topic(&mut out, topic, options);
         }
     }
+    render_registry(&mut out, areas, options.crate_path);
     out
+}
+
+/// `TOPICS`: every area and its topics, in reading order.
+fn render_registry(out: &mut String, areas: &[Area], krate: &str) {
+    writeln!(out, "\n/// Every topic, in reading order: for `provide_help_topics` and `HelpGuide`.").unwrap();
+    writeln!(out, "pub static TOPICS: ::std::sync::LazyLock<{krate}::HelpTopics> = ::std::sync::LazyLock::new(|| {{").unwrap();
+    writeln!(out, "    {krate}::HelpTopics::new([").unwrap();
+    for area in areas {
+        let topics: Vec<String> = area.topics.iter().map(|t| format!("{}.clone()", static_name(&t.id))).collect();
+        write!(out, "        {krate}::HelpArea::new({:?}, [{}])", area.title, topics.join(", ")).unwrap();
+        if let Some(intro) = &area.intro {
+            write!(out, ".intro({intro:?})").unwrap();
+        }
+        writeln!(out, ",").unwrap();
+    }
+    writeln!(out, "    ])").unwrap();
+    writeln!(out, "}});").unwrap();
 }
 
 fn render_topic(out: &mut String, topic: &Topic, options: &RustOptions) {
@@ -100,6 +119,13 @@ pub static SAY_HI: ::std::sync::LazyLock<::ferrox_ui::HelpTopic> = ::std::sync::
         .table(["K", "V"], [["1", "2"]])
         .related(["other"])
         .guide("/help#say-hi")
+});
+
+/// Every topic, in reading order: for `provide_help_topics` and `HelpGuide`.
+pub static TOPICS: ::std::sync::LazyLock<::ferrox_ui::HelpTopics> = ::std::sync::LazyLock::new(|| {
+    ::ferrox_ui::HelpTopics::new([
+        ::ferrox_ui::HelpArea::new("A", [SAY_HI.clone()]),
+    ])
 });
 "#;
         assert_eq!(code, expected);
