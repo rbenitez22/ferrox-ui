@@ -3,7 +3,7 @@
 All crates in this repo share one version and are released together under
 one git tag.
 
-## Unreleased (0.2.0)
+## 0.2.0 (2026-11-06)
 
 ### Added: help from Markdown, the topic registry (`plans/help-guide.md`)
 
@@ -41,6 +41,7 @@ one git tag.
   `__table`, `__heading` and `__cell` (were `help-popover__…`), inside a
   `.help-blocks` wrapper that holds the gap. A theme that styled the old
   names needs the new ones. Table headings gained `scope="col"`.
+- The starter pins `tag = "v0.2.0"`; the agent kit is `0.2.0`.
 
 ## 0.1.1 (2026-10-28)
 
