@@ -20,6 +20,7 @@ layout-grid layout-grid
 list list
 lock lock
 menu menu
+message-circle message-circle
 more-vertical ellipsis-vertical
 plus plus
 refresh refresh-cw
