@@ -21,8 +21,8 @@ plan, with the decisions and the full component inventory, is
 |---|---|
 | `ferrox-theme` | Runtime theme switching (families, `system`/`light`/`dark`, stored choice), Leptos signals (feature `leptos`). *Moved in.* |
 | `ferrox-theme-build` | Build-script helper: the tokens, built-in themes and fonts; validates an app's theme files; writes the CSS file, fonts and pre-paint script the app links in `index.html`. *Moved in.* |
-| `ferrox-help-build` | Build-script helper for help: reads topics written in a small Markdown subset (an `ORDER` file plus area files), fails the build on any problem with `file:line`, and writes one `HelpTopic` static per topic (`recipe-search` → `RECIPE_SEARCH`) an app `include!`s. Std only. *New; the registry, related links in the popover and `HelpGuide` follow (plans/help-guide.md).* |
-| `ferrox-ui` | Primitives in feature groups: `core` (always on: `Button`, `IconButton`, `Toolbar`, `Spinner`, `LoadingOverlay`, `Alert`, help on any component (`HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`: a `?` with an offline topic, and context for an app's assistant); call `ferrox_ui::init()` before mounting to add their CSS), feature `overlay` (`Dialog`, `ConfirmDialog`, `Sheet`), feature `forms` (`Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox`), feature `navigation` (`AppShell`, `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton`), feature `layout` (`AppBar`, `Page`, `PageGrid`, `Stack`, `Cluster`, `Panel`, also collapsible, `Card`, `Facts`), feature `data` (`DataView` with infinite scroll, `DataLayoutSwitch`, `Pagination`), feature `menus` (`Menu`, `SplitButton`, `ContextMenu`), feature `media` (`Carousel`). *Every group done: core, overlay, forms, navigation, layout, data, menus and media.* [README](ferrox-ui/README.md) |
+| `ferrox-help-build` | Build-script helper for help: reads topics written in a small Markdown subset (an `ORDER` file plus area files), fails the build on any problem with `file:line`, and writes one `HelpTopic` static per topic (`recipe-search` → `RECIPE_SEARCH`) plus `TOPICS`, the registry, for an app to `include!`; optionally the same topics as JSON for an assistant. Std only. [Format](ferrox-ui/docs/help-markdown.md) |
+| `ferrox-ui` | Primitives in feature groups: `core` (always on: `Button`, `IconButton`, `Toolbar`, `Spinner`, `LoadingOverlay`, `Alert`, help on any component (`HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`: a `?` with an offline topic, and context for an app's assistant; `HelpTopics`, the registry behind related links, and `HelpGuide`, every topic on one page); call `ferrox_ui::init()` before mounting to add their CSS), feature `overlay` (`Dialog`, `ConfirmDialog`, `Sheet`), feature `forms` (`Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox`), feature `navigation` (`AppShell`, `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton`), feature `layout` (`AppBar`, `Page`, `PageGrid`, `Stack`, `Cluster`, `Panel`, also collapsible, `Card`, `Facts`), feature `data` (`DataView` with infinite scroll, `DataLayoutSwitch`, `Pagination`), feature `menus` (`Menu`, `SplitButton`, `ContextMenu`), feature `media` (`Carousel`). *Every group done: core, overlay, forms, navigation, layout, data, menus and media.* [README](ferrox-ui/README.md) |
 | `ferrox-icons` | SVG icons (Lucide), checked at build time: each icon a const (`CLOSE`), drawn by one `Icon` component. 27 icons so far, added as components need them. [README](ferrox-icons/README.md) |
 | `ferrox-charts` | Charts on the theme's chart tokens (later) |
 | `starter/` | The smallest app with everything wired: copy it to start (not published; not a workspace member, it depends on ferrox-ui by git). `scripts/starter-local.sh` builds it against the working tree for the tests. |
@@ -99,6 +99,46 @@ ferrox_theme::init();
 ```
 
 [`demo/`](demo/) does this with its own themes.
+
+### Your help topics
+
+Write help once, as Markdown, and get one `HelpTopic` static per topic, the
+registry (`TOPICS`) for related links and the full guide, and optionally a
+JSON copy for an assistant. The format is
+[ferrox-ui/docs/help-markdown.md](ferrox-ui/docs/help-markdown.md); the
+components are in [ferrox-ui/docs/help.md](ferrox-ui/docs/help.md).
+
+```toml
+[build-dependencies]
+ferrox-help-build = { git = "…", tag = "…" }  # the same tag as ferrox-ui
+```
+
+```rust
+// build.rs: a problem in the help files fails the build with file:line
+fn main() {
+    ferrox_help_build::Help::load("../docs/help")
+        .guide_prefix("/help#") // every topic's "Full guide" link
+        .write_rust("help_topics.rs");
+}
+```
+
+```rust
+// src/help.rs
+include!(concat!(env!("OUT_DIR"), "/help_topics.rs"));
+
+// at the app's root
+ferrox_ui::provide_help_topics(crate::help::TOPICS.clone());
+
+// on a component, and the /help page
+<Page title="Recipes" help=crate::help::RECIPE_LIST.clone()>
+<Page title="Help"><HelpGuide /></Page>
+```
+
+An API's build script writes the same topics as JSON to serve:
+`Help::load(dir).guide_prefix("/help#").write_json("help.json")`, then
+`include_str!(concat!(env!("OUT_DIR"), "/help.json"))`.
+
+[`demo/`](demo/) does this with `demo/help/`.
 
 ## Developing
 

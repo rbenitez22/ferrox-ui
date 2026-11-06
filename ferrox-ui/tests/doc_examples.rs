@@ -279,6 +279,41 @@ mod core {
         }
         // endregion
     }
+
+    static ACCOUNT_KINDS: LazyLock<HelpTopic> = LazyLock::new(|| HelpTopic::new("account-kinds", "The five kinds of account"));
+
+    fn help_related() -> HelpTopic {
+        // region: help-related
+        HelpTopic::new("statement-balance", "Statement balance")
+            .paragraph("The closing balance printed on the bank's statement.")
+            .related(["split-amount", "account-kinds"]) // ids, found in the registry
+        // endregion
+    }
+
+    fn help_topics() {
+        // region: help-topics
+        use ferrox_ui::{provide_help_topics, HelpArea, HelpTopics};
+
+        // Once, at the app's root. A generated `TOPICS` replaces all of this.
+        provide_help_topics(HelpTopics::new([
+            HelpArea::new("Accounts", [STATEMENT_BALANCE.clone(), ACCOUNT_KINDS.clone()])
+                .intro("What an account is, and the kinds there are."),
+            HelpArea::new("Entries", [SPLIT_AMOUNT.clone()]),
+        ]));
+        // endregion
+    }
+
+    fn help_guide() -> impl IntoView {
+        // region: help-guide
+        use ferrox_ui::HelpGuide;
+
+        // The app's /help route: every topic of the provided registry.
+        view! {
+            <h1>"Help"</h1>
+            <HelpGuide />
+        }
+        // endregion
+    }
 }
 
 // ---------------------------------------------------------------------------

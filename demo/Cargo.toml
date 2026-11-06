@@ -16,3 +16,4 @@ web-sys       = { workspace = true, features = ["Window", "Document", "Element",
 # Wired exactly as an app would be (apps use a git dependency instead of a path).
 [build-dependencies]
 ferrox-theme-build = { path = "../ferrox-theme-build" }
+ferrox-help-build  = { path = "../ferrox-help-build" }

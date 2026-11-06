@@ -45,6 +45,10 @@ A standard padded button (`.btn`).
 - `class: MaybeProp<String>`, optional
 - `children: Children`
 
+### `HelpBlocks` (component)
+A topic's blocks: paragraphs, lists and tables, as plain text.
+- `blocks: Vec<HelpBlock>`
+
 ### `help_button_classes` (function)
 `fn help_button_classes(extra: &str) -> String`: The class list for a help button: an `.icon-btn` sized to sit by text.
 
@@ -55,11 +59,23 @@ A `?` that opens a help topic in a popover beside it.
 - `help_label: Signal<String>`, default `"Help"`
 - `guide_label: Signal<String>`, default `"Full guide"`
 - `ask_label: Signal<String>`, default `"Ask about this"`
+- `related_label: Signal<String>`, default `"Related"`
 - `suggested_label: Signal<String>`, default `", suggested"`
 - `kind: &'static str`, default `"help"`
 - `about: MaybeProp<String>`, optional
 - `value: MaybeProp<String>`, optional
 - `id: Option<String>`, optional
+- `class: MaybeProp<String>`, optional
+
+### `help_guide_classes` (function)
+`fn help_guide_classes(extra: &str) -> String`: The class list for a guide.
+
+### `HelpGuide` (component)
+Every help topic on one page, in reading order: a contents list, then each area with its intro and topics.
+- `topics: Option<HelpTopics>`, optional
+- `contents_label: Signal<String>`, default `"Contents"`
+- `related_label: Signal<String>`, default `"Related"`
+- `ask_label: Signal<String>`, default `"Ask about this"`
 - `class: MaybeProp<String>`, optional
 
 ### `HelpKeys` (component)
@@ -115,6 +131,18 @@ One thing a `?` can explain: a title, its blocks, and where the same words sit i
 
 ### `MaybeHelp` (struct)
 A component's `help` prop: a topic, or none.
+
+### `HelpArea` (struct)
+A group of topics read together, such as one file of an app's help: a title, an optional intro, and topics in reading order. Fields: title, intro, topics.
+
+### `HelpTopics` (struct)
+All of an app's help topics, in reading order, found by id.
+
+### `provide_help_topics` (function)
+`fn provide_help_topics(topics: HelpTopics)`: Makes `topics` the registry for everything below: related links in `?` popovers, and a `HelpGuide` with no `topics` of its own.
+
+### `use_help_topics` (function)
+`fn use_help_topics() -> Option<HelpTopics>`: The registry provided above, if any.
 
 ### `icon_button_classes` (function)
 `fn icon_button_classes(danger: bool, extra: &str) -> String`: The class list for an `.icon-btn`.

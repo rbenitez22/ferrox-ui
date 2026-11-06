@@ -37,6 +37,11 @@ static SPLIT_AMOUNT: LazyLock<HelpTopic> = LazyLock::new(|| {
 The `id` is stable: an assistant and a guide find the topic by it. The
 `title` names the `?`.
 
+Most apps don't write topics in Rust: they write Markdown, and
+`ferrox-help-build` generates these statics at build time (see
+[Topics from Markdown](#topics-from-markdown-ferrox-help-build)). Either way
+the result is the same `HelpTopic`; nothing parses Markdown at runtime.
+
 ## The `help` prop
 
 | Component | Where the `?` sits | Also |
@@ -121,7 +126,14 @@ view! {
 - Props: `topic`, `skip_tab`, `kind` / `about` / `value` (what a request says
   carries the `?`; components set these), `id` (for F1: see `HelpKeys`),
   `suggested_label` (`", suggested"`), `help_label` (`"Help"`),
-  `guide_label` (`"Full guide"`), `ask_label` (`"Ask about this"`), `class`.
+  `guide_label` (`"Full guide"`), `ask_label` (`"Ask about this"`),
+  `related_label` (`"Related"`), `class`.
+- **Related topics.** With a registry provided (`provide_help_topics`), the
+  popover lists the topic's related topics. Choosing one shows it in the
+  same popover with focus on its title; "Full guide" and "Ask about this"
+  follow the topic shown, and a related topic's request carries its own
+  title as the label and no value. Each opening starts again at the `?`'s
+  own topic.
 - Put it where block content is allowed: not inside a `<label>` or a
   `<button>`.
 
@@ -346,6 +358,125 @@ view! {
   clicks. Thresholds, cool-downs and the offer itself belong to the app's
   `on_signal`.
 - Signals stay in the page; only what `on_signal` does with them leaves it.
+
+## Topics from Markdown: `ferrox-help-build`
+
+An app writes its help once, as Markdown files, and a build script turns
+them into `HelpTopic` statics. A `help=` prop then names a constant, so a
+wrong topic id is a compile error, and a broken related link or an
+unsupported construct fails the build with `file:line`.
+
+The files are a directory holding an `ORDER` file (the area files, in
+reading order) and one Markdown file per area:
+
+```markdown
+# Accounts
+
+What an account is, and the kinds there are.
+
+## Statement balance {#statement-balance}
+
+The closing balance printed on the bank's statement for this period.
+
+Related: #split-amount, #account-kinds
+```
+
+The format is a small subset of Markdown: [help-markdown.md](help-markdown.md)
+is its full contract. The build script, the generated module and the JSON
+output for an assistant are in
+[the repo README](../../README.md#your-help-topics). The
+generated module holds one static per topic (`statement-balance` →
+`STATEMENT_BALANCE`) and `TOPICS`, the registry of them all.
+
+## `related` and the registry: `HelpTopics`
+
+A topic can name other topics by id. The ids resolve through a registry,
+so a topic carries only ids, never copies:
+
+<!-- example: help-related -->
+```rust
+HelpTopic::new("statement-balance", "Statement balance")
+    .paragraph("The closing balance printed on the bank's statement.")
+    .related(["split-amount", "account-kinds"]) // ids, found in the registry
+```
+<!-- /example -->
+
+`HelpTopics` holds every topic in reading order, grouped in `HelpArea`s
+(a title, an optional intro, topics). Provide it once at the app's root;
+`HelpButton` resolves related ids through it and `HelpGuide` shows it. A
+generated `TOPICS` is one, ready made:
+
+<!-- example: help-topics -->
+```rust
+use ferrox_ui::{provide_help_topics, HelpArea, HelpTopics};
+
+// Once, at the app's root. A generated `TOPICS` replaces all of this.
+provide_help_topics(HelpTopics::new([
+    HelpArea::new("Accounts", [STATEMENT_BALANCE.clone(), ACCOUNT_KINDS.clone()])
+        .intro("What an account is, and the kinds there are."),
+    HelpArea::new("Entries", [SPLIT_AMOUNT.clone()]),
+]));
+```
+<!-- /example -->
+
+- `get(id)`, `related(topic)`, `areas()`, `iter()`, `len()`.
+- `problems()` lists repeated ids and related ids that name no topic. In
+  debug builds `HelpTopics::new` panics on them; generated topics are
+  already checked at build time.
+- Without a registry, related ids are ignored and the popover shows no
+  "Related" list.
+
+## `HelpGuide`: every topic on one page
+
+The body of an app's `/help` page. The app owns the route, the page around
+it and the side-menu entry; topics' "Full guide" links point at it.
+
+<!-- example: help-guide -->
+```rust
+use ferrox_ui::HelpGuide;
+
+// The app's /help route: every topic of the provided registry.
+view! {
+    <h1>"Help"</h1>
+    <HelpGuide />
+}
+```
+<!-- /example -->
+
+- A contents list, then each area with its intro and topics. Each topic is
+  a `<section id="{topic id}">`, so `/help#statement-balance` (what
+  `guide_prefix("/help#")` generates) opens at it: arriving at a hash, or a
+  hash change, scrolls the topic into view and focuses its title. Contents
+  and related links move in place and update the hash; the router doesn't
+  navigate.
+- Inside a `HelpAssistant`, each topic offers "Ask about this": a
+  `HelpRequest` with component `"guide"`, the topic's title as the label,
+  and the enclosing scopes' context.
+- Props: `topics` (the provided registry by default; with neither, the
+  guide is empty), `contents_label` (`"Contents"`), `related_label`
+  (`"Related"`), `ask_label` (`"Ask about this"`), `class`.
+- A sticky app bar can cover a topic scrolled to the top: set
+  `--help-guide-scroll-margin` to its height (4.5rem by default).
+
+## `HelpBlocks`
+
+A topic's blocks (paragraphs, lists, tables) as one component, the one the
+popover and the guide both use: `<HelpBlocks blocks=topic.blocks().to_vec() />`.
+Use it to show a topic somewhere of the app's own.
+
+## CSS classes
+
+- Popover: `.help-popover` with `__title`, `__body`, `__related`,
+  `__related-title`, `__related-list`, `__related-link`, `__actions`,
+  `__link`, `__ask`.
+- Blocks: `.help-blocks` (holds the gap) with `__paragraph`, `__list`,
+  `__table`, `__heading`, `__cell`. **Changed in 0.2.0:** these were
+  `help-popover__paragraph` and so on. A theme that styled the old names
+  needs the new ones.
+- Guide: `.help-guide` with `__contents`, `__contents-title`,
+  `__contents-area`, `__contents-list`, `__contents-topics`, `__area`,
+  `__area-title`, `__intro`, `__topic`, `__topic-title`, `__related`,
+  `__related-title`, `__related-list`, `__link`, `__ask`.
 
 ## Privacy
 

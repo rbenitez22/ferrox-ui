@@ -347,4 +347,5 @@ All as recommended:
 4. No "ask anywhere": a `?` appears only where a topic is given.
 5. Field values are opt-in per component (`help_shares_value`), and never
    offered for passwords.
-6. The topic registry comes later.
+6. The topic registry comes later. **Done in 0.2.0:** `plans/help-guide.md`
+   (`ferrox-help-build`, `related`, `HelpTopics`, `HelpGuide`).

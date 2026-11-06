@@ -66,7 +66,7 @@ test.describe('the ?', () => {
     await expect(kinds.locator('th')).toHaveText(['Kind', 'Holds', 'Grows with']);
     await expect(kinds.locator('tbody tr')).toHaveCount(5);
     const guide = kinds.getByRole('link', { name: 'Full guide' });
-    await expect(guide).toHaveAttribute('href', '#account-kinds');
+    await expect(guide).toHaveAttribute('href', '/help-guide#account-kinds');
   });
 });
 
@@ -597,9 +597,9 @@ test.describe('related topics', () => {
   test('the guide link follows the topic shown', async ({ page }) => {
     await help(page, 'Statement balance').click();
     const popover = topic(page, 'Statement balance');
-    await expect(popover.getByRole('link', { name: 'Full guide' })).toHaveCount(0);
+    await expect(popover.getByRole('link', { name: 'Full guide' })).toHaveAttribute('href', '/help-guide#statement-balance');
     await popover.getByRole('button', { name: 'The five kinds of account' }).click();
-    await expect(topic(page, 'The five kinds of account').getByRole('link', { name: 'Full guide' })).toHaveAttribute('href', '#account-kinds');
+    await expect(topic(page, 'The five kinds of account').getByRole('link', { name: 'Full guide' })).toHaveAttribute('href', '/help-guide#account-kinds');
   });
 
   test('a topic with none shows no list', async ({ page }) => {

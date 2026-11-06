@@ -6,54 +6,14 @@
 //! viewport's edges for placement, and a section with a fake assistant that
 //! shows the request "Ask about this" sends.
 
-use std::sync::LazyLock;
-
-use ferrox_ui::{help_signals, provide_help_topics, HelpArea, HelpGuide, HelpTopics, 
+use ferrox_ui::{help_signals, provide_help_topics, HelpGuide, 
     Button, ButtonFamily, Checkbox, Combobox, ConfirmDialog, Dialog, DialogAction, Field, HelpAssistant, HelpButton, HelpKeys, HelpRequest, HelpReveal,
     HelpScope, HelpSignal, HelpSignals, HelpTopic, Input, PasswordInput, Sheet, SheetSide, Switch, Toolbar,
 };
 use leptos::prelude::*;
 
+use crate::help::{ACCOUNT_KINDS, SPLIT_AMOUNT, STATEMENT_BALANCE, TOPICS};
 use crate::section::Section;
-
-static STATEMENT_BALANCE: LazyLock<HelpTopic> = LazyLock::new(|| {
-    HelpTopic::new("statement-balance", "Statement balance")
-        .paragraph("The closing balance printed on the bank's statement for this period.")
-        .paragraph("Reconciling ticks off entries until the account agrees with it.")
-        .related(["split-amount", "account-kinds"])
-});
-
-static SPLIT_AMOUNT: LazyLock<HelpTopic> = LazyLock::new(|| {
-    HelpTopic::new("split-amount", "Amounts on a split")
-        .paragraph("Each line moves money into or out of one account.")
-        .list(["Positive: money comes in", "Negative: money goes out", "The lines of an entry add up to zero"])
-        .related(["account-kinds"])
-});
-
-static ACCOUNT_KINDS: LazyLock<HelpTopic> = LazyLock::new(|| {
-    HelpTopic::new("account-kinds", "The five kinds of account")
-        .table(
-            ["Kind", "Holds", "Grows with"],
-            [
-                ["Asset", "What you own", "Debits"],
-                ["Liability", "What you owe", "Credits"],
-                ["Equity", "What is left", "Credits"],
-                ["Income", "Money earned", "Credits"],
-                ["Expense", "Money spent", "Debits"],
-            ],
-        )
-        .guide("#account-kinds")
-});
-
-/// The registry: related links in the popovers resolve through it, and
-/// the guide page shows it.
-pub(crate) fn topics() -> HelpTopics {
-    HelpTopics::new([
-        HelpArea::new("Accounts", [STATEMENT_BALANCE.clone(), ACCOUNT_KINDS.clone()])
-            .intro("What an account is, and the kinds there are."),
-        HelpArea::new("Entries", [SPLIT_AMOUNT.clone()]),
-    ])
-}
 
 /// The full guide: every topic in the registry, inside an assistant whose
 /// requests the fake assistant shows.
@@ -69,7 +29,7 @@ pub fn HelpGuidePage() -> impl IntoView {
         <h1>"Help guide"</h1>
         <HelpAssistant on_ask=on_ask>
             <HelpScope context=[("screen", "help")]>
-                <HelpGuide topics=topics() />
+                <HelpGuide topics=TOPICS.clone() />
             </HelpScope>
         </HelpAssistant>
         <FakeAssistant asked=asked open=assistant_open />
@@ -78,7 +38,7 @@ pub fn HelpGuidePage() -> impl IntoView {
 
 #[component]
 pub fn HelpPage() -> impl IntoView {
-    provide_help_topics(topics());
+    provide_help_topics(TOPICS.clone());
     let log = RwSignal::new(Vec::<HelpSignal>::new());
     view! {
         <HelpSignals on_signal=move |signal: HelpSignal| log.update(|l| l.push(signal))>

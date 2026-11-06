@@ -33,7 +33,7 @@ call adds nothing.
 
 | Group | Feature | Contains |
 |---|---|---|
-| [`core`](docs/core.md) | always on | `Button`, `IconButton`, `Toolbar`, `ToolbarGroup`, `Spinner`, `LoadingOverlay`, `Alert`; help: `HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`, `HelpRequest` |
+| [`core`](docs/core.md) | always on | `Button`, `IconButton`, `Toolbar`, `ToolbarGroup`, `Spinner`, `LoadingOverlay`, `Alert`; help: `HelpTopic`, `HelpButton`, `HelpScope`, `HelpAssistant`, `HelpRequest`, `HelpTopics`, `HelpGuide` ([topics from Markdown](docs/help-markdown.md)) |
 | [`overlay`](docs/overlay.md) | `overlay` | `Dialog`, `DialogAction`, `ConfirmDialog`, `Sheet` |
 | [`forms`](docs/forms.md) | `forms` | `Field`, `Input`, `Textarea`, `PasswordInput`, `Checkbox`, `Switch`, `Select`, `Combobox` |
 | [`navigation`](docs/navigation.md) | `navigation` (turns on `overlay` and `layout`; brings leptos_router) | `AppShell`, `NavList`, `NavLink`, `NavGroup`, `SideMenu`, `SideMenuButton` |
@@ -82,8 +82,8 @@ tests: every group is built. `core` later gains
 Skeleton, Badge and a theme toggle. `overlay` later gains
 `TypeToConfirmDialog`, Toast, Popover and Tooltip, and the
 phone variants of Dialog (a bottom sheet, full screen) when an app needs them.
-Help later gains a topic registry (checked `related` links, a `/help` guide
-rendered from the same topics) and `help` on new components as they land.
+Help later gains search inside the guide and `help` on new components as
+they land.
 `forms` later gains Combobox groups and multi-select, and
 NumberInput, DateInput, Radio and the rest of the inventory when an app needs
 them. `navigation` later gains a persistent sidebar that folds to a rail of
