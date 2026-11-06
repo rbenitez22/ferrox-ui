@@ -3,6 +3,28 @@
 All crates in this repo share one version and are released together under
 one git tag.
 
+## 0.2.1 (2026-11-06)
+
+### Changed: Ask is a chat icon in a header that stays (`plans/help-ask-icon.md`)
+
+- `HelpButton`'s popover is a header (the title, then Ask) over a region
+  that alone scrolls (the topic, related topics, "Full guide"). Ask is in
+  view the moment it opens, however long the topic and however small the
+  screen.
+- Ask is an icon button (`MESSAGE_CIRCLE`), named by `ask_label` ("Ask about
+  this"), its tooltip naming the topic shown. The text button at the
+  popover's bottom is gone.
+- `HelpGuide`: the same icon at the end of each topic's title row
+  (`.help-guide__topic-header`), replacing the text button under it.
+- Classes: new `help-popover__header`, `help-popover__scroll`,
+  `help-guide__topic-header`; `help-popover__ask` and `help-guide__ask` are
+  icon buttons now. A theme that styled them as text buttons needs a look.
+
+### Added
+
+- ferrox-icons: `message-circle` (`MESSAGE_CIRCLE`), for asking an assistant.
+- The starter pins `tag = "v0.2.1"`; the agent kit is `0.2.1`.
+
 ## 0.2.0 (2026-11-06)
 
 ### Added: help from Markdown, the topic registry (`plans/help-guide.md`)

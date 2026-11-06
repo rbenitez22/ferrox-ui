@@ -3,7 +3,7 @@
 Any component with a label or a title can carry help. Give it a topic and a
 discreet `?` appears beside the label. It opens the topic in a popover: a
 short, structured explanation that works offline. Inside a `HelpAssistant`,
-the popover also offers **Ask about this**, which hands the app a
+the popover's header also carries a chat icon, **Ask about this**, which hands the app a
 `HelpRequest`: the topic, which component, its label, and the context the app
 declared around it. The app sends that to its chat, a model, or a memory
 store. ferrox-ui never calls a model.
@@ -123,6 +123,12 @@ view! {
   is open at a time, and Esc gives focus back to the `?`. It sits below the
   `?` (above when there's no room), stays inside the viewport, and follows
   the page as it scrolls.
+- **A header that stays.** The title, and inside a `HelpAssistant` the Ask
+  icon (`MESSAGE_CIRCLE`) at its end, stay in place; only the topic, its
+  related topics and "Full guide" scroll beneath them. Ask is in view the
+  moment the popover opens, on a phone too. The icon is named by
+  `ask_label` and its tooltip names the topic shown ("Ask about this:
+  Statement balance"); it closes the popover and sends the request.
 - Props: `topic`, `skip_tab`, `kind` / `about` / `value` (what a request says
   carries the `?`; components set these), `id` (for F1: see `HelpKeys`),
   `suggested_label` (`", suggested"`), `help_label` (`"Help"`),
@@ -130,7 +136,7 @@ view! {
   `related_label` (`"Related"`), `class`.
 - **Related topics.** With a registry provided (`provide_help_topics`), the
   popover lists the topic's related topics. Choosing one shows it in the
-  same popover with focus on its title; "Full guide" and "Ask about this"
+  same popover with focus on its title; "Full guide" and the Ask icon
   follow the topic shown, and a related topic's request carries its own
   title as the label and no value. Each opening starts again at the `?`'s
   own topic.
@@ -449,9 +455,10 @@ view! {
   hash change, scrolls the topic into view and focuses its title. Contents
   and related links move in place and update the hash; the router doesn't
   navigate.
-- Inside a `HelpAssistant`, each topic offers "Ask about this": a
-  `HelpRequest` with component `"guide"`, the topic's title as the label,
-  and the enclosing scopes' context.
+- Inside a `HelpAssistant`, each topic's title has the same Ask icon at its
+  end (named by `ask_label`, its tooltip naming the topic): a `HelpRequest`
+  with component `"guide"`, the topic's title as the label, and the
+  enclosing scopes' context.
 - Props: `topics` (the provided registry by default; with neither, the
   guide is empty), `contents_label` (`"Contents"`), `related_label`
   (`"Related"`), `ask_label` (`"Ask about this"`), `class`.
@@ -466,17 +473,20 @@ Use it to show a topic somewhere of the app's own.
 
 ## CSS classes
 
-- Popover: `.help-popover` with `__title`, `__body`, `__related`,
-  `__related-title`, `__related-list`, `__related-link`, `__actions`,
-  `__link`, `__ask`.
+- Popover: `.help-popover` with `__header` (the title and Ask, which stay),
+  `__scroll` (what scrolls), `__title`, `__body`, `__related`,
+  `__related-title`, `__related-list`, `__related-link`, `__actions` (now
+  only "Full guide"), `__link`, `__ask`. **Changed in 0.2.1:** `__ask` is an
+  icon button in the header, no longer a text button in `__actions`.
 - Blocks: `.help-blocks` (holds the gap) with `__paragraph`, `__list`,
   `__table`, `__heading`, `__cell`. **Changed in 0.2.0:** these were
   `help-popover__paragraph` and so on. A theme that styled the old names
   needs the new ones.
 - Guide: `.help-guide` with `__contents`, `__contents-title`,
   `__contents-area`, `__contents-list`, `__contents-topics`, `__area`,
-  `__area-title`, `__intro`, `__topic`, `__topic-title`, `__related`,
-  `__related-title`, `__related-list`, `__link`, `__ask`.
+  `__area-title`, `__intro`, `__topic`, `__topic-header` (the title and
+  Ask), `__topic-title`, `__related`, `__related-title`, `__related-list`,
+  `__link`, `__ask` (an icon button since 0.2.1).
 
 ## Privacy
 
