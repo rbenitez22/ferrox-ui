@@ -60,3 +60,24 @@ test('"Ask about this" sends the topic, from the guide, with the context around 
   await expect(page.locator('[data-request="label"]')).toHaveText('The five kinds of account');
   await expect(page.locator('[data-request="prompt"]')).toContainText('screen: help');
 });
+
+test('Ask is a chat icon beside each topic\'s title, its tooltip naming the topic', async ({ page }) => {
+  await openApp(page, '/help-guide');
+  for (const title of ['Statement balance', 'The five kinds of account', 'Amounts on a split']) {
+    const header = section(page, title).locator('.help-guide__topic-header');
+    const ask = header.getByRole('button', { name: 'Ask about this' });
+    await expect(ask).toHaveCount(1);
+    await expect(ask.locator('svg.icon')).toHaveAttribute('data-icon', 'message-circle');
+    await expect(ask).toHaveAttribute('title', `Ask about this: ${title}`);
+    const [heading, icon] = [await header.locator('.help-guide__topic-title').boundingBox(), await ask.boundingBox()];
+    expect(icon!.x).toBeGreaterThan(heading!.x);
+    expect(Math.abs(icon!.y - heading!.y)).toBeLessThan(heading!.height);
+  }
+});
+
+test('a topic has one Ask, in its header', async ({ page }) => {
+  await openApp(page, '/help-guide');
+  const topic = section(page, 'Statement balance');
+  await expect(topic.getByRole('button', { name: 'Ask about this' })).toHaveCount(1);
+  await expect(topic.locator(':scope > .help-guide__ask')).toHaveCount(0);
+});

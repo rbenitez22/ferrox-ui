@@ -1,6 +1,6 @@
 # Ask as a chat icon in the help header, and a header that stays
 
-Status: approved 2026-11-06 (open questions as recommended). Piece 1 done: `message-circle` (`MESSAGE_CIRCLE`) in ferrox-icons; 14 icon e2e pass. Piece 2 done: the header (title and Ask icon) stays while `.help-popover__scroll` scrolls; the text button is gone. 10 new e2e tests, and the 144 existing help, guide and smoke tests still pass in Chromium and Firefox. Next: piece 3.
+Status: approved 2026-11-06 (open questions as recommended). Piece 1 done: `message-circle` (`MESSAGE_CIRCLE`) in ferrox-icons; 14 icon e2e pass. Piece 2 done: the header (title and Ask icon) stays while `.help-popover__scroll` scrolls; the text button is gone. 10 new e2e tests, and the 144 existing help, guide and smoke tests still pass in Chromium and Firefox. Piece 3 done: each `HelpGuide` topic has the icon at the end of a `.help-guide__topic-header` row; 4 new e2e tests, 158 help, guide and smoke tests pass. Next: piece 4.
 
 The idea comes from testing Rusty Skillet's assistant (rusty-skillet `plans/help-assistant.md`).
 

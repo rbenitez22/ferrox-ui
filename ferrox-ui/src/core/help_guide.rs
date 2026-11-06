@@ -1,3 +1,4 @@
+use ferrox_icons::{Icon, MESSAGE_CIRCLE};
 use leptos::ev::hashchange;
 use leptos::prelude::*;
 use leptos::{component, view, IntoView};
@@ -122,7 +123,7 @@ fn area_view(
     }
 }
 
-/// One topic: title, blocks, related links, and "Ask about this".
+/// One topic: its title with the Ask icon beside it, blocks, related links.
 fn topic_view(
     topic: &HelpTopic,
     related: Vec<HelpTopic>,
@@ -143,22 +144,32 @@ fn topic_view(
     });
     let ask = ask.map(|(on_ask, context)| {
         let topic = topic.clone();
+        let title = topic.title().to_string();
         let send = move |_| {
             let request = HelpRequest::new(&topic, "guide", topic.title()).with_context(context.get_untracked());
             on_ask.run(request);
         };
+        // The popover's chat icon: named by `ask_label`, its tooltip naming the topic.
         view! {
-            <button type="button" class="btn btn--secondary btn--sm help-guide__ask" on:click=send>
-                {move || ask_label.get()}
+            <button
+                type="button"
+                class="icon-btn help-guide__ask"
+                aria-label=move || ask_label.get()
+                title=move || format!("{}: {title}", ask_label.get())
+                on:click=send
+            >
+                <Icon icon=MESSAGE_CIRCLE />
             </button>
         }
     });
     view! {
         <section class="help-guide__topic" id=topic.id().to_string() aria-labelledby=labelled_by>
-            <h3 class="help-guide__topic-title" id=heading_id tabindex="-1">{topic.title().to_string()}</h3>
+            <div class="help-guide__topic-header">
+                <h3 class="help-guide__topic-title" id=heading_id tabindex="-1">{topic.title().to_string()}</h3>
+                {ask}
+            </div>
             <HelpBlocks blocks=topic.blocks().to_vec() />
             {related}
-            {ask}
         </section>
     }
 }
