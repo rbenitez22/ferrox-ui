@@ -1,4 +1,4 @@
-use ferrox_icons::{Icon, HELP};
+use ferrox_icons::{Icon, HELP, MESSAGE_CIRCLE};
 use leptos::ev::{on, Custom};
 use leptos::html;
 use leptos::prelude::*;
@@ -172,25 +172,28 @@ pub fn HelpButton(
             };
             on_ask.run(request.with_context(scope_context_here.get_untracked()));
         };
+        // A chat icon in the header: named by `ask_label`, its tooltip
+        // names the topic shown. It stays in view while the topic scrolls.
         view! {
             <button
                 type="button"
-                class="btn btn--secondary btn--sm help-popover__ask"
+                class="icon-btn help-popover__ask"
+                aria-label=move || ask_label.get()
+                title=move || format!("{}: {}", ask_label.get(), shown.with(|t| t.title().to_string()))
                 popovertarget=closes
                 popovertargetaction="hide"
                 on:click=ask
             >
-                {move || ask_label.get()}
+                <Icon icon=MESSAGE_CIRCLE />
             </button>
         }
     });
-    let has_ask = ask.is_some();
     let guide = move || shown.get().guide_href().map(|href| view! {
         <a class="help-popover__link" href=href.to_string()>{move || guide_label.get()}</a>
     });
     let has_guide = move || shown.with(|t| t.guide_href().is_some());
     let actions = view! {
-        <div class="help-popover__actions" hidden=move || !has_ask && !has_guide()>{guide}{ask}</div>
+        <div class="help-popover__actions" hidden=move || !has_guide()>{guide}</div>
     };
 
     let popover = view! {
@@ -204,10 +207,16 @@ pub fn HelpButton(
             tabindex="-1"
             on:toggle=on_toggle
         >
-            <h3 class="help-popover__title" id=title_id node_ref=title_ref tabindex="-1">{move || shown.get().title().to_string()}</h3>
-            <div class="help-popover__body">{body}</div>
-            {related}
-            {actions}
+            // The header stays; only the topic scrolls under it.
+            <div class="help-popover__header">
+                <h3 class="help-popover__title" id=title_id node_ref=title_ref tabindex="-1">{move || shown.get().title().to_string()}</h3>
+                {ask}
+            </div>
+            <div class="help-popover__scroll">
+                <div class="help-popover__body">{body}</div>
+                {related}
+                {actions}
+            </div>
         </div>
     }
     // Not `on:beforetoggle`: Leptos takes it for a bubbling event and

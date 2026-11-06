@@ -1,6 +1,6 @@
 # Ask as a chat icon in the help header, and a header that stays
 
-Status: approved 2026-11-06 (open questions as recommended). Piece 1 done: `message-circle` (`MESSAGE_CIRCLE`) in ferrox-icons; 14 icon e2e pass. Next: piece 2.
+Status: approved 2026-11-06 (open questions as recommended). Piece 1 done: `message-circle` (`MESSAGE_CIRCLE`) in ferrox-icons; 14 icon e2e pass. Piece 2 done: the header (title and Ask icon) stays while `.help-popover__scroll` scrolls; the text button is gone. 10 new e2e tests, and the 144 existing help, guide and smoke tests still pass in Chromium and Firefox. Next: piece 3.
 
 The idea comes from testing Rusty Skillet's assistant (rusty-skillet `plans/help-assistant.md`).
 
@@ -41,7 +41,7 @@ The idea comes from testing Rusty Skillet's assistant (rusty-skillet `plans/help
   - Its accessible name is `ask_label`, which still defaults to `"Ask about this"`, so existing tests that find the button by role and name keep working.
   - Its tooltip (`title`) names the topic: `"Ask about this: {title}"`.
   - It still closes the popover (`popovertargetaction="hide"`) and sends the same `HelpRequest`.
-- **Focus** still moves to the title on open and on a related swap. The icon comes after the title in tab order.
+- **Focus** still goes to the popover on open (so a screen reader reads it) and to the title on a related swap. The icon is the first stop after that in tab order.
 - **`.help-popover__actions`** now holds only "Full guide", inside the scroll region. It is hidden when there's no guide link.
 - **CSS classes.**
   - New: `help-popover__header`, `help-popover__scroll`, `help-popover__ask` (now an icon button).
@@ -71,7 +71,7 @@ The idea comes from testing Rusty Skillet's assistant (rusty-skillet `plans/help
      - a phone-width viewport shows the icon without scrolling;
      - the icon's name and tooltip;
      - asking still sends the topic shown, including after a related swap;
-     - focus still starts on the title.
+     - focus still goes to the popover on open, and Tab reaches the icon.
    - Update the existing Ask tests to the new layout.
 3. **`HelpGuide`: the icon beside each topic's title.** e2e tests for it.
 4. **Docs and release.**

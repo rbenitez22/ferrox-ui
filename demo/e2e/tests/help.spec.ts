@@ -483,6 +483,74 @@ test.describe('asking an assistant', () => {
   });
 });
 
+test.describe('Ask in the header', () => {
+  const asking = (page: Page) => page.locator('section', { has: page.getByRole('heading', { name: 'Asking an assistant' }) });
+  const open = async (page: Page, title: string) => {
+    await asking(page).getByRole('button', { name: `Help: ${title}` }).click();
+    const popover = topic(page, title);
+    await expect(popover).toBeVisible();
+    return popover;
+  };
+  /** Makes the shown topic long enough to scroll. */
+  const lengthen = (popover: Locator) => popover.locator('.help-blocks').evaluate((blocks) => {
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('p');
+      p.className = 'help-blocks__paragraph';
+      p.textContent = `Filler line ${i}, long enough to wrap and make the topic scroll.`;
+      blocks.appendChild(p);
+    }
+  });
+
+  test('a chat icon beside the title, named Ask about this, its tooltip naming the topic', async ({ page }) => {
+    const popover = await open(page, 'Statement balance');
+    const ask = popover.locator('.help-popover__header').getByRole('button', { name: 'Ask about this' });
+    await expect(ask).toBeVisible();
+    await expect(ask.locator('svg.icon')).toHaveAttribute('data-icon', 'message-circle');
+    await expect(ask).toHaveAttribute('title', 'Ask about this: Statement balance');
+    const [title, icon] = [await box(popover.locator('.help-popover__title')), await box(ask)];
+    expect(icon.x).toBeGreaterThan(title.x);
+    expect(Math.abs(icon.y - title.y)).toBeLessThan(title.height);
+  });
+
+  test('there is no text button for asking any more', async ({ page }) => {
+    const popover = await open(page, 'Statement balance');
+    await expect(popover.getByRole('button', { name: 'Ask about this' })).toHaveCount(1);
+    await expect(popover.locator('.help-popover__actions .help-popover__ask')).toHaveCount(0);
+  });
+
+  test('focus still goes to the popover on open, and Ask comes after the title', async ({ page }) => {
+    const popover = await open(page, 'Statement balance');
+    await expect(popover).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(popover.getByRole('button', { name: 'Ask about this' })).toBeFocused();
+  });
+
+  test('a long topic scrolls under a header that stays, Ask still in view', async ({ page }) => {
+    const popover = await open(page, 'Statement balance');
+    await lengthen(popover);
+    const scroll = popover.locator('.help-popover__scroll');
+    const sizes = await scroll.evaluate((el) => ({ scroll: el.scrollHeight, client: el.clientHeight }));
+    expect(sizes.scroll).toBeGreaterThan(sizes.client);
+    const before = await box(popover.getByRole('button', { name: 'Ask about this' }));
+    await scroll.evaluate((el) => { el.scrollTop = el.scrollHeight; });
+    const after = await box(popover.getByRole('button', { name: 'Ask about this' }));
+    expect(after.y).toBe(before.y);
+    // Nothing is drawn outside the popover's box.
+    const outer = await box(popover);
+    const last = await box(popover.locator('.help-blocks__paragraph').last());
+    expect(last.y + last.height).toBeLessThanOrEqual(outer.y + outer.height + 1);
+  });
+
+  test('on a phone, Ask shows without scrolling, even for a long topic', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    const popover = await open(page, 'Statement balance');
+    await lengthen(popover);
+    const ask = popover.getByRole('button', { name: 'Ask about this' });
+    await expect(ask).toBeInViewport({ ratio: 1 });
+    await expect(popover.locator('.help-popover__title')).toBeInViewport();
+  });
+});
+
 test.describe('help on components', () => {
   const area = (page: Page) => page.locator('section', { has: page.getByRole('heading', { name: 'Help on components' }) });
   const q = (page: Page, title: string) => page.getByRole('button', { name: `Help: ${title}` });
