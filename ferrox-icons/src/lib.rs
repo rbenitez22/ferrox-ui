@@ -33,17 +33,13 @@ pub struct IconData {
 include!(concat!(env!("OUT_DIR"), "/icons.rs"));
 
 #[cfg(test)]
-#[path = "../build/mod.rs"]
-mod build_logic;
-
-#[cfg(test)]
 mod tests {
     use super::*;
 
     /// The stems of `icons/*.svg`, sorted.
     fn icon_files() -> Vec<String> {
         let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("icons");
-        build_logic::discover::svg_files(&dir).unwrap().iter()
+        ferrox_icons_build::discover::svg_files(&dir).unwrap().iter()
             .map(|p| p.file_stem().unwrap().to_string_lossy().into_owned())
             .collect()
     }

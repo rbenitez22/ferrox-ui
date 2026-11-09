@@ -1,0 +1,17 @@
+[package]
+name        = "ferrox-icons-build"
+description = "Build-script helper for ferrox-icons: checks icon SVG files and generates the IconData consts that draw them."
+version.workspace    = true
+edition.workspace    = true
+license.workspace    = true
+repository.workspace = true
+authors.workspace    = true
+# One copy per build: Cargo allows one package per `links` value, so an app
+# that pulls in two ferrox versions (a different tag, or the same tag through
+# another URL) fails to resolve, naming both, instead of checking icons by
+# two sets of rules. Not a native library.
+links = "ferrox-icons-build"
+
+# Std + an XML parser only: an app's build script never compiles Leptos.
+[dependencies]
+roxmltree = { workspace = true }

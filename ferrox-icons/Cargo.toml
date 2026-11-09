@@ -15,10 +15,11 @@ links = "ferrox-icons"
 [dependencies]
 leptos = { workspace = true }
 
-# build.rs checks every icons/*.svg and generates one const per icon. The
-# tests include the same logic (build/), so they need the parser too.
+# build.rs checks every icons/*.svg (ferrox-icons-build: the same rules app
+# icons follow) and generates one const per icon. The tests list the files
+# the same way.
 [build-dependencies]
-roxmltree = { workspace = true }
+ferrox-icons-build = { path = "../ferrox-icons-build" }
 
 [dev-dependencies]
-roxmltree = { workspace = true }
+ferrox-icons-build = { path = "../ferrox-icons-build" }

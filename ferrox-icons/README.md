@@ -82,8 +82,9 @@ Add icons with the component that first needs them, not ahead of time.
 3. Add a row to the icons table above. The demo's `/icons` gallery and its
    e2e tests pick the new icon up from `ALL` by themselves.
 
-The build script checks every file and fails the build with the file name
-and the rule broken:
+The build script checks every file (the rules live in
+[`ferrox-icons-build`](../ferrox-icons-build), which app icons will use too)
+and fails the build with the file name and the rule broken:
 
 - The root is `<svg>` with `viewBox="0 0 24 24"`, `fill="none"`,
   `stroke="currentColor"`, `stroke-width="2"`, and round line caps and joins.
@@ -116,9 +117,10 @@ every icon, so using it keeps them all; it is for galleries and tests.
 
 ## Testing
 
-- `cargo test -p ferrox-icons`: the build script's rules (each rejection),
-  naming, `SOURCES`, the generated markup, and checks that `ALL` matches
-  `icons/*.svg` and no two icons draw the same.
+- `cargo test -p ferrox-icons-build`: the rules (each rejection), naming,
+  `SOURCES`, the generated markup.
+- `cargo test -p ferrox-icons`: `ALL` matches `icons/*.svg` and no two icons
+  draw the same.
 - The demo's `/icons` page shows every icon. `demo/e2e/tests/icons.spec.ts`
   checks in Chromium and Firefox that each icon draws in the SVG namespace, is
   decorative and 1em, strokes in the text colour in every theme, and swaps
