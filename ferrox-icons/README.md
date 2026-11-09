@@ -51,16 +51,17 @@ width="1em" height="1em" aria-hidden="true" focusable="false">`:
 
 | Const | Lucide | | Const | Lucide |
 |---|---|---|---|---|
-| `BAN` | `ban` | | `INFO` | `info` |
-| `CAMERA` | `camera` | | `LAYOUT_GRID` | `layout-grid` |
-| `CHECK` | `check` | | `LIST` | `list` |
-| `CHEVRON_DOWN` | `chevron-down` | | `LOCK` | `lock` |
-| `CHEVRON_LEFT` | `chevron-left` | | `MENU` | `menu` |
-| `CHEVRON_RIGHT` | `chevron-right` | | `MESSAGE_CIRCLE` | `message-circle` |
-| `CLOSE` | `x` | | `MORE_VERTICAL` | `ellipsis-vertical` |
-| `DELETE` | `trash` | | `PLUS` | `plus` |
-| `EDIT` | `pencil` | | `REFRESH` | `refresh-cw` |
-| `ERROR` | `circle-alert` | | `SEARCH` | `search` |
+| `ARROW_UP` | `arrow-up` | | `INFO` | `info` |
+| `BAN` | `ban` | | `LAYOUT_GRID` | `layout-grid` |
+| `CAMERA` | `camera` | | `LIST` | `list` |
+| `CHECK` | `check` | | `LOCK` | `lock` |
+| `CHEVRON_DOWN` | `chevron-down` | | `MENU` | `menu` |
+| `CHEVRON_LEFT` | `chevron-left` | | `MESSAGE_CIRCLE` | `message-circle` |
+| `CHEVRON_RIGHT` | `chevron-right` | | `MORE_VERTICAL` | `ellipsis-vertical` |
+| `CLOSE` | `x` | | `PLUS` | `plus` |
+| `DELETE` | `trash` | | `REFRESH` | `refresh-cw` |
+| `EDIT` | `pencil` | | `SEARCH` | `search` |
+| `ERROR` | `circle-alert` | | `STAR` | `star` |
 | `EYE` | `eye` | | `SUCCESS` | `circle-check` |
 | `EYE_OFF` | `eye-off` | | `TAGS` | `tags` |
 | `GALLERY_HORIZONTAL` | `gallery-horizontal` | | `UNLOCK` | `lock-open` |
