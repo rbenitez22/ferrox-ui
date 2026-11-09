@@ -15,19 +15,36 @@
 //! They are decorative (`aria-hidden`): the control around one carries the
 //! label. The drawings are Lucide's (ISC licence, `icons/LICENSE-lucide`).
 
+// `icon!` expands to `::ferrox_icons::…`; this makes that path work inside
+// this crate too (its tests).
+extern crate self as ferrox_icons;
+
 mod icon;
 
 pub use icon::{icon_classes, Icon};
+/// An app icon from the app's own SVG, checked at compile time by the same
+/// rules as the icons here: `icon!("icons/pin.svg")` (a file, from the crate
+/// root; named by its stem) or `icon!(name = "spark", "<svg …>")`.
+pub use ferrox_macros::icon;
 
 /// One icon: its name (the file stem, e.g. `"chevron-down"`) and its drawing
-/// (the SVG's children, on a 24×24 grid). Only this crate makes these, from
-/// files its build script has checked, so the drawing is safe to set as
-/// markup.
+/// (the SVG's children, on a 24×24 grid). Only this crate's build script and
+/// [`icon!`] make these, from checked markup, so the drawing is safe to set
+/// as markup.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 #[non_exhaustive]
 pub struct IconData {
     pub name: &'static str,
     pub body: &'static str,
+}
+
+impl IconData {
+    /// Only for [`icon!`]'s expansion, which has checked `body`. Not an API:
+    /// calling it with unchecked markup defeats the safety above.
+    #[doc(hidden)]
+    pub const fn __checked(name: &'static str, body: &'static str) -> Self {
+        IconData { name, body }
+    }
 }
 
 include!(concat!(env!("OUT_DIR"), "/icons.rs"));
@@ -57,6 +74,20 @@ mod tests {
                 assert_ne!(a.body, b.body, "{} and {} draw the same", a.name, b.name);
             }
         }
+    }
+
+    const FILE_ICON: IconData = icon!("icons/close.svg");
+    const INLINE_ICON: IconData = icon!(name = "dash", r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>"#);
+
+    #[test]
+    fn icon_macro_from_a_file_matches_the_built_in() {
+        assert_eq!(FILE_ICON, CLOSE);
+    }
+
+    #[test]
+    fn icon_macro_inline() {
+        assert_eq!(INLINE_ICON.name, "dash");
+        assert_eq!(INLINE_ICON.body, r#"<path d="M5 12h14"/>"#);
     }
 
     #[test]

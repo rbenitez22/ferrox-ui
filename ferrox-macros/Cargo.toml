@@ -1,0 +1,23 @@
+[package]
+name        = "ferrox-macros"
+description = "Procedural macros for ferrox-ui crates, each behind its own feature: icon! (app icons, checked at compile time)."
+version.workspace    = true
+edition.workspace    = true
+license.workspace    = true
+repository.workspace = true
+authors.workspace    = true
+
+[lib]
+proc-macro = true
+
+# One feature per macro family, so a crate compiles only the macros (and
+# their checkers) it uses. Apps reach each macro through the crate it serves
+# (`ferrox_icons::icon!`), not by depending on this crate.
+[features]
+icons = ["dep:ferrox-icons-build"]
+
+[dependencies]
+proc-macro2 = "1"
+quote       = "1"
+syn         = "2"
+ferrox-icons-build = { path = "../ferrox-icons-build", optional = true }

@@ -14,6 +14,8 @@ links = "ferrox-icons"
 
 [dependencies]
 leptos = { workspace = true }
+# icon!, re-exported: an app's own icons, checked at compile time.
+ferrox-macros = { path = "../ferrox-macros", features = ["icons"] }
 
 # build.rs checks every icons/*.svg (ferrox-icons-build: the same rules app
 # icons follow) and generates one const per icon. The tests list the files

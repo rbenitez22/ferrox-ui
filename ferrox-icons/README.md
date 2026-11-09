@@ -42,7 +42,8 @@ width="1em" height="1em" aria-hidden="true" focusable="false">`:
 | Item | What it is |
 |---|---|
 | `Icon` | The component: `icon` (required: `IconData`, a closure, or a signal), `class` (optional, may be reactive). |
-| `IconData` | One icon: `name` (the file stem, e.g. `"chevron-down"`) and `body` (the SVG's children). `#[non_exhaustive]`: only this crate makes them. |
+| `IconData` | One icon: `name` (the file stem, e.g. `"chevron-down"`) and `body` (the SVG's children). `#[non_exhaustive]`: only this crate's build and `icon!` make them, from checked markup. |
+| `icon!` | An app's own icon, checked at compile time (see "App icons"). |
 | `icon_classes(extra)` | The class list `Icon` sets: `"icon"` or `"icon {extra}"`. |
 | `ALL` | Every icon, sorted by name, for galleries and tests. It keeps every icon in the build, so apps name the icons they use instead. |
 
@@ -67,6 +68,38 @@ width="1em" height="1em" aria-hidden="true" focusable="false">`:
 
 `INFO`, `SUCCESS`, `WARNING` and `ERROR` are the severity marks (ferrox-ui's
 `Alert` draws them).
+
+## App icons
+
+An app's own icons are part of the app's code, not of ferrox: define each as
+a const with `icon!`, from an SVG file in the app or from inline markup, and
+use it like any icon here.
+
+```rust
+// src/icons.rs in the app
+use ferrox_icons::{icon, IconData};
+
+// A file, relative to the app crate's root (its Cargo.toml folder),
+// named by its stem ("pin"). Editing the file rebuilds the crate.
+pub const PIN: IconData = icon!("icons/pin.svg");
+
+// Inline markup, with its name.
+pub const SPARK: IconData = icon!(name = "spark", r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="…"/></svg>"#);
+
+view! { <IconButton title="Pin" on_click=…><Icon icon=PIN/></IconButton> }
+```
+
+The drawing must follow the rules below (the same as ferrox's own icons;
+Lucide's SVGs pass unchanged). A drawing that breaks one is a compile error
+on the `icon!` call, naming the rule:
+
+```text
+error: icons/pin.svg: <path fill="red">: only none or currentColor
+```
+
+A name may repeat one of ferrox's (`CLOSE`): the app's const lives in the
+app's module. There is no unchecked way to make an `IconData`, so every
+drawing `Icon` sets as markup has passed the rules.
 
 ## Adding an icon
 
@@ -111,16 +144,18 @@ every icon, so using it keeps them all; it is for galleries and tests.
 - Sizing works without any CSS (the `1em` attributes). ferrox-ui's `.icon`
   class (`style/core/icon.css`) adds `display: block` and
   `pointer-events: none` for icons inside buttons.
-- Apps can't make their own `IconData` (`#[non_exhaustive]`, so every drawing
-  is one this crate checked). Until app icons arrive, an app draws its own
-  `<svg class="icon" …>`.
+- `IconData` is `#[non_exhaustive]`: an app makes its own with `icon!` only,
+  so every drawing is checked markup.
 
 ## Testing
 
 - `cargo test -p ferrox-icons-build`: the rules (each rejection), naming,
   `SOURCES`, the generated markup.
-- `cargo test -p ferrox-icons`: `ALL` matches `icons/*.svg` and no two icons
-  draw the same.
+- `cargo test -p ferrox-macros --all-features`: `icon!`'s parsing, errors and
+  expansion.
+- `cargo test -p ferrox-icons`: `ALL` matches `icons/*.svg`, no two icons
+  draw the same, and `icon!` (a file, inline markup) gives the same
+  `IconData` as the build.
 - The demo's `/icons` page shows every icon. `demo/e2e/tests/icons.spec.ts`
   checks in Chromium and Firefox that each icon draws in the SVG namespace, is
   decorative and 1em, strokes in the text colour in every theme, and swaps
@@ -129,8 +164,7 @@ every icon, so using it keeps them all; it is for galleries and tests.
 ## Planned
 
 - More icons as components need them (see "Adding an icon").
-- App-supplied icons through the same checks (a `ferrox-icons-build`, like
-  the themes), when an app asks.
+- A solid (filled) icon style, for ferrox's icons and app icons.
 
 ## Licence
 
