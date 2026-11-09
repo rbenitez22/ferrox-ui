@@ -2,14 +2,14 @@
 resolver = "3"
 # Crates are added as they move in from webapp-lib (plans/ferrox-ui.md):
 # ferrox-theme-build, ferrox-theme, demo, ferrox-ui, ferrox-icons.
-members = ["ferrox-theme-build", "ferrox-help-build", "ferrox-theme", "ferrox-ui", "ferrox-icons", "ferrox-icons-build", "ferrox-macros", "demo"]
+members = ["ferrox-theme-build", "ferrox-help-build", "ferrox-theme", "ferrox-ui", "ferrox-icons", "ferrox-icons-build", "ferrox-macros", "ferrox-traits", "demo"]
 # The starter is an app to copy, not a member: it has its own lockfile and
 # depends on ferrox-ui by git, as a copied app does.
 exclude = ["starter"]
 
 # One version for every crate in this repo; one git tag releases them all.
 [workspace.package]
-version      = "0.2.1"
+version      = "0.2.2"
 edition      = "2024"
 license      = "MIT OR Apache-2.0"
 repository   = "https://github.com/rbenitez22/ferrox-ui"

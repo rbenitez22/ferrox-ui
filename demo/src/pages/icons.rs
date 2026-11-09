@@ -1,7 +1,8 @@
-//! Every icon in ferrox-icons (`ALL`), icons at several font sizes, and one
-//! icon chosen at runtime, so a theme or a new icon can be checked at once.
+//! Every icon in ferrox-icons (`ALL`), the app's own icons (`icon!`), icons
+//! at several font sizes, and one icon chosen at runtime, so a theme or a new
+//! icon can be checked at once.
 
-use ferrox_icons::{Icon, ALL, CHEVRON_DOWN, CHEVRON_RIGHT, SEARCH};
+use ferrox_icons::{icon, Icon, IconData, ALL, CHEVRON_DOWN, CHEVRON_RIGHT, SEARCH};
 use ferrox_ui::Button;
 use leptos::prelude::*;
 
@@ -11,6 +12,7 @@ use crate::section::Section;
 pub fn IconsPage() -> impl IntoView {
     view! {
         <Gallery />
+        <AppIcons />
         <Sizes />
         <ChosenAtRuntime />
     }
@@ -27,6 +29,28 @@ fn Gallery() -> impl IntoView {
                         <code>{icon.name}</code>
                     </li>
                 }).collect_view()}
+            </ul>
+        </Section>
+    }
+}
+
+/// A file in the demo crate (`demo/icons/pin.svg`, Lucide's `pin`).
+const PIN: IconData = icon!("icons/pin.svg");
+/// Inline markup.
+const DASH: IconData = icon!(name = "dash", r#"<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>"#);
+
+/// Icons the app defines itself with `icon!`, drawn like ferrox's.
+#[component]
+fn AppIcons() -> impl IntoView {
+    view! {
+        <Section title="App icons">
+            <ul class="demo-icons">
+                {[PIN, DASH].map(|icon| view! {
+                    <li class="demo-icon">
+                        <Icon icon=icon />
+                        <code>{icon.name}</code>
+                    </li>
+                })}
             </ul>
         </Section>
     }

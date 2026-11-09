@@ -63,6 +63,31 @@ test.describe('gallery', () => {
   });
 });
 
+test.describe('app icons (icon!)', () => {
+  const appIcons = (page: Page) => section(page, 'App icons').locator('svg.icon');
+
+  test('a file icon and an inline icon draw like ferrox icons', async ({ page }) => {
+    await expect(appIcons(page)).toHaveCount(2);
+    expect(await appIcons(page).evaluateAll((svgs) => svgs.map((s) => s.getAttribute('data-icon')))).toEqual(['pin', 'dash']);
+    const reference = await galleryIcons(page).first().evaluate((svg) => {
+      const s = getComputedStyle(svg);
+      return { display: s.display, stroke: s.stroke, width: svg.getBoundingClientRect().width };
+    });
+    for (const icon of await appIcons(page).all()) {
+      const name = await icon.getAttribute('data-icon');
+      await expect(icon).toHaveAttribute('aria-hidden', 'true');
+      const children = await icon.evaluate((svg) => Array.from(svg.children).map((c) => c.namespaceURI));
+      expect(children.length, name!).toBeGreaterThan(0);
+      expect(children.every((ns) => ns === SVG_NS), name!).toBe(true);
+      const look = await icon.evaluate((svg) => {
+        const s = getComputedStyle(svg);
+        return { display: s.display, stroke: s.stroke, width: svg.getBoundingClientRect().width };
+      });
+      expect(look, name!).toEqual(reference);
+    }
+  });
+});
+
 test('size follows the font: 1em at 16, 24 and 32px', async ({ page }) => {
   const icons = section(page, 'Size follows the font').locator('svg.icon');
   await expect(icons).toHaveCount(3);

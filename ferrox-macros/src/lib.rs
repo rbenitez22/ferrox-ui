@@ -5,7 +5,10 @@
 //! | Feature | Macro | Re-exported as |
 //! |---|---|---|
 //! | `icons` | [`icon!`](macro@icon) | `ferrox_icons::icon!` |
+//! | `traits` | `#[derive(HasId, HasName, HasParentId)]` | `ferrox_traits::{HasId, HasName, HasParentId}` |
 
+#[cfg(feature = "traits")]
+mod has;
 #[cfg(feature = "icons")]
 mod icon;
 
@@ -28,4 +31,30 @@ mod icon;
 #[proc_macro]
 pub fn icon(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     icon::expand(input.into()).unwrap_or_else(syn::Error::into_compile_error).into()
+}
+
+/// `impl HasId for T`: `get_id()` returns a clone of the field `id`, or the
+/// one named by `#[has_id(field = "…")]`. The trait must be in scope (it is,
+/// when the derive is imported from `ferrox_traits` or a re-export).
+#[cfg(feature = "traits")]
+#[proc_macro_derive(HasId, attributes(has_id))]
+pub fn derive_has_id(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    has::expand(&has::HAS_ID, input.into()).unwrap_or_else(syn::Error::into_compile_error).into()
+}
+
+/// `impl HasName for T`: `get_name()` returns a clone of the field `name`, or
+/// the one named by `#[has_name(field = "…")]`.
+#[cfg(feature = "traits")]
+#[proc_macro_derive(HasName, attributes(has_name))]
+pub fn derive_has_name(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    has::expand(&has::HAS_NAME, input.into()).unwrap_or_else(syn::Error::into_compile_error).into()
+}
+
+/// `impl HasParentId for T`: `get_parent_id()` returns a clone of the field
+/// `parent_id` (an `Option<String>`), or the one named by
+/// `#[has_parent_id(field = "…")]`.
+#[cfg(feature = "traits")]
+#[proc_macro_derive(HasParentId, attributes(has_parent_id))]
+pub fn derive_has_parent_id(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    has::expand(&has::HAS_PARENT_ID, input.into()).unwrap_or_else(syn::Error::into_compile_error).into()
 }

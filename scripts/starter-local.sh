@@ -14,8 +14,8 @@ copy="$root/target/starter-local"
 
 mkdir -p "$copy"
 # Fresh sources each time; the copy's own build output stays, for speed.
-rm -rf "$copy/src" "$copy/Cargo.toml" "$copy/Cargo.lock"
-cp -r "$root/starter/src" "$root/starter/build.rs" "$root/starter/Trunk.toml" "$root/starter/index.html" "$root/starter/Cargo.toml" "$copy/"
+rm -rf "$copy/src" "$copy/icons" "$copy/Cargo.toml" "$copy/Cargo.lock"
+cp -r "$root/starter/src" "$root/starter/icons" "$root/starter/build.rs" "$root/starter/Trunk.toml" "$root/starter/index.html" "$root/starter/Cargo.toml" "$copy/"
 
 # `ferrox-x = { git = "…ferrox-ui", tag = "…", …` → `ferrox-x = { path = "<root>/ferrox-x", …`
 for crate in ferrox-ui ferrox-theme ferrox-icons ferrox-theme-build; do

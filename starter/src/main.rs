@@ -2,6 +2,7 @@
 //! mount.
 
 mod app;
+mod icons;
 
 fn main() {
     ferrox_theme::init();

@@ -13,6 +13,7 @@ generic	../../starter/README.md	.ferrox/starter/README.md	copy
 generic	../../starter/Trunk.toml	.ferrox/starter/Trunk.toml	copy
 generic	../../starter/build.rs	.ferrox/starter/build.rs	copy
 generic	../../starter/index.html	.ferrox/starter/index.html	copy
+generic	../../starter/icons	.ferrox/starter/icons	copy
 generic	../../starter/src	.ferrox/starter/src	copy
 claude	adapters/claude/skill.md	.claude/skills/ferrox-{{ID}}/SKILL.md	each:task
 claude	adapters/claude/command.md	.claude/commands/ferrox-{{ID}}.md	each:task

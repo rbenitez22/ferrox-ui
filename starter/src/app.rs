@@ -16,6 +16,8 @@ use leptos::prelude::*;
 use leptos_router::components::{Route, Router, Routes};
 use leptos_router::path;
 
+use crate::icons;
+
 /// The app's name: the bar, the side menu, the tab's title.
 const APP_NAME: &str = "Starter";
 
@@ -134,6 +136,7 @@ fn ItemsPage() -> impl IntoView {
                 loading=loading
                 loading_label="Loading items…"
                 empty_view=move || view! {
+                    <Icon icon=icons::EMPTY />
                     <p>"No items yet."</p>
                     <Button on_click=move || open_add()>"Add an item"</Button>
                 }

@@ -71,6 +71,7 @@ a `Panel` (`heading_level=HeadingLevel::H1`), and a list of records is a
 |---|---|
 | an action with words (Save, Delete) | `Button`: `family` says what it does (`Primary` for the screen's main action, `Secondary`, `Cancel`, `Danger`); `saving` while it works |
 | an action shown only as an icon (a row's, a toolbar's) | `IconButton`, named by its `label` |
+| an icon ferrox-icons doesn't have | the app's own SVG as a const: `pub const PIN: IconData = ferrox_icons::icon!("icons/pin.svg");` (checked at compile time; never a hand-written `<svg>`) |
 | a bar of buttons, grouped, with an optional title | `Toolbar` with `ToolbarGroup`s |
 | a region whose data is on its way | `Spinner` (`SpinnerKind::Region`); a button's own work: its `saving` |
 | nothing on screen is valid yet (boot, signing in) | `LoadingOverlay` |

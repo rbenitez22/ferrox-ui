@@ -12,6 +12,7 @@ new ones don't each need a crate.
 | Feature | Macro | Re-exported as | Docs |
 |---|---|---|---|
 | `icons` | `icon!` | `ferrox_icons::icon!` | [ferrox-icons, "App icons"](../ferrox-icons/README.md#app-icons) |
+| `traits` | `#[derive(HasId, HasName, HasParentId)]` | `ferrox_traits::{HasId, …}` | [ferrox-traits](../ferrox-traits/README.md) |
 
 ### `icon!` (feature `icons`)
 
@@ -32,6 +33,15 @@ pub const SPARK: IconData = icon!(name = "spark", r#"<svg …>…</svg>"#);  // 
 - Expands to `::ferrox_icons::IconData::__checked(name, body)`: the caller
   must depend on `ferrox-icons` under that name.
 
+### `HasId`, `HasName`, `HasParentId` derives (feature `traits`)
+
+Each writes `impl <Trait> for T` returning a clone of one field: `id`,
+`name`, `parent_id` by default, or the one named by
+`#[has_id(field = "…")]` (`has_name`, `has_parent_id`). The trait is named
+unqualified, so it must be in scope; importing the derive from
+`ferrox_traits` (or a re-export) brings it. Generics and `where` clauses are
+carried; an unknown attribute key is a compile error.
+
 ## Adding a macro family
 
 1. A module in `src/` behind a new feature, with an `expand(TokenStream) ->
@@ -46,13 +56,10 @@ pub const SPARK: IconData = icon!(name = "spark", r#"<svg …>…</svg>"#);  // 
 ## Requirements
 
 - `syn` 2, `quote`, `proc-macro2`; `ferrox-icons-build` with `icons`.
+- Generated code: `icon!` names `::ferrox_icons` (the caller depends on
+  it); the derives name their trait unqualified (in scope at the caller).
 - At the same ferrox tag as the app's other ferrox crates (it comes in
   through them).
-
-## Planned
-
-- Derives for general traits (e.g. `HasId`, `HasName`), if they move into
-  ferrox (see patina `plans/web-to-ferrox.md`, "Afterwards").
 
 ## Testing
 

@@ -3,6 +3,38 @@
 All crates in this repo share one version and are released together under
 one git tag.
 
+## 0.2.2 (2026-11-09)
+
+### Added: app icons (`icon!`)
+
+- `ferrox_icons::icon!`: an app defines its own icon as a const, from an SVG
+  file in the app (`icon!("icons/pin.svg")`, named by its stem, relative to
+  the crate root) or inline markup (`icon!(name = "spark", "<svg …>")`). It
+  is checked at compile time by the same rules as ferrox's icons; a broken
+  drawing is a compile error naming the rule. The icons are the app's code,
+  not part of ferrox. There is still no unchecked way to make an `IconData`.
+- `ferrox-icons-build`, a new std crate: the icon rules and code generation,
+  moved out of ferrox-icons' build script (whose output is unchanged).
+  `check_file`, `check_markup`.
+- `ferrox-macros`, a new proc-macro crate for all ferrox macros, one feature
+  per family, each re-exported by the crate it serves (`icons` → `icon!`).
+- ferrox-icons: `arrow-up` (`ARROW_UP`) and `star` (`STAR`).
+
+### Added: `ferrox-traits` moves in
+
+- `ferrox-traits`, a new std-only crate: `HasId`, `HasName`, `HasParentId`,
+  as in the old `ferrox-traits` repo, with their derives re-exported
+  (feature `derive`, default on). The derives move from the old
+  `ferrox-webapp-macros` repo into `ferrox-macros` (feature `traits`): same
+  attributes (`#[has_id(field = "…")]`, …), now carrying generics and failing
+  on an unknown attribute key instead of ignoring it. `FormModel` is not
+  carried over (unused). One copy per build (`links`). The two old repos can
+  be archived once nothing depends on them.
+- The starter defines one app icon (`src/icons.rs`, `EMPTY`, in the empty
+  list); the demo's `/icons` page has an "App icons" section; `choosing.md`
+  and the agent kit point to `icon!` for an icon ferrox doesn't have.
+- The starter pins `tag = "v0.2.2"`; the agent kit is `0.2.2`.
+
 ## 0.2.1 (2026-11-06)
 
 ### Changed: Ask is a chat icon in a header that stays (`plans/help-ask-icon.md`)

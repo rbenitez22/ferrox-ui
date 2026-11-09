@@ -19,6 +19,7 @@ Rename it: `name` in `Cargo.toml`, `<title>` in `index.html`, `APP_NAME` in
 | `index.html` | inlines the pre-paint script, links the stylesheet and fonts, puts the page in the theme (`class="ferrox-app"` on `<body>`), shows a loading screen until the app mounts |
 | `Trunk.toml` | runs the build script before Trunk reads `index.html`, so a clean checkout builds |
 | `src/main.rs` | `ferrox_theme::init()` and `ferrox_ui::init()`, then mount |
+| `src/icons.rs`, `icons/` | the app's own icons (`ferrox_icons::icon!`, checked at compile time): one, `EMPTY`, for the empty list |
 | `src/app.rs` | the frame (`AppShell`, the router, the side menu's links) and one `Page`: `Card`s in a `DataView`, each with a `Menu` (rename, delete), an add `Dialog`, a `ConfirmDialog`, loading and empty states |
 
 Everything on the page comes from ferrox-ui and its theme: the app has no

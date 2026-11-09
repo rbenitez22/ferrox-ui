@@ -22,6 +22,6 @@ view! {
 | `pressed` | makes it a switch (`aria-pressed`); on reads as tinted |
 | `danger` | for a destructive action: drawn in the danger colour, tinted on hover |
 | `disabled`, `on_click`, `class` | |
-| children | the icon: ferrox-icons' `Icon`, or any `<svg class="icon">` |
+| children | the icon: ferrox-icons' `Icon`, drawing a ferrox icon or the app's own (`icon!`) |
 
 `icon_button_classes(danger, extra)` returns the class list.

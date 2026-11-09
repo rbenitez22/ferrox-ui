@@ -64,6 +64,11 @@ test('deletes after a confirmation naming the item; then the empty view', async 
     await expect(confirm).toBeHidden();
   }
   await expect(page.getByText('No items yet.')).toBeVisible();
+  // The app's own icon (starter/src/icons.rs, icon!), drawn like a ferrox one.
+  const empty = page.locator('svg.icon[data-icon="empty"]');
+  await expect(empty).toBeVisible();
+  await expect(empty).toHaveAttribute('aria-hidden', 'true');
+  expect(await empty.evaluate((svg) => svg.children.length)).toBeGreaterThan(0);
   await page.getByRole('button', { name: 'Add an item' }).click();
   await expect(page.getByRole('dialog', { name: 'Add item' })).toBeVisible();
 });

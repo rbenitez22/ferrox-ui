@@ -1,0 +1,20 @@
+[package]
+name        = "ferrox-traits"
+description = "Small shared traits for records (HasId, HasName, HasParentId), with their derives. Std only: usable by servers and WASM apps alike."
+version.workspace    = true
+edition.workspace    = true
+license.workspace    = true
+repository.workspace = true
+authors.workspace    = true
+# One copy per build: two copies of a trait don't mix (a type implementing
+# one copy's HasId doesn't implement the other's), so a second ferrox version
+# fails to resolve, naming both. Not a native library.
+links = "ferrox-traits"
+
+[features]
+default = ["derive"]
+# #[derive(HasId, HasName, HasParentId)], re-exported beside the traits.
+derive = ["dep:ferrox-macros"]
+
+[dependencies]
+ferrox-macros = { path = "../ferrox-macros", features = ["traits"], optional = true }
